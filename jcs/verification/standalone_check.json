@@ -1,0 +1,62 @@
+{
+  "scope": "Standalone normalized endpoint payoff and joint-welfare workflow",
+  "standalone_copy_outside_repository": true,
+  "separate_virtual_environment": true,
+  "conference_package_absent": true,
+  "mesa_absent": true,
+  "standalone_tests_passed": 91,
+  "wheel_build_and_normal_install_verified": true,
+  "smoke_grid": [
+    4,
+    5
+  ],
+  "smoke_agents": 6,
+  "steps_per_smoke_realization": 12,
+  "smoke_model_steps": 2916,
+  "workflow_stages": {
+    "characterize": "complete",
+    "train": "complete",
+    "validate": "complete",
+    "test": "complete",
+    "robustness": "complete"
+  },
+  "characterization_before_search": true,
+  "stock_and_delivery_persistence_tests": true,
+  "exact_archived_trajectory_replay": true,
+  "source_and_agent_flow_replay": true,
+  "rescoring_without_simulations": true,
+  "release_archive_export_and_extracted_bundle_verification": true,
+  "artifact_files_verified": 119,
+  "environment": {
+    "python": "3.12.14",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "dependencies": {
+      "numpy": "2.3.1",
+      "scipy": "1.15.3",
+      "matplotlib": "3.10.3"
+    },
+    "rng": "sha256-indexed-PCG64-v1"
+  },
+  "smoke_run_id": "352d57dd5166a2506fa689f7",
+  "source_sha256": {
+    "pyproject.toml": "0668c3d9458a29af814d4050901a0f3612e9467f796ca999b07fa432840ffaf2",
+    "reproduce.py": "8008c4ba0a4387f20c40eb7a8555584d602a5aab3ce6796ebb1da39597c2fc09",
+    "requirements.txt": "4eeccebb5e51b04a9061be657d4856545fbff46785cd4a036cc1aa7c1f7f7bf6",
+    "src/watertoc_jcs/__init__.py": "380deaa6130e41f64a0839324ce10e0bac8a180a3144c7735ba5204620243b1a",
+    "src/watertoc_jcs/__main__.py": "cf7390a2508a0fcad4777a4a629fc5212ab655cb45845975995f835676a834e3",
+    "src/watertoc_jcs/analysis.py": "cc216c8ed0546cf9906abbc948a396ab6f62fdfa508c3e003473edfd4c49505d",
+    "src/watertoc_jcs/capacity.py": "2355a91b07d2053027398e93e95b744a04c2eb8fe55964eeefd3c86f8233b90f",
+    "src/watertoc_jcs/cli.py": "610a1433e16f5efa5197913e4b2d62fb43140e9e93c7e5ecaa8bd0ba76b84386",
+    "src/watertoc_jcs/config.py": "62a3a3a38299953fbf6a0b80082422b4b8a611e6641bc740569cfe1ab9f42b8d",
+    "src/watertoc_jcs/diagnostics.py": "fc561d93fc66ea8c3fcbfc683fd430454142bfa1fe188d045ceae1750334433c",
+    "src/watertoc_jcs/dynamics.py": "a56d0f1b64ee6bcb1712f4bc1275065e03547bdc3f1d7fc4d0a2c9a7fc7ae57a",
+    "src/watertoc_jcs/experiments.py": "8cfb504db7e7fe2beb65c6790409ed2fd0bd1881fb43a04ac314de25a7fc03bd",
+    "src/watertoc_jcs/metrics.py": "995ae27fd12ce361f48e026b409c4794e160b88ac90cd5d85699950dca8d78dd",
+    "src/watertoc_jcs/optimization.py": "d7364364ef61e23d88e7b1adf77a6f6f7682123f82122e6e26d763851456f879",
+    "src/watertoc_jcs/payoffs.py": "9b68d7a834d83091ebb99dee28e81a8b5a163f5a02dc58386c8c8ab9f9b15220",
+    "src/watertoc_jcs/provenance.py": "7e2e577789d24742359dd8e3f6be11f385938195dee6959b3e304461df1e8c65",
+    "src/watertoc_jcs/release.py": "d1788a2e47fde7439f38ad61b7c098bc93a96c210baac5151ee6fe03bbfae3bb",
+    "src/watertoc_jcs/world.py": "1fb92e364f7035df1d5d3993f02ef508eb3aec850fd5d22293ec7bdb4f2eb414"
+  },
+  "requirements_sha256": "4eeccebb5e51b04a9061be657d4856545fbff46785cd4a036cc1aa7c1f7f7bf6"
+}

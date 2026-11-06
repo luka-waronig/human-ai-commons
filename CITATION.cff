@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: Please cite the published study and identify the exact software revision used.
+title: Human-AI Commons research software
+type: software
+repository-code: https://github.com/luka-waronig/human-ai-commons
+authors:
+  - family-names: Malčić
+    given-names: Ivana
+  - family-names: Roy
+    given-names: Debraj
+  - family-names: Waronig
+    given-names: Luka
+preferred-citation:
+  type: conference-paper
+  title: 'Emergent Spatial Traps in the Coevolutionary Commons: Human-AI Cooperation Under Environmental Feedback'
+  authors:
+    - family-names: Malčić
+      given-names: Ivana
+    - family-names: Roy
+      given-names: Debraj
+    - family-names: Waronig
+      given-names: Luka
+  year: 2026
+  doi: 10.1007/978-3-032-29909-3_8
+  start: '95'
+  end: '109'

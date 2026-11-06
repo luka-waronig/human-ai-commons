@@ -31,5 +31,12 @@ Thumbs.db
 
 *.log
 
+# Generated research artifacts; provenance manifests and test fixtures are tracked.
+snapshots/
+results/
+sweep_outputs/
+water_toc_sweep_results.csv
+.pytest_cache/
+
 
 .env

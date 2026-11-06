@@ -1,0 +1,70 @@
+{
+  "created_utc": "2026-10-30T08:36:15.989924+00:00",
+  "git_revision": "3c5fdc918b7f4a22dc6d9c20b460878134bfed2a",
+  "python": "3.12.14",
+  "dependencies": {
+    "Mesa": "1.2.1",
+    "numpy": "2.3.1",
+    "pandas": "2.3.0",
+    "scipy": "1.15.3",
+    "SALib": "1.5.1",
+    "statsmodels": "0.14.4",
+    "PyWavelets": "1.8.0"
+  },
+  "configuration": {
+    "experiment": "paired replenishment sensitivity pilot",
+    "cases": [
+      {
+        "theta": 1.4,
+        "max_water_capacity": 10,
+        "water_cell_density": 0.2
+      },
+      {
+        "theta": 2.0,
+        "max_water_capacity": 20,
+        "water_cell_density": 0.3
+      },
+      {
+        "theta": 5.0,
+        "max_water_capacity": 20,
+        "water_cell_density": 0.4
+      },
+      {
+        "theta": 10.0,
+        "max_water_capacity": 40,
+        "water_cell_density": 0.5
+      }
+    ],
+    "replications": 12,
+    "steps": 100,
+    "seed_scheme": "sha256 feedback-audit/replicate",
+    "publication_reproduction": false
+  },
+  "source_sha256": {
+    "sensitivity_analysis.py": "e4bb453e6a7dd990eb91851f0cf5165b44bdd2f3a2bd7f91d0cfa935d5752191",
+    "server.py": "d1ac0f6dc602f3a2f5066e6869f087e1127d9ea52f8c10e4c1f05cca869abb72",
+    "spatial_analysis_plotting.py": "e4e707857cf1f06f6aabaf17a65bed14af204b18638e96bc04874fff6bacfb91",
+    "spatial_analysis_sweep.py": "5d1abe74dcdfb5e887552afb2e1a95bd3fd44715ea34c9cd21bf5ef3caa93be6",
+    "sweep_run.py": "4f42d0db2af369b9f7c7bbc2709606add63649041ab8f17def7737ee4b9765cf",
+    "water_toc/__init__.py": "2f42720a60e3e7719bc19d8a3163177d6806dad329541b9489844a9638284a57",
+    "water_toc/agents.py": "ed66a33b83e149b3700df859fb308918dc94e628f868687c92e6c0f05c06d919",
+    "water_toc/audit.py": "287d0dd0161db592c3fed58af8f36caf4d2b20c085fa795cacb113bbaf8c65d6",
+    "water_toc/feedback.py": "ea186f18919a17d5485f28b7dbca1403d5f209babfa0b6b35554395a4b953fa5",
+    "water_toc/model.py": "1d26598518296be582e18db8dfc77e27d09dbe1e52c6a180e82e4e1103d37e49",
+    "water_toc/reproducibility.py": "63bf90ad17169c30142293ed3d7c633c60cbc5657b3b8f7f8179dbcd44ae74ce",
+    "water_toc/spatial_null.py": "f843d55f71940b8fc6cd37770d612a6957e21707400976e4526c5967a1cece70",
+    "water_toc/timeseries.py": "ccf531a46bea1fbaee1541d09c5baa823e150db97ed095340ba80755fa923070",
+    "plotting/3Dplots_coop.py": "5ea558b0c5b3d7e214b37691af0a075a37e93f4bf7d30c945fe5c4ef21d43845",
+    "plotting/3Dplots_env.py": "35278d2ebd7004f5343a172760d08dffcdcb0e6835ca73debfe6d8994e3a5d06",
+    "plotting/fpoint.py": "6e170426c32afb101dd4374a69f1d82b93fc3c3ea324955d464f06195c4c0324",
+    "plotting/meanfield_visualizations.py": "9417a866d1cd6b4f5abd5be74f173fdb84e5e72fe3fb6f8865ef9afa5746dc99",
+    "plotting/morlet_wavelet.py": "2c5a020c23005cb758f1280cd3d02fac50760f3f3564a46a247f78861de185d5",
+    "plotting/peak_envelope_oscillations.py": "579cc77984960ba10a55643de5d386bc976b3f646c358b5138c4f0ce492e8108",
+    "requirements.txt": "1ca8a89e2c9b5d7eb14bea740dda99686907c72178e0a8557b7832f553df16ab",
+    "pyproject.toml": "67b613fbdf2124468a938e0388c24392fc5173ba00112539beb66ecb8c0d71fd"
+  },
+  "input": {
+    "path": "reproducibility/feedback_pilot/feedback_variant_runs.csv",
+    "sha256": "a39fa3f1f86af22911ab14c5aa38c76f0e6e2b3ca3e5a8a0a5aeaba371feb49d"
+  }
+}

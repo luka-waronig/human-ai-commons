@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "water-toc"
+version = "1.2.1"
+description = "Spatial human-AI commons model and reproducible research analyses"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "Mesa==1.2.1",
+    "numpy==2.3.1",
+    "pandas==2.3.0",
+]
+
+[project.optional-dependencies]
+analysis = [
+    "matplotlib==3.10.3",
+    "PyWavelets==1.8.0",
+    "SALib==1.5.1",
+    "scipy==1.15.3",
+    "seaborn==0.13.2",
+    "statsmodels==0.14.4",
+]
+dashboard = ["plotly==6.1.2", "solara==1.49.0", "narwhals!=1.43.0"]
+# The historical agents module imports pydantic; retain its original version
+# when executing the untouched pre-correction source for regression checks.
+dev = ["pytest==8.4.1", "pydantic==2.11.7"]
+
+[tool.setuptools.packages.find]
+include = ["water_toc*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

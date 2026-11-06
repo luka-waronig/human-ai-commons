@@ -1,0 +1,21 @@
+{
+  "scope": "Exact normalized payoff identities and analytical geometry",
+  "agent_based_simulations": 0,
+  "checks": {
+    "original_numeric_matrix_recovered_by_common_normalization": true,
+    "endpoint_payoff_differences_and_expected_advantage": true,
+    "derived_transition_levels": true,
+    "equal_relative_changes_preserve_one_transition": true,
+    "unequal_changes_separate_transitions": true,
+    "redistribution_preserves_original_row_sum_rule": true,
+    "minimum_relative_L2_cost_identity": true
+  },
+  "sha256": {
+    "scripts/verify_payoff_design.py": "f8a8d8a3d52b4d5ae6b22329a4186083c6b976f4336b4ecd9f5c4ffaec94580f",
+    "configs/research_protocol.json": "b9ca7a5f7daf072019a0f882b30c0bea352949b3784af8a33bcc7c452375aa38",
+    "src/watertoc_jcs/payoffs.py": "9b68d7a834d83091ebb99dee28e81a8b5a163f5a02dc58386c8c8ab9f9b15220",
+    "src/watertoc_jcs/optimization.py": "d7364364ef61e23d88e7b1adf77a6f6f7682123f82122e6e26d763851456f879",
+    "docs/research-plan.md": "172ee909c9ae33410a658f7a01e538488fcdb6aad9d2a9267f11a77729fb750a",
+    "docs/figures/strategic_geometry.png": "9ea52b551625e5c5c3eaaa4504a8423928e36d574d70e8cc279b6c3710146b3e"
+  }
+}

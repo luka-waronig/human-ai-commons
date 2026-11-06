@@ -1,0 +1,2 @@
+# Install the tested repository-level lock, rather than the historical OS export.
+-r ../requirements.txt

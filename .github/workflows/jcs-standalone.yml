@@ -1,0 +1,35 @@
+name: Standalone JCS study
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  jcs:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Copy only the journal folder outside the checkout
+        shell: bash
+        run: cp -R jcs "$RUNNER_TEMP/jcs-standalone"
+      - name: Install self-contained dependencies
+        working-directory: ${{ runner.temp }}/jcs-standalone
+        run: python -m pip install --require-hashes -r requirements.txt
+      - name: Verify standalone scientific and workflow tests
+        working-directory: ${{ runner.temp }}/jcs-standalone
+        run: python -m pytest -q
+      - name: Run bounded smoke workflow
+        working-directory: ${{ runner.temp }}/jcs-standalone
+        run: python -I reproduce.py run --config configs/smoke.json --output results/ci-smoke
+      - name: Verify artifacts and render smoke plots
+        working-directory: ${{ runner.temp }}/jcs-standalone
+        run: |
+          python -I reproduce.py verify results/ci-smoke
+          python -I reproduce.py analyze results/ci-smoke
+          python -m pip check

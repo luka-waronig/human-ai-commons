@@ -1,0 +1,22 @@
+{
+  "extends": "research_protocol.json",
+  "objective": {
+    "welfare": {
+      "human_weight": 1
+    }
+  },
+  "execution": {
+    "include_l1_search": false,
+    "robustness_variants": []
+  },
+  "search": {
+    "main_problems": [
+      {
+        "pressure": 1,
+        "budget": 0.5
+      }
+    ],
+    "payoff_maps": [],
+    "global_composition_reoptimization": null
+  }
+}

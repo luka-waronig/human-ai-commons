@@ -1,0 +1,79 @@
+{
+  "extends": "research_protocol.json",
+  "execution": {
+    "label": "smoke_software_check_not_paper_results",
+    "include_l1_search": true,
+    "robustness_variants": [
+      {
+        "name": "clustered_ai",
+        "world_transform": "cluster_ai"
+      },
+      {
+        "name": "sequential_planning",
+        "scenario": {
+          "schedule": "sequential_planning"
+        }
+      },
+      {
+        "name": "manuscript_feedback",
+        "scenario": {
+          "feedback": "manuscript"
+        }
+      }
+    ]
+  },
+  "world": {
+    "width": 4,
+    "height": 5,
+    "humans": 3,
+    "ai": 3,
+    "water_cell_density": 0.5,
+    "water_capacity": 3,
+    "condition": "placements_conditioned_on_access_given_landscape"
+  },
+  "objective": {
+    "total_steps": 12,
+    "excluded_initial_steps": 3,
+    "persistent_local_stress": {
+      "duration_steps": 3
+    }
+  },
+  "search": {
+    "explicit_population_size": 6,
+    "maximum_generations": 1,
+    "optimizer_restarts": 1,
+    "main_problems": [
+      {
+        "pressure": 1,
+        "budget": 0.5
+      }
+    ],
+    "payoff_maps": [
+      {
+        "pressure": 1,
+        "points_per_axis": 3
+      }
+    ],
+    "one_dimensional_search": {
+      "initial_grid_points": 5,
+      "refined_intervals_per_round": 1,
+      "refinement_grid_points": 3,
+      "refinement_rounds": 1
+    }
+  },
+  "validation": {
+    "training_realizations": 2,
+    "validation_realizations": 2,
+    "maximum_shortlisted_candidates_per_family_and_problem": 3,
+    "test_realizations": 3,
+    "robustness_realizations": 2,
+    "characterization_realizations": 2
+  },
+  "secondary_checks": {
+    "stress_duration_steps": [
+      1,
+      3,
+      5
+    ]
+  }
+}

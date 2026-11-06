@@ -1,0 +1,29 @@
+{
+  "baseline_commit": "3c5fdc918b7f4a22dc6d9c20b460878134bfed2a",
+  "historical_tag": "v1.2",
+  "historical_tag_commit": "ac4cd0e5844541f59bd038ea23b296c7378c15d4",
+  "purpose": "Source and dependency checksums for the baseline commit.",
+  "files": {
+    ".gitignore": "27552d939d94a9c68efe16a048ed7150b37dae2c82322972f4698649199bcf94",
+    "CHAPTERS.md": "85b17cb4becd5ad8cb012858cd5ea0b5cfdf04a073e11b3963bdca3dbd1c70c5",
+    "README.md": "50f77e38fc3932b0b8bbb200d3b111f3c891c4d230fd155abd870fcdfd54bce7",
+    "plotting/3Dplots_coop.py": "5ea558b0c5b3d7e214b37691af0a075a37e93f4bf7d30c945fe5c4ef21d43845",
+    "plotting/3Dplots_env.py": "35278d2ebd7004f5343a172760d08dffcdcb0e6835ca73debfe6d8994e3a5d06",
+    "plotting/fpoint.py": "480f6d60964f0f766d85970982d2d9eb6898e3b5c397d27ac668b4109cb88f45",
+    "plotting/meanfield_visualizations.py": "5d81d45349fd6bbf8872d29e1fa0c544450d2b954cb6423e93b852d26783cf65",
+    "plotting/morlet_wavelet.py": "d488160840611db3b52870edbc48a1f273e76457b13d810373b2cb758a6b26a3",
+    "plotting/peak_envelope_oscillations.py": "f69be841ecaa02476b60080845d089aab8d1c84ce6162326da0746291eea9ed2",
+    "public/ABMenv.png": "d5bc39fee350c039e10c41a1671b53af6f1aba499ac5d35c061ebce57d13f5d2",
+    "public/screenshot.png": "7c295d3b1b3c47ae023e02c1403d90688c9e16453e420c0a6ff2f5ce31e45c65",
+    "requirements.txt": "8e27a19cfff122069329bbdbadf8bc99341bac80aefe9e2b2f46c8601effb78b",
+    "sensitivity_analysis.ipynb": "84653a5dbce936ec6cbd838fe77e72ee707b9555ffd4a9c3da201960f3b90ef5",
+    "sensitivity_analysis.py": "94d4e2d5b7397a863a8a0eb05cfaa24a2d28221bf83822a29b51edeb8d79d86e",
+    "server.py": "0337436ff08e19fd375231582dec5dee598f3839c10e9b0d32c01f27b46159f4",
+    "spatial_analysis_plotting.py": "8ec8ea2064ae014f815c7cf737392bb60ee2fb4c92d6550b7a939b45a7ffcd03",
+    "spatial_analysis_sweep.py": "b292640617fa7ab4058a74273eaf176e3c795eb3dbec35740917905c58902e9c",
+    "sweep_run.py": "37116b8de3ea61a3bd8e7ccf9376b94c28e26a8664f27d9bdd1e04a8b9079047",
+    "water_toc/agents.py": "3e214a6a10263d52d971eb9a763931333cd7be8ea93c6fea78c7e8bbdf45df70",
+    "water_toc/model.py": "ce40e683fdd04b53dc1192907136b3fb643815c4f0a83c432972b2073f4233bc",
+    "water_toc/requirements.txt": "8e27a19cfff122069329bbdbadf8bc99341bac80aefe9e2b2f46c8601effb78b"
+  }
+}

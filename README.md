@@ -1,6 +1,6 @@
 # Human-AI Commons: Interdisciplinary Chapters
 
-This is the public parent repository of a series of interdisciplinary research chapters studying the coevolution of behavioral and environmental parameter patterns in the Human-AI commons.
+This is the public parent repository of a series of interdisciplinary research chapters studying the coevolution of behavioral and environmental parameter patterns in a spatial and resource-bound Human-AI commons.
 
 | Study | Code and experiments | Documentation |
 | --- | --- | --- |

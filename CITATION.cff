@@ -1,15 +1,15 @@
 cff-version: 1.2.0
 message: Please cite the published study and identify the exact software revision used.
-title: Human-AI Commons research software
+title: Strategic Incentives and Joint Welfare in Human-AI Commons
 type: software
 repository-code: https://github.com/luka-waronig/human-ai-commons
 authors:
-  - family-names: Malčić
-    given-names: Ivana
-  - family-names: Roy
-    given-names: Debraj
   - family-names: Waronig
     given-names: Luka
+  - family-names: Roy
+    given-names: Debraj
+  - family-names: Malčić
+    given-names: Ivana
 preferred-citation:
   type: conference-paper
   title: 'Emergent Spatial Traps in the Coevolutionary Commons: Human-AI Cooperation Under Environmental Feedback'

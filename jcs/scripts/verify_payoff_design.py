@@ -1,4 +1,4 @@
-"""Check payoff identities with exact arithmetic; no agent simulations."""
+"""Checking payoff identities with exact arithmetic; no agent simulations."""
 from fractions import Fraction as F
 import hashlib
 import json

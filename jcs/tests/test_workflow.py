@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import sys
 import zipfile
+import runpy
 import numpy as np
 import pytest
 from watertoc_jcs.analysis import analyze, metric_sensitivity, verify_bundle
@@ -115,3 +116,39 @@ def test_copied_folder_works_outside_repository_in_isolated_python(tmp_path):
     result = subprocess.run([sys.executable, '-I', str(copied/'reproduce.py'), 'plan', '--config', str(copied/'configs/smoke.json')],
                             cwd=tmp_path, env=environment, text=True, capture_output=True, check=True)
     assert json.loads(result.stdout)['simulations_started'] is False
+
+
+def test_direct_python_experiment_runs_and_resumes_outside_repository(tmp_path):
+    copied = tmp_path/'journal'
+    shutil.copytree(ROOT, copied, ignore=shutil.ignore_patterns('results', '.venv', '__pycache__', '.pytest_cache', '*.egg-info'))
+    command = [sys.executable, '-I', str(copied/'reproduce.py'), 'smoke']
+    first = subprocess.run(command, cwd=tmp_path, capture_output=True, text=True, check=True)
+    assert 'Finished:' in first.stdout
+    output = copied/'results/smoke'
+    assert (output/'analysis/heldout_frontier.csv').exists()
+    manifest = json.loads((output/'manifest.json').read_text())
+    assert set(manifest['stages'].values()) == {'complete'}
+    before = (output/'budget_ledger.jsonl').read_bytes()
+    subprocess.run(command, cwd=tmp_path, capture_output=True, text=True, check=True)
+    assert (output/'budget_ledger.jsonl').read_bytes() == before
+
+
+def test_direct_all_dispatch_uses_all_configured_stages_and_budgets_without_simulating(monkeypatch):
+    import watertoc_jcs.config as configuration
+    import watertoc_jcs.analysis as analysis
+    calls = []
+    def record(config, output, stage, limit):
+        expected = configuration.budget_plan(config)['model_step_caps'][stage]
+        assert limit == expected
+        calls.append((output.name, stage))
+    monkeypatch.setattr(experiments, 'run_stages', record)
+    monkeypatch.setattr(analysis, 'verify_bundle', lambda *args: None)
+    monkeypatch.setattr(analysis, 'analyze', lambda *args: None)
+    monkeypatch.setattr(analysis, 'metric_sensitivity', lambda *args: None)
+    monkeypatch.setattr(sys, 'argv', ['reproduce.py', 'all'])
+    runpy.run_path(str(ROOT/'reproduce.py'), run_name='__main__')
+    expected = []
+    for name in ['research_protocol', 'human_only_priority', 'ai_only_priority', 'delivery_reliability']:
+        config = configuration.load_config(ROOT/'configs'/f'{name}.json')
+        expected.extend((name, stage) for stage, cap in configuration.budget_plan(config)['model_step_caps'].items() if cap)
+    assert calls == expected

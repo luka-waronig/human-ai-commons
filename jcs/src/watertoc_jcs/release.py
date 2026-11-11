@@ -32,6 +32,7 @@ def export_release(bundle, destination):
                 raise ValueError('analysis inputs changed; run analyze again before export')
     files = {}
     for name in ['README.md', 'CITATION.cff', 'pyproject.toml', 'requirements.txt', '.python-version', 'reproduce.py',
+                 'run-experiments', 'run_experiments.py',
                  'configs', 'docs', 'src', 'tests', 'scripts', 'verification']:
         source = ROOT/name
         paths = source.rglob('*') if source.is_dir() else [source]

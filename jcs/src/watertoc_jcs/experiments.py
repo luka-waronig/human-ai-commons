@@ -3,6 +3,8 @@ from dataclasses import asdict, replace
 import json
 from pathlib import Path
 import shutil
+import signal
+import threading
 import numpy as np
 from .capacity import strict_safety_bound
 from .config import budget_plan, metric_spec, problems, robustness_variants, scenario, stress_spec, welfare_spec, world_spec
@@ -47,9 +49,14 @@ class Evaluation:
         self.maximum_steps, self.used = maximum_steps, 0
         self.world_cache, self.candidates = {}, {}
         self.encountered = set()
+        self.stop_requested = False
         self.cache = {r['evaluation_id']: r for r in read_jsonl(self.output/'realizations.jsonl')}
         for row in read_jsonl(self.output/'training_candidates.jsonl'):
             self.candidates[(row['pressure'], row['policy']['observation'], row['policy_id'])] = row
+
+    def check_stop(self):
+        if self.stop_requested:
+            raise KeyboardInterrupt('Stopped after saving the current realization')
 
     def world(self, split, index, variant=None):
         variant = variant or {}
@@ -68,6 +75,7 @@ class Evaluation:
         return self.world_cache[key]
 
     def realization(self, pressure, policy, split, index, *, variant=None, record=False):
+        self.check_stop()
         variant = variant or {}
         world = self.world(split, index, variant)
         physical = replace(scenario(self.config, pressure), **variant.get('scenario', {}))
@@ -144,6 +152,7 @@ class Evaluation:
         return result
 
     def objective(self, pressure, policy):
+        self.check_stop()
         key = (pressure, policy.observation, policy.id)
         self.encountered.add(key)
         if key not in self.candidates:
@@ -366,20 +375,29 @@ def run_stages(config, output, stages, maximum_steps):
             shutil.copy2(source_path, target)
     write_json(manifest_path, manifest)
     ctx = Evaluation(config, output, maximum_steps)
+    previous_handler = None
+    if threading.current_thread() is threading.main_thread():
+        previous_handler = signal.getsignal(signal.SIGINT)
+        signal.signal(signal.SIGINT, lambda *_: setattr(ctx, 'stop_requested', True))
     try:
         for stage in pending:
+            ctx.check_stop()
             manifest['stages'][stage] = 'running'
             write_json(manifest_path, manifest)
             globals()[stage](ctx)
+            ctx.check_stop()
             manifest['stages'][stage] = 'complete'
             manifest['model_steps_logged'] = sum(r['steps'] for r in read_jsonl(output/'budget_ledger.jsonl'))
             write_json(manifest_path, manifest)
-    except Exception as error:
+    except (Exception, KeyboardInterrupt) as error:
         manifest['last_error'] = str(error)
         manifest['model_steps_logged'] = sum(r['steps'] for r in read_jsonl(output/'budget_ledger.jsonl'))
         write_json(manifest_path, manifest)
         write_json(output/'checksums.json', bundle_hashes(output))
         raise
+    finally:
+        if previous_handler is not None:
+            signal.signal(signal.SIGINT, previous_handler)
     manifest.pop('last_error', None)
     manifest['updated_utc'] = utc_now()
     write_json(manifest_path, manifest)

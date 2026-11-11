@@ -152,7 +152,7 @@ The intended finding is a characterization of when payoff redesign can improve j
 
 The main configuration uses 2,000 steps, excluding the first 500; 8 separate characterization realizations, 8 training, 16 validation, and 64 held-out realizations; and disjoint indexed random inputs. Candidate policies are frozen before held-out evaluation. All targets, welfare assumptions, stress definitions, random inputs, source versions, individual outcomes, and analysis settings are archived. Replaying a realization checks the recorded individual deliveries and welfare results as well as the physical trajectory.
 
-The `smoke.json` configuration is a short software check, not evidence for scientific conclusions. Production experiments require an explicit execution budget. [Usage](usage.md) describes commands and [implementation](implementation.md) specifies the event order and output records.
+The `smoke.json` configuration is a short software check, not evidence for scientific conclusions. Production experiments require an explicit execution budget. [Running the experiments](running-experiments.md) describes commands and [implementation](implementation.md) specifies the event order and output records.
 
 ## Discussion questions tied to the evidence
 

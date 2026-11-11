@@ -1,24 +1,95 @@
-# Human-AI Commons: Journal of Computational Science - Special Issue
+# Running the JCS experiments
 
 This folder contains the JCS study. It can be copied to another location to install its dependencies, run tests, generate experiments, and analyze their outputs independently of the parent repository.
 
 The implementation includes the payoff family, spatial simulator, joint welfare calculation, persistent-stress restriction, constrained searches, resource-only comparators, independent validation and testing, observation controls, physical capacity checks, robustness experiments, and artifact replay. `configs/smoke.json` provides a small integration-test configuration; `configs/research_protocol.json` specifies the research experiments.
 
+## Set up Python once
+
+The setup below uses [uv](https://docs.astral.sh/uv/pip/environments/) to create a Python 3.12 environment and install the pinned requirements. Install uv first if it is not already available.
+
+From the `jcs/` folder, create the environment once, activate it, and install the requirements:
+
+```text
+uv venv --python 3.12 .venv
+source .venv/bin/activate
+uv pip install --python .venv/bin/python --require-hashes -r requirements.txt
+uv pip check --python .venv/bin/python
+python --version
+```
+
+The last command should report Python 3.12.x. `uv pip install` is an installer provided by uv; it does not require pip to be installed in the environment. A uv-created environment without pip is normal.
+
+For each new terminal session, activate the existing environment with `source .venv/bin/activate` from the `jcs/` folder. Do not recreate a working environment. In an IDE, select `jcs/.venv/bin/python` as the interpreter.
+
+These activation commands are for macOS/Linux. On Windows PowerShell, use `.venv\Scripts\Activate.ps1`; replace `.venv/bin/python` with `.venv\Scripts\python.exe` in explicit interpreter paths. If another correctly configured Python 3.12 environment is already in use, it can be used directly instead.
+
+## Check the installation
+
+Run the tiny software check first:
+
+```text
+python reproduce.py smoke
+```
+
+It should print `Finished:` and create `results/smoke/analysis/`. This checks the workflow; its output is not research evidence.
+
+## Run the experiments
+
+Run the main experiment:
+
+```text
+python reproduce.py
+```
+
+This runs the original-game measurements, payoff search, validation, independent testing, and robustness experiments in order. It then generates tables, figures, and the additional depletion-diagnostic comparisons. The main command starts the full research workload; it is not a quick check. It prints stage names, but can remain quiet during a long stage.
+
+Run the three comparisons separately, after the main experiment:
+
+```text
+python reproduce.py human_only_priority
+python reproduce.py ai_only_priority
+python reproduce.py delivery_reliability
+```
+
+Alternatively, `python reproduce.py all` runs the main experiment followed by these three comparisons sequentially. Choose the individual commands or `all`; both execute the same four configurations. The comparison configurations have no additional robustness variants.
+
+If your selected Python environment already contains the required dependencies, the same scripts can be run with `python reproduce.py`. From the repository root, use `python jcs/reproduce.py`. In an IDE, select the environment above and run `reproduce.py` to start the main experiment.
+
+## Results and restarting
+
+Results are written relative to the script, regardless of the terminal's current folder:
+
+| Experiment | Result folder inside `jcs/` |
+| --- | --- |
+| Main | `results/research_protocol/` |
+| Human-only priority | `results/human_only_priority/` |
+| AI-only priority | `results/ai_only_priority/` |
+| Delivery protection | `results/delivery_reliability/` |
+
+Each folder contains the resolved configuration, source record, generated worlds, evaluations, and an `analysis/` directory with tables and figures. The repository ignores generated `results/` folders. Copy the complete result folders to backup storage, including the source records and raw trajectories.
+
+Repeating the same command reuses completed simulation stages and regenerates the analysis. During simulation stages, Ctrl+C requests a stop after the current realization is saved; wait for the script to exit before restarting. A forced kill or power loss may need recovery. Do not run two copies of the same experiment into the same output folder. Keep the model code, configurations, and numerical dependency versions unchanged while collecting one study's results. If they change, preserve the old results and use a separate study copy or the individual-stage commands below with a new output folder.
+
+The direct script verifies result checksums and generates analyses. Replay and ZIP export are separate optional commands described below. The cross-priority comparison and the original-game/redesign spatial figures still require assembly from the saved results; the automatic per-study plots do not replace them.
+
+<details>
+<summary>Individual commands for installation, stages, and analysis</summary>
+
 ## Install and check
 
-Use Python 3.12. From the `jcs/` folder:
+After the setup above, from the `jcs/` folder:
 
 ```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install --require-hashes -r requirements.txt
-python -m pytest -q
-python scripts/verify_payoff_design.py
+.venv/bin/python -m pytest -q
+.venv/bin/python scripts/verify_payoff_design.py
 ```
 
 `requirements.txt` is a complete, hashed dependency lock for the numerical libraries, plotting, and tests. There is no Mesa or parent-project dependency. The `reproduce.py` entry point loads the package from this folder, so an editable install and a custom `PYTHONPATH` are unnecessary. A normal package installation is also supported by `pyproject.toml`.
 
 ## Reproduce the small software check
+
+The remaining reference commands use `python` from the activated Python 3.12 environment.
 
 ```bash
 python reproduce.py plan --config configs/smoke.json
@@ -30,7 +101,7 @@ python reproduce.py rescore results/smoke --floor 0.3 --tail 0.2 --output result
 
 The smoke design uses a 4 by 5 grid, six agents, and twelve time steps per realization. It exercises all workflow stages, both budget norms, and selected mechanism controls. It has a conservative upper bound of 4,140 model steps across the entire workflow, before cache reuse. Output figures identify it as a software check.
 
-The runner defaults to a hard limit of 10,000 model steps. A production configuration is rejected **before constructing worlds or starting simulations** if its planned upper bound exceeds that limit. `plan`, `verify`, `analyze`, and `rescore` never run simulations. `replay` reruns one realization and also has a model-step limit.
+The low-level `run` command defaults to a hard limit of 10,000 model steps. The direct commands above use the budgets calculated from each experiment configuration. With the low-level default, a production configuration is rejected **before constructing worlds or starting simulations** if its planned upper bound exceeds that limit. `plan`, `verify`, `analyze`, and `rescore` never run simulations. `replay` reruns one realization and also has a model-step limit.
 
 ## Inspect the reference before optimization
 
@@ -74,3 +145,12 @@ Generated `results/` folders are ignored by Git. A research release consists of 
 The previous paper is cited in [CITATION.cff](../CITATION.cff). [Model continuity](model-continuity.md) describes the inherited mechanisms, the payoff embedding, and the new formulation. The JCS experiments generate and archive their own datasets.
 
 Core bundle checksums cover immutable inputs and results. Regenerated files in the default `analysis/` folder have their own input manifest. Export rejects that analysis if its recorded inputs have changed; regenerate it after completing additional stages.
+
+</details>
+
+<details>
+<summary>Optional automated launcher</summary>
+
+On macOS/Linux, `./run-experiments` remains available for automated environment setup, a private source copy, concurrent study runs, progress updates, replay checks, and release archives. Its default workspace is `~/Documents/human-ai-commons-private/experiments/full-study/`. Repeating it resumes the saved study. It accepts `--status`, `--smoke`, `--jobs 1`, and `--output /absolute/private/path`. The direct Python commands above do not use this launcher.
+
+</details>

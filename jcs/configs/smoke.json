@@ -39,9 +39,6 @@
     }
   },
   "search": {
-    "explicit_population_size": 6,
-    "maximum_generations": 1,
-    "optimizer_restarts": 1,
     "main_problems": [
       {
         "pressure": 1,
@@ -55,10 +52,12 @@
       }
     ],
     "one_dimensional_search": {
-      "initial_grid_points": 5,
-      "refined_intervals_per_round": 1,
-      "refinement_grid_points": 3,
-      "refinement_rounds": 1
+      "initial_grid_points": 5
+    },
+    "pareto": {
+      "initial_points_per_axis": 3,
+      "refinement_rounds": 1,
+      "refinement_anchors": 3
     }
   },
   "validation": {
@@ -67,7 +66,8 @@
     "maximum_shortlisted_candidates_per_family_and_problem": 3,
     "test_realizations": 3,
     "robustness_realizations": 2,
-    "characterization_realizations": 2
+    "characterization_realizations": 2,
+    "maximum_tested_candidates_per_family_and_problem": 3
   },
   "secondary_checks": {
     "stress_duration_steps": [

@@ -15,7 +15,7 @@ Two opposing positions motivate this question. One treats AI demand as inherentl
 | Component | Conference study | Journal extension |
 | --- | --- | --- |
 | Strategic game | Fixed environmental interpolation | Two depleted-state payoff changes, with exact normalized reference recovery |
-| Main computational task | Describe changes in cooperation, resource state, and spatial patterns | Optimize joint support for human and AI activity under explicit design and persistence restrictions |
+| Main computational task | Describe changes in cooperation, resource state, and spatial patterns | Estimate Pareto trade-offs among human support, AI support, and local depletion under explicit restrictions |
 | Mechanism comparisons | Variation in physical and feedback parameters | Equal-relative, resource-only, and unchanged-row-sum redistribution controls |
 | Spatial interpretation | Identify persistent resource–strategy organization | Measure that organization alongside deliveries and welfare, and test paired changes under redesigned games |
 | Reproduction record | Conference implementation and protocol | Independently runnable journal folder with indexed random inputs, individual deliveries, source-level flows, replay, and versioned release bundles |
@@ -81,17 +81,11 @@ $$
 
 $H$ is the mean of this quantity over human agents and observed steps; $A$ is the corresponding mean for AI agents. These separate measurements describe components of the same resource-coupled system. They do not assume independent dynamics.
 
-The joint welfare index is
+The main study keeps human support, AI support, and local depletion as three separate objectives. No welfare weight ranks designs or decides which candidates survive. A design is dominated when another admissible design is at least as good on all three objectives and strictly better on at least one. The remaining designs form an estimated Pareto frontier.
 
-$$
-W_\lambda=H^\lambda A^{1-\lambda},\quad 0<\lambda<1.
-$$
+For optional preference comparisons and recorded-trajectory sensitivity analysis, the code also reports the weighted geometric mean $W_\lambda=H^\lambda A^{1-\lambda}$. This score expresses a declared priority; it is not the main optimization objective. Its endpoints give the optional human-only and AI-only searches. A different reported weight does not change the main Pareto search or selection.
 
-At equal priority, $\lambda=\frac{1}{2}$, the index is $\sqrt{HA}$. Poor support for either group lowers joint support; complete loss of either group gives zero. At the endpoints, $\lambda=1$ means a human-only objective and $\lambda=0$ means an AI-only objective. The main optimization maximizes the expected index across independent realizations, not the index calculated from outcomes pooled across different realizations.
-
-Equal priority is a declared modeling choice. It is not an estimate of the relative worth of people and infrastructure. Groups receive equal aggregate weight at $\lambda=\frac{1}{2}$ regardless of their water demand. A different group weight changes the welfare assumption. Individual deliveries and unserved periods are reported alongside group means to make their distribution available for assessment.
-
-Sensitivity checks use $\lambda\in\{0,0.25,0.5,0.75,1\}$. A second utility calculation, $\frac{\log(1+s)}{\log(2)}$, tests diminishing benefit from additional supported activity. Re-scoring frozen policies describes their transfer to another welfare assumption. Claims about a new optimum require a new optimization under that assumption.
+The primary delivery utility is linear. A second calculation, $\log(1+s)/\log(2)$, tests diminishing benefit from additional supported activity. Re-scoring frozen designs does not establish a reoptimized frontier under a different utility assumption.
 
 The fraction of additional use credited as useful is also tested at 0, 0.5, and 1. Let $c_i$ be the fixed cooperative request and $d_i$ the fixed higher request. With credited fraction $e$, supported activity is
 
@@ -107,7 +101,7 @@ The primary $e=1$ reduces to $\frac{\mathrm{delivered}}{d_i}$, capped at one. At
 
 The ICCS spatial trap is a persistent resource–strategy pattern, not a published numerical stock cutoff or a demonstrated delivery-shortage condition. Cooperative regions and chronically stressed peripheral regions are part of that description. Its welfare consequences must be measured rather than inferred from its name. A mean stock of 0.38 does not determine which locations are stressed or whether requests are being met.
 
-The conference paper's moderately stressed equilibria are distinct from total collapse. The reference stock-based constraint measures sustained local stress separately from the auxiliary depletion score below 0.2.
+The conference paper's moderately stressed equilibria are distinct from total collapse. The reference stock-based constraint measures sustained local stress separately from the continuous depletion objective below 0.2.
 
 For every geometrically accessible resource cell, track consecutive observed steps below a fixed resource reference. In the main specification, the reference is $n=0.5$ and the duration is 150 consecutive steps. The reference corresponds to the preferred-action change in the original game; it is not an empirically established ecological minimum. The duration is held fixed when the observation horizon changes.
 
@@ -123,7 +117,15 @@ The numerical reference, duration, and tolerated probability define the experime
 
 ## Constrained optimization
 
-The main problem maximizes expected joint welfare over admissible payoff structures, subject to the payoff-change budget and the probability restriction above. Cooperation and stored resource are explanatory measurements rather than optimization targets.
+The main problem seeks admissible payoff designs that maximize expected human support and expected AI support while minimizing expected local depletion:
+
+$$
+\operatorname{minimize}_{u,v}\;\bigl(-\mathbb{E}[H],-\mathbb{E}[A],\mathbb{E}[L]\bigr).
+$$
+
+Here $L$ measures resource deficit over time at the worst affected accessible locations. At each location, the normalized deficit below stock reference 0.2 is averaged over the observation window; $L$ is the fractional upper-tail mean over the worst 10% of accessible cells. Expected values average whole independent realizations. These references are mathematical choices, with sensitivity checks, rather than calibrated ecological standards. Cooperation is an explanatory measurement, not an optimization target.
+
+The payoff-change budget and persistent-stress probability remain constraints. Reducing depletion remains useful among designs that meet those constraints; passing the persistence requirement does not make all resource outcomes equivalent.
 
 A second matched experiment, `delivery_reliability.json`, restricts persistent unmet requests instead. It tracks each agent's delivered/requested fraction against one, with a relative floating-point tolerance of $10^{-12}$, and applies the same duration and probability allowance. Both conditions use the general site-fraction setting: sites are accessible resource cells in the stock condition and agents in the delivery condition. This experiment changes the protection goal, not the definition of the historical phenomenon.
 
@@ -131,33 +133,39 @@ Constructed model states can maintain low reserves while serving every request. 
 
 An escape claim requires paired evidence that the resource–strategy pattern changes and welfare improves under the same physical conditions. The stock-persistence indicator alone is insufficient. If a reference spatial pattern has no measured welfare cost, the result is a persistent spatial pattern without that demonstrated cost; delivery failures must not be invented or the old phenomenon renamed to fit the objective.
 
-During training and validation, the probability restriction is evaluated using the observed fraction of independent realizations with persistent stress. Candidate selection first prefers compliance with that restriction, then higher welfare, then smaller payoff change. If no candidate meets the empirical restriction, the selected diagnostic candidate is explicitly marked as such. An unsuccessful search does not prove that no admissible game can succeed.
+Training starts with fixed payoff grids. In the two-dimensional families, the headline pressure uses 17 points per axis and the remaining mapped pressures use 9; the original game is included explicitly. One-dimensional comparisons start with 65 points. Two refinement rounds evaluate shrinking neighborhoods around up to eight diverse non-dominated designs, preserving the ends of each objective. Bounds and payoff budgets are enforced before simulations. Evaluations are shared across budgets before shortlisting. This is a transparent finite search in two parameters, not a global-optimality certificate.
 
-Differential evolution searches the two-parameter family offline. The chosen $u$ and $v$ remain fixed throughout a realization; this is not a controller adapting after observing held-out outcomes. Its objective is one minus expected welfare; its constraints include the payoff bound and the empirical stress probability. The three one-dimensional comparators apply the same ordering. The resource-only comparator uses the least-cost encoding of its effective resource threshold, avoiding an artificial budget disadvantage. Equal-relative and zero-sum redistribution controls are retained separately.
+The resource restriction is first screened using the observed stress-event fraction. Up to 12 diverse candidates per family and problem are assessed on 16 independent validation realizations. Up to six validation designs per family are frozen before any test data are observed. Selection preserves objective extremes and fills gaps by distance in the three normalized outcomes; the geometric-mean score has no role. Equal-relative and redistribution candidates are also assessed as members of the full local family.
 
-Independent held-out realizations assess both welfare and protection. The stress probability receives an exact one-sided binomial upper confidence bound. A low observed failure fraction is distinguished from statistical support for the required probability. Main selected-policy protection claims use a correction for the number of distinct tested policies and pressures. These are finite-horizon results for the simulated distribution, not guarantees about all future trajectories.
+When no candidate meets the empirical restriction, the output retains explicitly labelled diagnostic designs with the least observed violation. They cannot enter an admissible frontier unless the independent test assessment supports them. Search failure never proves infeasibility.
+
+The frozen designs and original game are tested on 128 paired independent realizations. Exact one-sided binomial bounds, corrected across distinct tested policy/pressure pairs, assess the persistent-stress probability. The larger test sample supports assessment of a collection of designs rather than one winner. A small empirical failure fraction is distinguished from statistical support for the required probability.
+
+Analysis reports both an empirical-constraint frontier and a frontier restricted to designs whose resource constraint is supported. Each is computed separately by family, including the original game as an available alternative when it satisfies the corresponding condition. Both use test sample means; neither establishes dominance between unknown population means. Bootstrap intervals describe uncertainty in outcomes and paired changes. Separate simultaneous bounds for changes from the original game use the bounded range of independent paired differences and cover the three outcomes across all tested policy/pressure pairs. These distribution-free bounds are deliberately conservative. They and the resource bounds have separate confidence statements, not a combined confidence guarantee.
+
+The figure projects the three objectives onto human and AI support, with local depletion shown by colour. Designs without established resource protection remain visible with distinct markers. An empty supported frontier is reported explicitly; it is not replaced by a purported winner.
 
 ## Experiments and interpretation
 
-1. Run the separate characterization stage to establish the reference dynamics and map evaluated payoff structures. Record human support, AI support, joint welfare, continuous local stress, cooperation, and spatial resource patterns together.
-2. Compare the local-composition family against the optimized resource-only, equal-relative, and redistribution families under matched constraints. The headline setting is pressure 1 and payoff-change budget 0.5. Other budgets and pressures describe how attainable joint support changes.
-3. Compare the selected design with the embedded conference game on paired held-out worlds. Report changes in both human and AI support, including uncertainty. A claim that both improve requires evidence for both changes and support for the stress restriction.
-4. Reoptimize the headline setting under human-only and AI-only priorities, using `human_only_priority.json` and `ai_only_priority.json`. Keep physical conditions and constraints matched. Compare these designs under all reported welfare priorities. This tests the consequences of competing priorities without assuming the equal-priority design dominates each group's own optimum.
-5. Test frozen designs under changes in demand pressure, demand asymmetry, spatial concentration, initial strategies, feedback, grid size, and update timing. The main delivery calculation divides shortages proportionally among simultaneous requests at each source. Serving humans first is an explicit inherited-allocation comparison; welfare conclusions must state this assumption.
-6. Re-score archived trajectories under alternative welfare and stress definitions. Separate these evaluations from reoptimized results. Use longer trajectories and different initial conditions to investigate whether apparent improvements persist.
+1. Establish the original game's deliveries and spatial resource–strategy patterns on separate characterization worlds.
+2. Search the full local payoff family and the resource-only, equal-relative, and redistribution comparisons. Retain their trade-offs rather than one combined-score winner.
+3. Validate a diverse candidate set, freeze the retained designs, and test them against the original game on new paired worlds. Generate the three-objective frontier tables and figure.
+4. Compare frontiers across payoff-change budgets and resource pressures. The headline setting remains pressure 1 and budget 0.5. Investigate shared gains, competing outcomes, and changes in resource stress.
+5. Transfer the frozen headline sets to the stated spatial, physical, and behavioral variations. These are robustness checks of existing designs, not reoptimized frontiers. Re-score archived trajectories under alternative outcome definitions.
+6. Optionally run the human-only and AI-only preference comparisons, or repeat the Pareto workflow with the unmet-request persistence condition. These separate runs are not needed to generate the main frontier.
 
 The intended finding is a characterization of when payoff redesign can improve joint support, what trade-offs remain, and where persistent local stress prevents otherwise attractive activity levels. A negative result, or an improvement limited to a narrow regime, remains part of that characterization. The model cannot establish that a particular social priority is morally correct, or that a real location can support a specified infrastructure project.
 
 ## Reproducibility and scope
 
-The main configuration uses 2,000 steps, excluding the first 500; 8 separate characterization realizations, 8 training, 16 validation, and 64 held-out realizations; and disjoint indexed random inputs. Candidate policies are frozen before held-out evaluation. All targets, welfare assumptions, stress definitions, random inputs, source versions, individual outcomes, and analysis settings are archived. Replaying a realization checks the recorded individual deliveries and welfare results as well as the physical trajectory.
+The main configuration uses 2,000 steps, excluding the first 500; 8 separate characterization realizations, 8 training, 16 validation, and 128 held-out realizations; and disjoint indexed random inputs. Candidate policies are frozen before held-out evaluation. All targets, welfare assumptions, stress definitions, random inputs, source versions, individual outcomes, and analysis settings are archived. Replaying a realization checks the recorded individual deliveries and welfare results as well as the physical trajectory.
 
 The `smoke.json` configuration is a short software check, not evidence for scientific conclusions. Production experiments require an explicit execution budget. [Running the experiments](running-experiments.md) describes commands and [implementation](implementation.md) specifies the event order and output records.
 
 ## Discussion questions tied to the evidence
 
 - Joint gains: determine whether changing the payoff structure improves support for both groups relative to the embedded conference game, and where gains require a trade-off. An improved combined score alone does not establish gains for both groups.
-- Competing priorities: explain how human-only, AI-only, and joint objectives change selected incentives under the same resource conditions. A larger joint score under its own optimizer is not independent evidence that its normative weights are correct.
+- Competing outcomes: identify which improvements can be achieved together and which require a sacrifice elsewhere. Optional priority-specific searches illustrate declared preferences rather than determine a universally best design.
 - Spatial traps and consequences: distinguish a persistent resource–strategy pattern from demonstrated lost activity, unmet requests, or limited recovery. State whether the same conclusion survives both protection specifications and different definitions of additional-use benefit.
 - Mathematical limits: examine the limits imposed by spatial access, demand pressure, the permitted payoff changes, and the fixed abundant-state game. Failure to find a successful design is not a proof that none exists.
 - Political interpretation: discuss why shared physical dependence complicates both automatic rejection of AI demand and disregard for human access. Identify which conclusions follow from the simulations and which remain philosophical commitments. The model measures supported activity, not the full social value of an AI system or a person's life.

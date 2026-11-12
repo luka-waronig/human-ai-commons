@@ -59,7 +59,7 @@ def main():
     figure=ROOT/'docs/figures/strategic_geometry.png'
     fig.savefig(figure,dpi=150)
     plt.close(fig)
-    paths=['scripts/verify_payoff_design.py','configs/research_protocol.json','src/watertoc_jcs/payoffs.py','src/watertoc_jcs/optimization.py','docs/research-plan.md','docs/figures/strategic_geometry.png']
+    paths=['scripts/verify_payoff_design.py','configs/research_protocol.json','src/human_ai_commons/payoffs.py','src/human_ai_commons/optimization.py','docs/research-plan.md','docs/figures/strategic_geometry.png']
     report=dict(scope='Exact normalized payoff identities and analytical geometry',agent_based_simulations=0,
         checks=dict(original_numeric_matrix_recovered_by_common_normalization=True,
                     endpoint_payoff_differences_and_expected_advantage=True,derived_transition_levels=True,

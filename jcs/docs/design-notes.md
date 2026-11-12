@@ -2,7 +2,7 @@
 
 **Based on:** *Emergent Spatial Traps in the Coevolutionary Commons: Human-AI Cooperation under Environmental Feedback* (ICCS 2026)
 
-**Scope:** Alternative payoff and welfare formulations. The executable study is specified in the [research protocol](research-plan.md).  
+**Scope:** Research design formulations. The executable [research protocol](research-plan.md) uses the three-objective Pareto approach with the normalized endpoint payoff matrix. Proposed alternatives and stronger feasibility claims below are not all implemented; the protocol defines the numerical assumptions and limits.
 **Core aim:** turn the ICCS discovery of spatial traps into a constrained optimization and feasibility study of when strategic governance can, and cannot, prevent persistent localized depletion.
 
 ---
@@ -716,7 +716,7 @@ These are hypotheses, not conclusions.
 
 # 19. Computational study design
 
-## Stage A — Freeze and reproduce the ICCS model
+## Stage A — ICCS model baseline and reproduction
 
 A fixed source revision defines the software baseline.
 
@@ -724,9 +724,9 @@ Reference comparison:
 
 > The original payoff configuration and environmental parameters provide the basis for assessing qualitative trends and representative statistics.
 
-## Stage B — Add the parameterized game family
+## Stage B — Parameterized game family
 
-Add a small game module exposing
+A candidate game module exposes
 
 ```python
 PayoffParameters(alpha, beta, gamma)
@@ -740,9 +740,9 @@ delta_d(n, params)
 expected_payoff_gap(n, x_local, params)
 ```
 
-## Stage C — Record physical service and local resource trajectories
+## Stage C — Physical service and local resource trajectories
 
-Record:
+Recorded quantities:
 
 - requested human demand;
 - delivered human demand;
@@ -756,9 +756,9 @@ Record:
 
 The return value of `consume_water_at()` is the amount actually delivered, permitting direct measurement of unmet demand.
 
-## Stage D — Reparameterize physical scenarios
+## Stage D — Physical scenario parameterization
 
-Create scenario generation in terms of
+The proposed scenario generation uses
 
 \[
 \Pi,\chi,B,C_Q,\theta
@@ -766,9 +766,9 @@ Create scenario generation in terms of
 
 instead of reporting only raw \(K_{\max}\), resource density, and allocation values.
 
-## Stage E — Map phase space before optimizing
+## Stage E — Phase-space mapping before optimization
 
-Use Sobol or Latin-hypercube sampling over the payoff and physical spaces to establish:
+Sobol or Latin-hypercube sampling over the payoff and physical spaces can characterize:
 
 - collapse regions;
 - managed scarcity;
@@ -795,22 +795,22 @@ One implementation option is BoTorch with noisy expected hypervolume improvement
 
 Sampling and evolutionary baselines provide comparisons across optimization methods.
 
-## Stage G — Find the feasibility boundary
+## Stage G — Feasibility-boundary estimation
 
 For fixed \((\chi,B,C_Q,\theta)\):
 
-1. start at low \(\Pi\);
-2. optimize the payoff family;
-3. determine whether any candidate satisfies all constraints;
-4. increase \(\Pi\);
-5. repeat until feasibility disappears;
-6. refine the transition to estimate \(\Pi_c\).
+1. initialization at low \(\Pi\);
+2. payoff-family optimization;
+3. assessment of candidate compliance with all constraints;
+4. an increase in \(\Pi\);
+5. repeated searches for the loss of observed feasibility;
+6. refinement around the transition to estimate \(\Pi_c\).
 
 The outer continuation characterizes the feasibility boundary independently of the choice of inner search algorithm.
 
 ## Stage H — Out-of-sample validation
 
-Validate headline findings with:
+Proposed validation of headline findings uses:
 
 - unseen random seeds;
 - longer horizons;
@@ -957,19 +957,19 @@ Mechanism-specific policy prescriptions are outside the scope of an abstraction 
 
 # 26. Computational evaluation sequence
 
-1. Freeze the published ICCS model and add regression tests.
-2. Refactor game logic into a standalone payoff module.
-3. Implement the normalized payoff parameterization.
-4. Make local strategic composition enter payoff evaluation.
-5. Record requested versus delivered human and AI demand.
-6. Record complete per-cell water trajectories.
-7. Implement PLD and hard constraints.
-8. Implement \(\Pi,\chi,B,C_Q\).
-9. Run a coarse Sobol design before any optimizer.
-10. Inspect the regime structure manually.
-11. Add constrained multiobjective optimization.
-12. Estimate \(\Pi_c\) through an outer feasibility search.
-13. Validate headline results out of sample.
+1. Published ICCS model baseline and regression tests.
+2. Standalone payoff module.
+3. Normalized payoff parameterization.
+4. Payoff evaluation using local strategic composition.
+5. Records of requested and delivered human and AI demand.
+6. Complete per-cell resource trajectories.
+7. PLD measurement and hard constraints.
+8. Physical scenario parameters \(\Pi,\chi,B,C_Q\).
+9. Coarse Sobol design before optimization.
+10. Examination of the regime structure.
+11. Constrained multiobjective optimization.
+12. Estimation of \(\Pi_c\) through an outer feasibility search.
+13. Out-of-sample validation of headline results.
 
 The **phase structure and feasibility transition** are the scientific objects; optimization is the computational method used to investigate them.
 

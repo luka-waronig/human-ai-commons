@@ -14,6 +14,7 @@ from .optimization import differential_search, one_dimensional
 from .payoffs import Policy
 from .provenance import append_json, environment, identifier, read_jsonl, rng, seed, sha256, source_files, source_hashes, utc_now, write_json
 from .world import World, generate_world, transform_world
+from . import frontiers
 
 STAGES = ['characterize', 'train', 'validate', 'test', 'robustness']
 
@@ -25,6 +26,8 @@ def bundle_hashes(output):
 
 
 def candidate_key(row, norm):
+    if 'objective_vector' in row:
+        raise ValueError('Pareto designs cannot be ranked by the scalar candidate rule')
     return (max(0., row.get('stress_probability_violation', 0.)),
             row.get('objective_loss', row['mean_loss']), Policy(**row['policy']).cost(norm), row['policy_id'])
 
@@ -149,6 +152,9 @@ class Evaluation:
                           protection_supported=bool(upper <= maximum))
         else:
             result['objective_loss'] = result['mean_loss']
+        if frontiers.enabled(self.config):
+            result['objective_vector'] = frontiers.values(result).tolist()
+            result.pop('objective_loss', None)
         return result
 
     def objective(self, pressure, policy):
@@ -160,7 +166,8 @@ class Evaluation:
             row.update(pressure=pressure, regime=policy.regime)
             self.candidates[key] = row
             append_json(self.output/'training_candidates.jsonl', row)
-        return self.candidates[key]['objective_loss']
+        row = self.candidates[key]
+        return row['objective_vector'] if frontiers.enabled(self.config) else row['objective_loss']
 
     def stress_constraint(self, pressure, policy):
         self.objective(pressure, policy)
@@ -187,6 +194,8 @@ def characterize(ctx):
 
 
 def train(ctx):
+    if frontiers.enabled(ctx.config):
+        return frontiers.train(ctx)
     config = ctx.config
     s, p = config['search'], config['payoffs']
     t, bounds = p['t'], tuple(p['relative_bounds'])
@@ -224,6 +233,8 @@ def train(ctx):
 
 
 def validate(ctx):
+    if frontiers.enabled(ctx.config):
+        return frontiers.validate(ctx)
     design = json.loads((ctx.output/'shortlists.json').read_text())
     frozen = []
     for row in design:
@@ -248,6 +259,8 @@ def primary(frozen, config):
 
 
 def test(ctx):
+    if frontiers.enabled(ctx.config):
+        return frontiers.test(ctx)
     frozen = json.loads((ctx.output/'frozen_policies.json').read_text())
     count = ctx.config['validation']['test_realizations']
     results = []
@@ -321,6 +334,8 @@ def test(ctx):
 
 
 def robustness(ctx):
+    if frontiers.enabled(ctx.config):
+        return frontiers.robustness(ctx)
     frozen = json.loads((ctx.output/'frozen_policies.json').read_text())
     anchor = primary(frozen, ctx.config)
     policies = {family: Policy(**candidate['policy']) for family, candidate in anchor['winners'].items()}

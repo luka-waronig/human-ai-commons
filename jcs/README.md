@@ -1,7 +1,7 @@
 # Strategic Incentives and Joint Welfare in Human-AI Commons: Journal of Computational Science - Special Issue
 
 This JCS Special Issue study investigates patterns in the coevolution of behavioral and environmental parameters in a spatial and resource-bound Human-AI commons. 
-This directory contains all code and documentation for reproducing the self-contained experiments that optimize payoff structures to support human and AI activity together, integrating both into a concept of social welfare, subject to restrictions on persistent local resource stress.
+This directory contains all code and documentation for reproducing the self-contained experiments that optimize payoff structures to support human and AI activity together, retaining human support, AI support, and local depletion as separate objectives under restrictions on persistent local resource stress.
 
 - [Installation and reproduction](docs/running-experiments.md)
 - [Research protocol](docs/research-plan.md)
@@ -15,9 +15,9 @@ With Python 3.12 and the dependencies installed, run the main experiment from th
 python reproduce.py
 ```
 
-For a fresh installation with uv, follow [Set up Python once](docs/running-experiments.md#set-up-python-once). The script runs the original-game measurements, payoff search, validation, independent tests, and robustness experiments, then generates tables and figures. Results are written to `results/research_protocol/`, which is ignored by Git.
+For a fresh installation with uv, follow [Set up Python once](docs/running-experiments.md#set-up-python-once). The script runs the original-game measurements, payoff search, validation, independent tests, and robustness experiments, then generates tables and figures. Results are written to `results/research_protocol/`, which is ignored by Git. The main Pareto figure is `analysis/pareto_frontier.png` (also PDF); `analysis/pareto_candidates.csv` contains every tested design and its three outcomes. This main run produces the frontier without the separate priority-comparison runs.
 
-Run each comparison separately, or use `all` to run all four experiments in order:
+Optional comparisons can be run separately; `all` runs the main study and all three comparisons in order:
 
 ```text
 python reproduce.py human_only_priority

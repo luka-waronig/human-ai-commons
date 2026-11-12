@@ -1,4 +1,4 @@
-"""Describe spatial patterns and deliveries without declaring low stock a failure."""
+"""Spatial patterns and deliveries assessed separately from failure conditions."""
 import numpy as np
 from .metrics import request_fulfillment
 from .world import torus_distances

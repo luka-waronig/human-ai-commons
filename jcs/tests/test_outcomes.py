@@ -1,10 +1,10 @@
 import numpy as np
 import pytest
 
-from watertoc_jcs.dynamics import Scenario, simulate
-from watertoc_jcs.metrics import Depletion, MetricSpec
-from watertoc_jcs.payoffs import Policy
-from watertoc_jcs.world import World, WorldSpec
+from human_ai_commons.dynamics import Scenario, simulate
+from human_ai_commons.metrics import Depletion, MetricSpec
+from human_ai_commons.payoffs import Policy
+from human_ai_commons.world import World, WorldSpec
 
 
 @pytest.mark.parametrize('action', ['C', 'D'])

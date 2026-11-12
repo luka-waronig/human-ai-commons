@@ -9,11 +9,11 @@ import zipfile
 import runpy
 import numpy as np
 import pytest
-from watertoc_jcs.analysis import analyze, metric_sensitivity, verify_bundle
-from watertoc_jcs.config import budget_plan, load_config
-import watertoc_jcs.experiments as experiments
-from watertoc_jcs.experiments import replay, run_stages
-from watertoc_jcs.provenance import ROOT, read_jsonl
+from human_ai_commons.analysis import analyze, metric_sensitivity, verify_bundle
+from human_ai_commons.config import budget_plan, load_config
+import human_ai_commons.experiments as experiments
+from human_ai_commons.experiments import replay, run_stages
+from human_ai_commons.provenance import ROOT, read_jsonl
 
 
 def test_production_budget_guard_precedes_any_output(tmp_path):
@@ -64,9 +64,14 @@ def test_smoke_stages_holdouts_integrity_and_exact_replay(tmp_path, basis):
     assert all('welfare' in row and 'persistent_local_stress' in row for row in rows)
     assert replay(output, selected['evaluation_id'])['matched']
     frozen = json.loads((output/'frozen_policies.json').read_text())
-    assert all(all(candidate['count'] == 2 for candidate in problem['winners'].values()) for problem in frozen)
+    assert all('winners' not in problem for problem in frozen)
+    assert all(candidate['count'] == 2 for problem in frozen for candidates in problem['families'].values() for candidate in candidates)
     analyze(output)
-    assert (output/'analysis/heldout_frontier.png').exists()
+    assert (output/'analysis/pareto_frontier.png').exists()
+    assert (output/'analysis/pareto_frontier.pdf').exists()
+    # The software check cannot establish the production probability limit.
+    # Its supported-frontier table must retain its header without false claims.
+    assert len((output/'analysis/pareto_frontier.csv').read_text().splitlines()) == 1
     assert (output/'analysis/spatial_depletion.png').exists()
     assert (output/'analysis/observation_controls.png').exists()
     assert (output/'analysis/robustness.png').exists()
@@ -74,24 +79,25 @@ def test_smoke_stages_holdouts_integrity_and_exact_replay(tmp_path, basis):
     assert (output/'analysis/welfare_assumptions.csv').exists()
     assert (output/'analysis/stress_definitions.csv').exists()
     comparisons = json.loads((output/'test_comparisons.json').read_text())
-    assert all('welfare_local_vs_resource_only' in row for row in comparisons['problems'])
-    assert all('simultaneous_protection_supported' in value for row in comparisons['problems'] for value in row['policies'].values())
-    assert not any(value['simultaneous_protection_supported'] for row in comparisons['problems'] for value in row['policies'].values())
-    assert comparisons['original_game_outcome_comparison'] is not None
+    assert comparisons['mode'] == 'pareto'
+    assert comparisons['paired_outcome_comparisons']
+    assert all('simultaneous_protection_supported' in value for row in comparisons['problems'] for candidates in row['families'].values() for value in candidates)
+    assert not any(value['simultaneous_protection_supported'] for row in comparisons['problems'] for candidates in row['families'].values() for value in candidates)
+    assert all('reference' in row['families'] for row in comparisons['problems'])
     result = metric_sensitivity(output, .3, .2, output/'analysis/rescored.csv')
     assert result['rescored_realizations'] > 0
     assert not result['simulations_started']
-    from watertoc_jcs.release import export_release
+    from human_ai_commons.release import export_release
     exported = export_release(output, tmp_path/'release.zip')
     with zipfile.ZipFile(exported['archive']) as archive:
         names = archive.namelist()
-        assert 'jcs/src/watertoc_jcs/dynamics.py' in names
+        assert 'jcs/src/human_ai_commons/dynamics.py' in names
         assert 'jcs/results/paper/frozen_policies.json' in names
         assert 'jcs/docs/research-plan.md' in names
         assert 'jcs/scripts/verify_payoff_design.py' in names
         assert 'jcs/RELEASE_SHA256.json' in names
         assert 'jcs/RESEARCH_PLAN.md' not in names
-        assert not any('/.venv/' in name or '/water_toc/' in name for name in names)
+        assert not any('/.venv/' in name or '/iccs2026/' in name for name in names)
     with (output/selected['world_path']).open('ab') as stream:
         stream.write(b'tamper')
     with pytest.raises(ValueError, match='checksum'):
@@ -99,7 +105,7 @@ def test_smoke_stages_holdouts_integrity_and_exact_replay(tmp_path, basis):
 
 
 def test_package_imports_do_not_reference_legacy_modules():
-    prohibited = {'water_toc', 'mesa', 'sensitivity_analysis', 'server', 'spatial_analysis_sweep'}
+    prohibited = {'mesa', 'sensitivity_analysis', 'server', 'spatial_analysis_sweep'}
     for path in (ROOT/'src').rglob('*.py'):
         for node in ast.walk(ast.parse(path.read_text())):
             if isinstance(node, ast.Import):
@@ -125,7 +131,7 @@ def test_direct_python_experiment_runs_and_resumes_outside_repository(tmp_path):
     first = subprocess.run(command, cwd=tmp_path, capture_output=True, text=True, check=True)
     assert 'Finished:' in first.stdout
     output = copied/'results/smoke'
-    assert (output/'analysis/heldout_frontier.csv').exists()
+    assert (output/'analysis/pareto_candidates.csv').exists()
     manifest = json.loads((output/'manifest.json').read_text())
     assert set(manifest['stages'].values()) == {'complete'}
     before = (output/'budget_ledger.jsonl').read_bytes()
@@ -134,8 +140,8 @@ def test_direct_python_experiment_runs_and_resumes_outside_repository(tmp_path):
 
 
 def test_direct_all_dispatch_uses_all_configured_stages_and_budgets_without_simulating(monkeypatch):
-    import watertoc_jcs.config as configuration
-    import watertoc_jcs.analysis as analysis
+    import human_ai_commons.config as configuration
+    import human_ai_commons.analysis as analysis
     calls = []
     def record(config, output, stage, limit):
         expected = configuration.budget_plan(config)['model_step_caps'][stage]

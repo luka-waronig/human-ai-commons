@@ -2,8 +2,11 @@
   "extends": "research_protocol.json",
   "objective": {
     "welfare": {
-      "human_weight": 0
-    }
+      "human_weight": 0,
+      "role": "scalar_priority_control_objective"
+    },
+    "name": "joint_service_welfare_with_persistent_local_stress_constraint",
+    "pareto_objectives": []
   },
   "execution": {
     "include_l1_search": false,
@@ -17,6 +20,32 @@
       }
     ],
     "payoff_maps": [],
-    "global_composition_reoptimization": null
+    "global_composition_reoptimization": null,
+    "method": "scipy.optimize.differential_evolution",
+    "scipy_version": "1.15.3",
+    "strategy": "best1bin",
+    "explicit_population_size": 16,
+    "initialization": "scrambled_sobol_relative_changes_with_reference_and_equal_relative_seeds",
+    "mutation": [
+      0.5,
+      1
+    ],
+    "recombination": 0.7,
+    "maximum_generations": 16,
+    "optimizer_restarts": 3,
+    "updating": "deferred",
+    "polish": false,
+    "tol": 0,
+    "atol": 0,
+    "one_dimensional_search": {
+      "refined_intervals_per_round": 3,
+      "refinement_grid_points": 9,
+      "refinement_rounds": 2,
+      "assume_unimodal_loss": false
+    }
+  },
+  "validation": {
+    "maximum_shortlisted_candidates_per_family_and_problem": 5,
+    "test_realizations": 64
   }
 }

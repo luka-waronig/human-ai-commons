@@ -1,12 +1,12 @@
 from dataclasses import replace
 import numpy as np
 import pytest
-from watertoc_jcs.capacity import routing_bound, strict_safety_bound
-from watertoc_jcs.dynamics import Drivers, Scenario, Simulator, simulate
-from watertoc_jcs.metrics import Depletion, MetricSpec, rescore, upper_tail_mean
-from watertoc_jcs.optimization import differential_search
-from watertoc_jcs.payoffs import Policy, resource_only_encoding, effective_change_interval
-from watertoc_jcs.world import World, WorldSpec, generate_world, torus_distances, transform_world
+from human_ai_commons.capacity import routing_bound, strict_safety_bound
+from human_ai_commons.dynamics import Drivers, Scenario, Simulator, simulate
+from human_ai_commons.metrics import Depletion, MetricSpec, rescore, upper_tail_mean
+from human_ai_commons.optimization import differential_search
+from human_ai_commons.payoffs import Policy, resource_only_encoding, effective_change_interval
+from human_ai_commons.world import World, WorldSpec, generate_world, torus_distances, transform_world
 
 
 def hand_world():

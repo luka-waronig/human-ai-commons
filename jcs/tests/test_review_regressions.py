@@ -3,12 +3,12 @@ from dataclasses import replace
 import json
 import numpy as np
 import pytest
-import watertoc_jcs.experiments as experiments
-from watertoc_jcs.config import load_config, validate_config
-from watertoc_jcs.optimization import one_dimensional, differential_search
-from watertoc_jcs.payoffs import Policy
-from watertoc_jcs.provenance import ROOT, read_jsonl
-from watertoc_jcs.world import World, WorldSpec
+import human_ai_commons.experiments as experiments
+from human_ai_commons.config import load_config, validate_config
+from human_ai_commons.optimization import one_dimensional, differential_search
+from human_ai_commons.payoffs import Policy
+from human_ai_commons.provenance import ROOT, read_jsonl
+from human_ai_commons.world import World, WorldSpec
 
 
 def test_threshold_refinement_can_follow_a_right_hand_minimum():
@@ -65,15 +65,15 @@ def test_resumed_training_reproduces_uninterrupted_shortlists(tmp_path, monkeypa
     config = load_config(ROOT/'configs/smoke.json')
     complete, interrupted = tmp_path/'complete', tmp_path/'interrupted'
     experiments.run_stages(config, complete, 'train', 10000)
-    original = experiments.write_json
+    original = experiments.frontiers.write_json
     def interrupt(path, data):
         if path.name == 'shortlists.json':
             raise RuntimeError('interrupted before saving shortlists')
         return original(path, data)
-    monkeypatch.setattr(experiments, 'write_json', interrupt)
+    monkeypatch.setattr(experiments.frontiers, 'write_json', interrupt)
     with pytest.raises(RuntimeError, match='before saving'):
         experiments.run_stages(config, interrupted, 'train', 10000)
-    monkeypatch.setattr(experiments, 'write_json', original)
+    monkeypatch.setattr(experiments.frontiers, 'write_json', original)
     experiments.run_stages(config, interrupted, 'train', 10000)
     assert json.loads((complete/'shortlists.json').read_text()) == json.loads((interrupted/'shortlists.json').read_text())
 
@@ -97,7 +97,7 @@ def test_invalid_experiment_specifications_fail_early(change):
 
 
 def test_capacity_relaxation_matches_exhaustive_small_graph_cuts():
-    from watertoc_jcs.capacity import routing_bound
+    from human_ai_commons.capacity import routing_bound
     generator = np.random.default_rng(71)
     for _ in range(40):
         access = generator.random((3, 3)) < .5

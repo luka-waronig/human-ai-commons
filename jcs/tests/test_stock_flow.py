@@ -1,10 +1,10 @@
 import numpy as np
 import pytest
-from watertoc_jcs.diagnostics import spatial_autocorrelation,spatial_summary
-from watertoc_jcs.dynamics import Scenario,Simulator,Drivers
-from watertoc_jcs.metrics import LocalStress,Service,StressSpec,WelfareSpec,request_fulfillment
-from watertoc_jcs.payoffs import Policy
-from watertoc_jcs.world import World,WorldSpec
+from human_ai_commons.diagnostics import spatial_autocorrelation,spatial_summary
+from human_ai_commons.dynamics import Scenario,Simulator,Drivers
+from human_ai_commons.metrics import LocalStress,Service,StressSpec,WelfareSpec,request_fulfillment
+from human_ai_commons.payoffs import Policy
+from human_ai_commons.world import World,WorldSpec
 
 
 @pytest.mark.parametrize('initial',[[.38,.38],[0.,.76]])

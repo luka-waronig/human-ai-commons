@@ -1,4 +1,4 @@
-"""Export the standalone study plus one verified result bundle, without environments."""
+"""Export of the standalone study and one verified result bundle, without environments."""
 import json
 from pathlib import Path
 import zipfile
@@ -42,8 +42,8 @@ def export_release(bundle, destination):
             if path.is_symlink():
                 raise ValueError('release files must not be symbolic links')
             files[str(Path('jcs')/path.relative_to(ROOT))] = path
-    # A normal installation may execute a wheel rather than ROOT/src. Export
-    # the executed source, never a different uninstalled working copy.
+    # A normal installation may execute a wheel rather than ROOT/src. The
+    # exported source matches the executed package rather than another copy.
     for relative, path in source_files().items():
         files[str(Path('jcs')/relative)] = path
     for path in bundle.rglob('*'):

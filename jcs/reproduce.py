@@ -1,18 +1,18 @@
-"""Run the journal experiments directly, or use individual reproduction commands."""
+"""Direct journal experiment execution and individual reproduction commands."""
 from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / 'src'))
-from watertoc_jcs.cli import main
+from human_ai_commons.cli import main
 
 EXPERIMENTS = ('research_protocol', 'human_only_priority', 'ai_only_priority', 'delivery_reliability')
 
 
 def run_experiment(name):
-    from watertoc_jcs.config import load_config, budget_plan
-    from watertoc_jcs.experiments import run_stages
-    from watertoc_jcs.analysis import analyze, metric_sensitivity, verify_bundle
+    from human_ai_commons.config import load_config, budget_plan
+    from human_ai_commons.experiments import run_stages
+    from human_ai_commons.analysis import analyze, metric_sensitivity, verify_bundle
 
     config = load_config(ROOT / 'configs' / (name + '.json'))
     output = ROOT / 'results' / name

@@ -1,4 +1,4 @@
-"""Run the journal experiments with a private environment and saved source copy."""
+"""Journal experiments with an isolated environment and saved source copy."""
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import fcntl
@@ -196,7 +196,8 @@ def finish(root, python, name):
                     name + ': checking the depletion measurement', bundle)
     comparisons = read(bundle / 'test_comparisons.json')
     primary = next(row for row in comparisons['problems'] if row['problem'] == comparisons['primary_problem'])
-    evaluation = primary['policies']['local']['realization_ids'][0]
+    local = primary['families']['local'][0] if comparisons.get('mode') == 'pareto' else primary['policies']['local']
+    evaluation = local['realization_ids'][0]
     steps = read(bundle / 'manifest.json')['configuration']['objective']['total_steps']
     cli(root, python, ['replay', str(bundle), evaluation, '--max-model-steps', str(steps)],
         name + ': replaying one saved realization', bundle)

@@ -2,7 +2,7 @@
 
 This folder contains the JCS study. It can be copied to another location to install its dependencies, run tests, generate experiments, and analyze their outputs independently of the parent repository.
 
-The implementation includes the payoff family, spatial simulator, joint welfare calculation, persistent-stress restriction, constrained searches, resource-only comparators, independent validation and testing, observation controls, physical capacity checks, robustness experiments, and artifact replay. `configs/smoke.json` provides a small integration-test configuration; `configs/research_protocol.json` specifies the research experiments.
+The implementation includes the payoff family, spatial simulator, three separate outcome objectives, persistent-stress restriction, constrained Pareto searches, resource-only comparators, independent validation and testing, observation controls, physical capacity checks, robustness experiments, and artifact replay. `configs/smoke.json` provides a small integration-test configuration; `configs/research_protocol.json` specifies the research experiments.
 
 ## Set up Python once
 
@@ -42,9 +42,9 @@ Run the main experiment:
 python reproduce.py
 ```
 
-This runs the original-game measurements, payoff search, validation, independent testing, and robustness experiments in order. It then generates tables, figures, and the additional depletion-diagnostic comparisons. The main command starts the full research workload; it is not a quick check. It prints stage names, but can remain quiet during a long stage.
+This runs the original-game measurements, payoff search, validation, independent testing, and robustness experiments in order. It then generates the tested design table, Pareto-frontier tables, PNG and PDF frontier figures, spatial comparisons, and depletion sensitivity analyses. This one main run is sufficient to produce the main frontier. The main command starts the full research workload; it is not a quick check. It prints stage names, but can remain quiet during a long stage.
 
-Run the three comparisons separately, after the main experiment:
+The following comparisons are optional; none is required to generate the main frontier:
 
 ```text
 python reproduce.py human_only_priority
@@ -54,7 +54,7 @@ python reproduce.py delivery_reliability
 
 Alternatively, `python reproduce.py all` runs the main experiment followed by these three comparisons sequentially. Choose the individual commands or `all`; both execute the same four configurations. The comparison configurations have no additional robustness variants.
 
-If your selected Python environment already contains the required dependencies, the same scripts can be run with `python reproduce.py`. From the repository root, use `python jcs/reproduce.py`. In an IDE, select the environment above and run `reproduce.py` to start the main experiment.
+If the selected Python environment already contains the required dependencies, the same scripts can be run with `python reproduce.py`. From the repository root, use `python jcs/reproduce.py`. In an IDE, select the environment above and run `reproduce.py` to start the main experiment.
 
 ## Results and restarting
 
@@ -71,7 +71,7 @@ Each folder contains the resolved configuration, source record, generated worlds
 
 Repeating the same command reuses completed simulation stages and regenerates the analysis. During simulation stages, Ctrl+C requests a stop after the current realization is saved; wait for the script to exit before restarting. A forced kill or power loss may need recovery. Do not run two copies of the same experiment into the same output folder. Keep the model code, configurations, and numerical dependency versions unchanged while collecting one study's results. If they change, preserve the old results and use a separate study copy or the individual-stage commands below with a new output folder.
 
-The direct script verifies result checksums and generates analyses. Replay and ZIP export are separate optional commands described below. The cross-priority comparison and the original-game/redesign spatial figures still require assembly from the saved results; the automatic per-study plots do not replace them.
+The direct script verifies result checksums and generates analyses. Replay and ZIP export are separate optional commands described below. The main run produces the original-game/frontier spatial illustrations automatically. These show the same first indexed test world under the original game and representative retained designs; the ensemble tables provide the quantitative evidence.
 
 <details>
 <summary>Individual commands for installation, stages, and analysis</summary>
@@ -99,7 +99,7 @@ python reproduce.py analyze results/smoke
 python reproduce.py rescore results/smoke --floor 0.3 --tail 0.2 --output results/smoke/analysis/metric_sensitivity.csv
 ```
 
-The smoke design uses a 4 by 5 grid, six agents, and twelve time steps per realization. It exercises all workflow stages, both budget norms, and selected mechanism controls. It has a conservative upper bound of 4,140 model steps across the entire workflow, before cache reuse. Output figures identify it as a software check.
+The smoke design uses a 4 by 5 grid, six agents, and twelve time steps per realization. It exercises all workflow stages, both budget norms, and selected mechanism controls. Use `python reproduce.py plan --config configs/smoke.json` to inspect its conservative model-step bound before cache reuse. Output figures identify it as a software check.
 
 The low-level `run` command defaults to a hard limit of 10,000 model steps. The direct commands above use the budgets calculated from each experiment configuration. With the low-level default, a production configuration is rejected **before constructing worlds or starting simulations** if its planned upper bound exceeds that limit. `plan`, `verify`, `analyze`, and `rescore` never run simulations. `replay` reruns one realization and also has a model-step limit.
 
@@ -118,19 +118,36 @@ The reference stage evaluates the embedded game and forced lower/higher extracti
 python reproduce.py plan --config configs/research_protocol.json
 ```
 
-This reports the training, validation, test, and robustness budgets. The `run` command accepts an explicit `--max-model-steps` and a stage: `characterize`, `train`, `validate`, `test`, or `robustness`. Training runs the characterization stage first if it has not already completed. Use the same output bundle for successive stages. Validation requires training; testing requires frozen validation winners. Completed stages are reused. A changed configuration, source, dependency environment, or modified recorded artifact requires a new bundle.
+This reports the training, validation, test, and robustness budgets. The `run` command accepts an explicit `--max-model-steps` and a stage: `characterize`, `train`, `validate`, `test`, or `robustness`. Training runs the characterization stage first if it has not already completed. Use the same output bundle for successive stages. Validation requires training; testing requires the frozen validation design sets. Completed stages are reused. A changed configuration, source, dependency environment, or modified recorded artifact requires a new bundle.
 
 The [research plan](research-plan.md) explains the scientific question and decision rules. The [implementation record](implementation.md) defines scheduling, random streams, world sampling, and the correspondence between experiment stages and the protocol. Robustness outputs transfer frozen policies; a transfer under changed physical conditions is not a newly optimized outcome.
 
-`research_protocol.json` maximizes joint support for human and AI activity subject to the persistent-local-stress restriction. `human_only_priority.json` and `ai_only_priority.json` reoptimize the headline setting with one activity type given all objective weight. Their physical conditions, random streams, and protection requirement match the main study. `plan` accepts each configuration without starting simulations. Their production runs use separate output bundles and explicit execution budgets. `delivery_reliability.json` holds the headline physical and welfare conditions fixed but constrains persistent unmet requests instead of low source stocks. This is a comparison of protection goals, not a redefinition of the conference spatial trap.
+`research_protocol.json` estimates the trade-offs among human support, AI support, and local depletion, subject to the payoff budget and persistent-local-stress restriction. No combined welfare score guides this search. `human_only_priority.json` and `ai_only_priority.json` reoptimize the headline setting with one activity type given all objective weight. Their physical conditions, random streams, and protection requirement match the main study. `plan` accepts each configuration without starting simulations. Their production runs use separate output bundles and explicit execution budgets. `delivery_reliability.json` repeats the three-objective Pareto workflow at the headline setting, constraining persistent unmet requests instead of low source stocks. This is a comparison of protection goals, not a redefinition of the conference spatial trap.
 
 ## Output bundle
 
-Each run produces the resolved configuration, a budget plan and ledger, source hashes and a source snapshot, environment versions, generated worlds, candidate scores, validation shortlists, frozen policies, and per-realization metrics. Metrics include individual mean requests and deliveries, the fraction of steps each agent receives nothing, and the duration of continuous depletion at each accessible resource cell. Held-out and robustness realizations additionally archive complete post-withdrawal stock trajectories, strategies, individual requests and deliveries, and their actual random drivers.
+Each run produces the resolved configuration, a budget plan and ledger, source hashes and a source snapshot, environment versions, generated worlds, candidate scores, validation shortlists, frozen policies, and per-realization metrics. Metrics include individual mean requests and deliveries, the fraction of steps each agent receives nothing, and the duration of continuous depletion at each accessible resource cell. Held-out test realizations additionally archive complete post-withdrawal stock trajectories, strategies, individual requests and deliveries, and their actual random drivers. In the Pareto workflow, robustness realizations retain outcome summaries rather than full trajectories.
 
-`test_comparisons.json` contains paired welfare intervals over independent complete realizations, separate human and AI outcomes, and stress-probability bounds. A selected policy is not automatically supported as protective: inspect `simultaneous_protection_supported`. The small software check has too few independent realizations to support the main probability restriction.
+`test_comparisons.json` stores a list of frozen designs for each family, separate human/AI/depletion outcomes, paired changes from the original game, observation controls, and resource-probability bounds. A design is not automatically supported as protective: inspect `simultaneous_protection_supported`. The tiny software check has too few independent realizations to support the production probability restriction.
 
-`analysis/heldout_frontier.csv` reports welfare and stress results together. Red crosses in the corresponding figure mark designs whose protection requirement is not statistically established. `welfare_assumptions.csv` and `stress_definitions.csv` re-score frozen policies under alternative definitions. They do not establish reoptimized outcomes under those definitions. `payoff_coordinates.csv` records matrix entries and their derived strategic transitions. `spatial_characterization.csv` reports the resource–strategy pattern and actual request fulfillment together. `spatial_stress.png` shows continuous duration for the configured persistence basis; `spatial_depletion.png` retains the auxiliary cumulative resource-deficit map. Changing the diagnostic depletion reference or spatial tail fraction is also available through `rescore`, without simulations.
+The main outputs in `analysis/` are:
+
+| File | Contents |
+| --- | --- |
+| `pareto_frontier.png` and `pareto_frontier.pdf` | Human support versus AI support, with depletion shown by colour; separate panels for pressure, budget, and norm |
+| `pareto_candidates.csv` | Every tested design, its three mean outcomes and descriptive uncertainty intervals, payoff parameters, and resource-constraint status |
+| `estimated_pareto_frontier.csv` | Non-dominated test sample means among empirically admissible designs, separately by family and including the original game as an alternative |
+| `pareto_frontier.csv` | The corresponding frontier restricted to designs with statistical support for the resource condition |
+| `pareto_summary.json` | Whether any tested design establishes the resource condition in each problem |
+| `paired_outcome_comparisons.csv` | Changes in each outcome from the original game, descriptive bootstrap intervals, and conservative simultaneous bounds |
+| `training_pareto_candidates.csv` | Evaluated training designs and their three outcomes |
+| `spatial_depletion.png`, `spatial_stress.png` | Matched first-world illustrations of the original game and representative retained designs |
+| `observation_controls.csv` and `.png` | The same payoff matrices under local, global, and fixed observations |
+| `robustness_comparisons.csv` and `robustness.png` | Frozen-design outcomes under the stated changes in model conditions |
+
+Frontiers describe the finite set of tested designs. They are estimates, not proofs of global optimality or population-level dominance. The figure does not interpolate an unsupported continuous surface. Hollow markers mean the resource requirement was not established; crosses mean it was violated empirically. A supported-frontier CSV can contain only its header when no design establishes the requirement. All tested outcomes remain available in `pareto_candidates.csv`; lack of support is not proof of infeasibility.
+
+`welfare_assumptions.csv` and `stress_definitions.csv` re-score frozen designs under alternative definitions. They do not establish reoptimized frontiers. `payoff_coordinates.csv` records matrix entries and strategic transitions. `spatial_characterization.csv` reports resource–strategy patterns and actual request fulfillment. Changing the depletion reference or spatial tail fraction is also available through `rescore`, without simulations. The optional single-priority configurations retain their scalar-comparison output format; their `heldout_frontier` files are not the main Pareto result.
 
 `capacity_bounds.jsonl` records the strictly scoped zero-depletion capacity relaxation. This diagnostic does not prove that the welfare problem with its persistent-stress restriction is impossible.
 

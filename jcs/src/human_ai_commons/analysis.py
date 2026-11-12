@@ -1,4 +1,4 @@
-"""Generate tables and figures from recorded artifacts, without simulations."""
+"""Tables and figures from recorded artifacts, without simulations."""
 import csv
 import json
 from pathlib import Path
@@ -55,6 +55,9 @@ def analyze(output, destination=None):
                                 t=policy.t, s=policy.s, relative_c=policy.relative[0], relative_d=policy.relative[1],
                                 q_c=policy.q_c, q_d=policy.q_d, slope_ratio=policy.omega, regime=policy.regime))
     write_csv(destination/'payoff_coordinates.csv', coordinates)
+    from .frontiers import enabled
+    if enabled(manifest['configuration']):
+        return analyze_frontiers(output, destination, manifest, rows, candidates, title_label)
     joint = 'welfare' in manifest['configuration']['objective']
     measure = 'mean_welfare' if joint else 'mean_loss'
     weight = manifest['configuration']['objective'].get('welfare', {}).get('human_weight', .5)
@@ -206,8 +209,183 @@ def analyze(output, destination=None):
     return dict(output=str(destination), rows=len(summaries), label=label)
 
 
+def analyze_frontiers(output, destination, manifest, records, training, title):
+    import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
+    from matplotlib.cm import ScalarMappable
+    from matplotlib.colors import Normalize
+    from .frontiers import nondominated
+    write_csv(destination/'training_pareto_candidates.csv', [dict(
+        pressure=r['pressure'], policy_id=r['policy_id'], observation=r['policy']['observation'],
+        u=r['policy']['u'], v=r['policy']['v'], human=r['mean_human_service'], ai=r['mean_ai_service'],
+        depletion=r['mean_loss'], empirical_constraint_satisfied=r['search_feasible']) for r in training])
+    result_path = output/'test_comparisons.json'
+    table = []
+    if result_path.exists():
+        data = json.loads(result_path.read_text())
+        for problem in data['problems']:
+            reference = problem['families']['reference'][0]
+            for family, candidates in problem['families'].items():
+                alternatives = candidates+[reference]
+                empirical = {r['policy_id'] for r in nondominated([r for r in alternatives if r['search_feasible']])}
+                supported = {r['policy_id'] for r in nondominated([r for r in alternatives if r['simultaneous_protection_supported']])}
+                for candidate in candidates:
+                    policy = Policy(**candidate['policy'])
+                    row = dict(problem_id=problem['problem_id'], **problem['problem'], family=family, policy_id=policy.id,
+                        u=policy.u, v=policy.v, q_c=policy.q_c, q_d=policy.q_d, payoff_cost=policy.cost(problem['problem']['norm']),
+                        human=candidate['mean_human_service'], ai=candidate['mean_ai_service'], depletion=candidate['mean_loss'],
+                        realizations=candidate['count'], stress_probability=candidate['stress_probability'],
+                        simultaneous_stress_probability_upper=candidate['simultaneous_stress_probability_upper'],
+                        empirical_constraint_satisfied=candidate['search_feasible'],
+                        constraint_supported=candidate['simultaneous_protection_supported'],
+                        estimated_family_pareto=policy.id in empirical,
+                        supported_family_pareto=policy.id in supported,
+                        frontier_scope='sample means among frozen tested designs and original game; no global or statistical dominance claim')
+                    for name, field in [('human', 'human_services'), ('ai', 'ai_services'), ('depletion', 'losses')]:
+                        interval = paired_interval(candidate[field], rng('pareto-mean', problem['problem_id'], policy.id, name))
+                        row[name+'_lower'], row[name+'_upper'] = interval['lower'], interval['upper']
+                    table.append(row)
+        write_csv(destination/'pareto_candidates.csv', table)
+        # Headers are retained even when no design establishes the constraint.
+        for name, flag in [('pareto_frontier.csv', 'supported_family_pareto'),
+                           ('estimated_pareto_frontier.csv', 'estimated_family_pareto')]:
+            with (destination/name).open('w', newline='', encoding='utf-8') as stream:
+                writer = csv.DictWriter(stream, fieldnames=list(table[0]))
+                writer.writeheader()
+                writer.writerows(r for r in table if r[flag])
+        write_csv(destination/'paired_outcome_comparisons.csv', data['paired_outcome_comparisons'])
+        ids = list(dict.fromkeys(r['problem_id'] for r in table))
+        columns = min(2, len(ids))
+        fig, axes = plt.subplots(int(np.ceil(len(ids)/columns)), columns,
+            figsize=(7*columns, 5*int(np.ceil(len(ids)/columns))), squeeze=False, constrained_layout=True)
+        colors = plt.get_cmap('viridis')
+        markers = {'local': 'o', 'resource_only': 's', 'equal_relative': 'D', 'redistribution': '^', 'global': 'P'}
+        for ax in axes.flat[len(ids):]:
+            ax.set_visible(False)
+        for ax, pid in zip(axes.flat, ids):
+            group = [r for r in table if r['problem_id'] == pid]
+            for row in group:
+                if row['family'] == 'reference':
+                    ax.scatter(row['human'], row['ai'], marker='*', s=150, color='black', zorder=5)
+                else:
+                    marker = markers[row['family']] if row['empirical_constraint_satisfied'] else 'x'
+                    color = colors(row['depletion'])
+                    if marker == 'x':
+                        ax.scatter(row['human'], row['ai'], marker=marker, color=[color], s=45, alpha=.7)
+                    else:
+                        ax.scatter(row['human'], row['ai'], marker=marker, s=65,
+                            facecolors=[color] if row['constraint_supported'] else 'none',
+                            edgecolors='black' if row['supported_family_pareto'] else [color],
+                            linewidths=1.2, zorder=3 if row['estimated_family_pareto'] else 2)
+            first = group[0]
+            ax.set(xlabel='Human activity supported', ylabel='AI activity supported', xlim=(0, 1.02), ylim=(0, 1.02),
+                   title=f"Pressure {first['pressure']}; budget {first['budget']}; {first['norm']}")
+            ax.grid(alpha=.15)
+        handles = [Line2D([], [], marker=m, linestyle='', color='#555555', label=f.replace('_', ' ')) for f, m in markers.items()]
+        handles += [Line2D([], [], marker='*', linestyle='', color='black', label='original game'),
+            Line2D([], [], marker='o', linestyle='', markerfacecolor='none', color='#555555', label='constraint not established'),
+            Line2D([], [], marker='x', linestyle='', color='#555555', label='empirical constraint violated')]
+        fig.legend(handles=handles, loc='outside lower center', ncol=3, fontsize=8)
+        fig.colorbar(ScalarMappable(norm=Normalize(0, 1), cmap=colors), ax=list(axes.flat[:len(ids)]),
+                     label='Local depletion (lower is better)', shrink=.75)
+        fig.suptitle(title+'\nThree-objective Pareto estimates projected onto human and AI support\n'
+            'Filled: resource constraint established; black edge: estimated family frontier within that set', fontsize=11)
+        for suffix in ['png', 'pdf']:
+            fig.savefig(destination/f'pareto_frontier.{suffix}', dpi=180)
+        plt.close(fig)
+        write_json(destination/'pareto_summary.json', dict(
+            problems=[dict(problem_id=pid,
+                tested_designs=len({r['policy_id'] for r in table if r['problem_id'] == pid}),
+                constraint_supported_designs=len({r['policy_id'] for r in table if r['problem_id'] == pid and r['constraint_supported']}),
+                status='constraint_supported_designs_found' if any(r['constraint_supported'] for r in table if r['problem_id'] == pid)
+                       else 'no_design_established_the_constraint') for pid in ids],
+            note='Empty supported frontiers do not prove infeasibility. Bootstrap mean intervals are descriptive; dominance uses sample means.'))
+        frontier_spatial_figures(output, destination, data, records, title)
+        write_csv(destination/'observation_controls.csv', [dict(
+            source_policy_id=c['policy_id'], observation=observation, policy_id=r['policy_id'],
+            human=r['mean_human_service'], ai=r['mean_ai_service'], depletion=r['mean_loss'],
+            scope='same matrix with changed observations, not a reoptimized frontier')
+            for c in data['same_matrix_observation_controls'] for observation, r in c['observations'].items()])
+        fig, ax = plt.subplots(figsize=(6, 5), constrained_layout=True)
+        for observation, marker in [('local', 'o'), ('global', 'P'), ('fixed', 's')]:
+            points = [r['observations'][observation] for r in data['same_matrix_observation_controls']]
+            plotted = ax.scatter([r['mean_human_service'] for r in points], [r['mean_ai_service'] for r in points],
+                c=[r['mean_loss'] for r in points], vmin=0, vmax=1, cmap='viridis', marker=marker, label=observation)
+        ax.set(xlabel='Human activity supported', ylabel='AI activity supported', xlim=(0, 1.02), ylim=(0, 1.02),
+               title=title+'\nFixed matrices under different observations')
+        ax.legend()
+        fig.colorbar(plotted, ax=ax, label='Local depletion')
+        fig.savefig(destination/'observation_controls.png', dpi=150)
+        plt.close(fig)
+    robustness_path = output/'robustness.json'
+    if robustness_path.exists():
+        transferred = json.loads(robustness_path.read_text())
+        write_csv(destination/'robustness_comparisons.csv', [dict(variant=v['variant']['name'], family=family,
+            policy_id=c['policy_id'], human=c['mean_human_service'], ai=c['mean_ai_service'], depletion=c['mean_loss'],
+            empirical_constraint_satisfied=c['search_feasible'], constraint_supported=c['simultaneous_protection_supported'],
+            scope='frozen-set transfer, not a reoptimized frontier')
+            for v in transferred for family, candidates in v['families'].items() for c in candidates])
+        if transferred:
+            fig, axes = plt.subplots(1, 3, figsize=(14, max(3, .35*len(transferred))), constrained_layout=True)
+            for ax, field, label in zip(axes, ['mean_human_service', 'mean_ai_service', 'mean_loss'],
+                                       ['Human support change', 'AI support change', 'Depletion change']):
+                for index, variant in enumerate(transferred):
+                    reference = variant['families']['reference'][0][field]
+                    for family, candidates in variant['families'].items():
+                        if family != 'reference':
+                            ax.scatter([c[field]-reference for c in candidates], [index]*len(candidates),
+                                       marker={'local': 'o', 'resource_only': 's', 'equal_relative': 'D',
+                                               'redistribution': '^', 'global': 'P'}[family], s=20, alpha=.6)
+                ax.axvline(0, color='black', linewidth=.7)
+                ax.set(yticks=range(len(transferred)), yticklabels=[v['variant']['name'] for v in transferred], xlabel=label)
+            fig.suptitle(title+'\nFrozen-design changes from the original game; not reoptimized frontiers')
+            fig.savefig(destination/'robustness.png', dpi=150)
+            plt.close(fig)
+    outcome_sensitivity(output, destination, manifest['configuration'])
+    write_json(destination/'analysis_manifest.json', dict(run_id=manifest['run_id'],
+        analysis_source_sha256=sha256(Path(__file__)), label=manifest['configuration'].get('execution', {}).get('label', 'research'),
+        inference='Estimated finite-horizon Pareto sets; software-check results are not research evidence.',
+        input_sha256={name: sha256(output/name) for name in ['manifest.json', 'reference_characterization.json',
+            'training_candidates.jsonl', 'realizations.jsonl', 'shortlists.json', 'frozen_policies.json',
+            'test_comparisons.json', 'robustness.json'] if (output/name).exists()}))
+    return dict(output=str(destination), rows=len(records), tested_designs=len(table))
+
+
+def frontier_spatial_figures(output, destination, data, records, title):
+    """Matched spatial illustrations of the original game and frontier ends."""
+    import matplotlib.pyplot as plt
+    from .frontiers import spread
+    primary = next(r for r in data['problems'] if r['problem'] == data['primary_problem'])
+    selected = [('original game', primary['families']['reference'][0])]
+    selected += [('payoff '+r['policy_id'][:6], r) for r in spread(primary['families']['local'], 3)]
+    lookup = {r['evaluation_id']: r for r in records}
+    for name, duration in [('spatial_depletion', False), ('spatial_stress', True)]:
+        fig, axes = plt.subplots(1, len(selected), figsize=(4*len(selected), 4), squeeze=False, constrained_layout=True)
+        for ax, (label, candidate) in zip(axes.flat, selected):
+            record = lookup[candidate['realization_ids'][0]]
+            world = World.load(output/record['world_path'])
+            image = np.full((world.spec.height, world.spec.width), np.nan)
+            accessible = world.access.any(axis=0)
+            if duration:
+                points = world.resources[accessible] if record['stress_basis'] == 'resource_stock' else world.positions
+                values = np.minimum(1, np.array(record['site_longest_continuous_stress_steps'])/record['stress_duration_steps'])
+            else:
+                with np.load(output/record['trajectory_path'], allow_pickle=False) as trajectory:
+                    floor = record['metric']['floor']
+                    values = np.maximum(floor-trajectory['stocks'][record['burn']:, accessible]/world.capacity[accessible], 0).mean(axis=0)/floor
+                points = world.resources[accessible]
+            for (x, y), value in zip(points, values):
+                image[y, x] = value if np.isnan(image[y, x]) else max(image[y, x], value)
+            plotted = ax.imshow(image, origin='lower', vmin=0, vmax=1, cmap='magma', interpolation='nearest')
+            ax.set(title=label, xlabel='Grid x', ylabel='Grid y')
+            fig.colorbar(plotted, ax=ax, label='Stress duration / limit' if duration else 'Mean normalized resource deficit')
+        fig.suptitle(title+'\nFirst independent test world, selected by index; illustrative spatial comparison', fontsize=10)
+        fig.savefig(destination/(name+'.png'), dpi=150)
+        plt.close(fig)
+
+
 def outcome_sensitivity(output, destination, config):
-    """Re-score frozen policies; these tables do not establish new optima."""
+    """Rescoring of frozen policies; these tables do not establish new optima."""
     welfare_rows, stress_rows, pattern_rows = [], [], []
     records = {r['evaluation_id']: r for r in read_jsonl(Path(output)/'realizations.jsonl')}
     checks = config['secondary_checks']

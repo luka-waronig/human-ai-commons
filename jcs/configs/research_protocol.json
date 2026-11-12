@@ -1,5 +1,5 @@
 {
-  "protocol_date": "2026-11-06",
+  "protocol_date": "2026-11-12",
   "reference_feedback_rule": "repository",
   "payoffs": {
     "optimized_parameters": [
@@ -26,7 +26,7 @@
     ]
   },
   "objective": {
-    "name": "joint_service_welfare_with_persistent_local_stress_constraint",
+    "name": "pareto_human_ai_depletion",
     "resource_cells": "fixed_geometrically_accessible_water_cells",
     "observation": "post_withdrawal",
     "total_steps": 2000,
@@ -35,14 +35,20 @@
       "service_reference": "fixed_defection_request",
       "human_weight": 0.5,
       "utility": "linear",
-      "additional_use_value": 1
+      "additional_use_value": 1,
+      "role": "optional_reporting_only_not_Pareto_selection"
     },
     "persistent_local_stress": {
       "reference": 0.5,
       "allowed_site_fraction": 0,
       "maximum_probability": 0.1,
       "duration_steps": 150
-    }
+    },
+    "pareto_objectives": [
+      "maximize_expected_human_support",
+      "maximize_expected_ai_support",
+      "minimize_expected_spatial_tail_depletion"
+    ]
   },
   "world": {
     "width": 20,
@@ -80,22 +86,7 @@
     "withdrawal_allocation": "proportional"
   },
   "search": {
-    "method": "scipy.optimize.differential_evolution",
-    "scipy_version": "1.15.3",
-    "strategy": "best1bin",
-    "explicit_population_size": 16,
-    "initialization": "scrambled_sobol_relative_changes_with_reference_and_equal_relative_seeds",
-    "mutation": [
-      0.5,
-      1
-    ],
-    "recombination": 0.7,
-    "maximum_generations": 16,
-    "optimizer_restarts": 3,
-    "updating": "deferred",
-    "polish": false,
-    "tol": 0,
-    "atol": 0,
+    "method": "grid_with_pareto_refinement",
     "constraints": "payoff_bounds_payoff_change_budget_and_empirical_persistent_local_stress_probability",
     "main_problems": [
       {
@@ -146,18 +137,19 @@
       "budget": 0.5
     },
     "one_dimensional_search": {
-      "initial_grid_points": 65,
-      "refined_intervals_per_round": 3,
-      "refinement_grid_points": 9,
+      "initial_grid_points": 65
+    },
+    "pareto": {
+      "initial_points_per_axis": 17,
       "refinement_rounds": 2,
-      "assume_unimodal_loss": false
+      "refinement_anchors": 8
     }
   },
   "validation": {
     "training_realizations": 8,
     "validation_realizations": 16,
-    "maximum_shortlisted_candidates_per_family_and_problem": 5,
-    "test_realizations": 64,
+    "maximum_shortlisted_candidates_per_family_and_problem": 12,
+    "test_realizations": 128,
     "independent_unit": "world_and_trajectory_driver_pair",
     "pair_random_inputs_between_policies": true,
     "base_seed": 20261030,
@@ -170,7 +162,7 @@
       "analysis"
     ],
     "disjoint_training_validation_test_sets": true,
-    "primary_contrast": "paired_joint_welfare_local_minus_resource_only_at_pressure_1_budget_0.5",
+    "primary_contrast": "three_outcome_frontiers_and_paired_changes_from_original_game",
     "confidence_level": 0.95,
     "interval_method": "paired_bootstrap_over_complete_independent_realizations",
     "forced_action_diagnostics": [
@@ -184,7 +176,8 @@
       "equal_relative_changes",
       "u_plus_v_zero_redistribution"
     ],
-    "characterization_realizations": 8
+    "characterization_realizations": 8,
+    "maximum_tested_candidates_per_family_and_problem": 6
   },
   "secondary_checks": {
     "initial_cooperation": [
@@ -264,7 +257,9 @@
     "empirical_hydrological_calibration": false,
     "welfare_scope": "normalized_support_for_human_and_AI_activity_not_measured_total_societal_value",
     "stress_reference_scope": "mathematical_reference_sensitivity_not_empirical_ecological_minimum",
-    "protection_support": "one_sided_exact_binomial_bound_on_independent_held_out_realizations"
+    "protection_support": "one_sided_exact_binomial_bound_on_independent_held_out_realizations",
+    "pareto_scope": "sample_mean_frontier_of_tested_designs_not_global_optimality_or_proven_dominance",
+    "shared_improvement_support": "simultaneous_bounded_difference_intervals_and_exact_resource_constraint_bound"
   },
   "depletion_diagnostic": {
     "resource_floor": 0.2,

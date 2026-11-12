@@ -19,7 +19,7 @@ class WelfareSpec:
 
 
 def supported_activity(delivered, baseline, target, additional_use_value=1):
-    """Value baseline delivery and a declared share of additional delivery."""
+    """Supported activity from baseline and additional delivery."""
     WelfareSpec(additional_use_value=additional_use_value)
     delivered, baseline, target = (np.asarray(value, dtype=float) for value in [delivered, baseline, target])
     if (not np.all(np.isfinite(delivered) & (delivered >= 0))
@@ -36,7 +36,7 @@ def supported_activity(delivered, baseline, target, additional_use_value=1):
 
 
 def joint_welfare(human, ai, human_weight=.5):
-    """Combine normalized support for both kinds of activity.
+    """Weighted geometric mean of normalized human and AI activity support.
 
     The weight expresses an assumed relative priority, not an estimated social value.
     At equal priority this is the geometric mean: sqrt(human * ai).

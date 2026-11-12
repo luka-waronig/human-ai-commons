@@ -57,7 +57,7 @@ class World:
     draw_attempts: int = 1
 
     def __post_init__(self):
-        # Own immutable arrays so policies cannot contaminate shared worlds.
+        # Owned immutable arrays prevent policies from modifying shared worlds.
         for name, dtype in [('resources', int), ('capacity', float), ('renewal', float),
                             ('positions', int), ('kinds', bool), ('initial', bool)]:
             raw = np.asarray(getattr(self, name))
@@ -120,7 +120,7 @@ def initial_strategies(kinds, fraction, generator):
 
 
 def generate_world(spec, world_seed):
-    """Condition placements on access given a landscape, not whole-world rejection."""
+    """Placement conditioning on access for a given landscape."""
     generator = rng(world_seed, 'landscape-and-placement')
     cells = np.array([(x, y) for x in range(spec.width) for y in range(spec.height)])
     n = spec.humans+spec.ai
@@ -159,6 +159,6 @@ def transform_world(world, *, initial_fraction=None, cluster_ai=False, transform
         kinds[:] = False
         kinds[order[:world.spec.ai]] = True
     fraction = world.spec.initial_cooperation if initial_fraction is None else initial_fraction
-    # Preserve the original per-position strategies when only demand labels change.
+    # Original per-position strategies remain fixed when only demand labels change.
     initial = world.initial if initial_fraction is None else initial_strategies(kinds, fraction, rng(transform_seed, 'initial-strategies'))
     return replace(world, spec=replace(world.spec, initial_cooperation=fraction), kinds=kinds, initial=initial)

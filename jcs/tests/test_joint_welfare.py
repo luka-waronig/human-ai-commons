@@ -1,14 +1,14 @@
 import numpy as np
 import pytest
 
-from watertoc_jcs.config import load_config, scenario as configured_scenario, world_spec
-from watertoc_jcs.dynamics import Scenario, Simulator, simulate
-from watertoc_jcs.experiments import candidate_key
-from watertoc_jcs.metrics import LocalStress, Service, StressSpec, WelfareSpec, joint_welfare, probability_upper_bound, supported_activity
-from watertoc_jcs.optimization import differential_search, one_dimensional
-from watertoc_jcs.payoffs import Policy
-from watertoc_jcs.provenance import ROOT
-from watertoc_jcs.world import World, WorldSpec
+from human_ai_commons.config import load_config, scenario as configured_scenario, world_spec
+from human_ai_commons.dynamics import Scenario, Simulator, simulate
+from human_ai_commons.experiments import candidate_key
+from human_ai_commons.metrics import LocalStress, Service, StressSpec, WelfareSpec, joint_welfare, probability_upper_bound, supported_activity
+from human_ai_commons.optimization import differential_search, one_dimensional
+from human_ai_commons.payoffs import Policy
+from human_ai_commons.provenance import ROOT
+from human_ai_commons.world import World, WorldSpec
 
 
 def shared_source_world():
@@ -57,7 +57,7 @@ def test_equal_priority_rewards_joint_support_and_priority_extremes_are_explicit
     assert joint_welfare(.9, .1, 0) == .1
 
 
-def test_main_selection_can_prefer_welfare_over_larger_unused_resource_stock():
+def test_optional_scalar_selection_can_prefer_welfare_over_larger_unused_resource_stock():
     def candidate(policy, human, ai, resource_loss, violation=0):
         return dict(policy=policy.__dict__, policy_id=policy.id, mean_loss=resource_loss,
                     objective_loss=1-float(joint_welfare(human, ai)), stress_probability_violation=violation)
@@ -151,9 +151,9 @@ def test_evolutionary_search_obeys_an_outcome_constraint():
     assert evaluated
 
 
-def test_research_configuration_optimizes_joint_welfare_with_a_stress_constraint():
+def test_research_configuration_optimizes_three_outcomes_with_a_stress_constraint():
     config = load_config(ROOT/'configs/research_protocol.json')
-    assert config['objective']['name'] == 'joint_service_welfare_with_persistent_local_stress_constraint'
+    assert config['objective']['name'] == 'pareto_human_ai_depletion'
     assert config['world']['withdrawal_allocation'] == 'proportional'
     assert config['payoffs']['optimized_parameters'] == ['u','v']
 

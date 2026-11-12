@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
-from watertoc_jcs.payoffs import Policy
-from watertoc_jcs.optimization import one_dimensional
+from human_ai_commons.payoffs import Policy
+from human_ai_commons.optimization import one_dimensional
 
 
 @pytest.mark.parametrize('u,v,qc,qd', [(0,0,.5,.5), (1,.5,2/3,2/3), (1,0,2/3,.5), (0,.5,.5,2/3)])

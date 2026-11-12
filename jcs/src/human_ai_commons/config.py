@@ -62,7 +62,7 @@ def metric_spec(config):
 def welfare_spec(config):
     if config['objective']['name'] == 'expected_spatial_upper_tail_cumulative_depletion':
         return None
-    if config['objective']['name'] != 'joint_service_welfare_with_persistent_local_stress_constraint':
+    if config['objective']['name'] not in ['joint_service_welfare_with_persistent_local_stress_constraint', 'pareto_human_ai_depletion']:
         raise ValueError('unknown optimization objective')
     w = config['objective']['welfare']
     if w['service_reference'] != 'fixed_defection_request':
@@ -82,7 +82,7 @@ def validate_config(config):
     welfare_spec(config)
     stress_spec(config)
     w, p, o, s, v = (config[name] for name in ['world', 'payoffs', 'objective', 'search', 'validation'])
-    if o['name'] not in ['expected_spatial_upper_tail_cumulative_depletion', 'joint_service_welfare_with_persistent_local_stress_constraint']:
+    if o['name'] not in ['expected_spatial_upper_tail_cumulative_depletion', 'joint_service_welfare_with_persistent_local_stress_constraint', 'pareto_human_ai_depletion']:
         raise ValueError('unknown optimization objective')
     if welfare_spec(config) is not None and (w['humans'] < 1 or w['ai'] < 1 or stress_spec(config) is None):
         raise ValueError('joint welfare requires both agent types and an explicit stress constraint')
@@ -123,24 +123,40 @@ def validate_config(config):
         minimum = 3 if field == 'maximum_shortlisted_candidates_per_family_and_problem' else (2 if field == 'test_realizations' else 1)
         if isinstance(v[field], bool) or not isinstance(v[field], int) or v[field] < minimum:
             raise ValueError(f'invalid {field}')
-    if s['explicit_population_size'] < 5 or s['maximum_generations'] < 0 or s['optimizer_restarts'] < 1:
-        raise ValueError('invalid DE budget')
-    for key in ['explicit_population_size', 'maximum_generations', 'optimizer_restarts']:
-        if isinstance(s[key], bool) or not isinstance(s[key], int):
-            raise ValueError(f'integer {key} required')
-    if s['strategy'] != 'best1bin' or s['updating'] != 'deferred' or s['polish']:
-        raise ValueError('unsupported optimizer convention')
-    if s['tol'] != 0 or s['atol'] != 0:
-        raise ValueError('fixed-budget search requires zero tolerance stopping settings')
-    if (len(s['mutation']) != 2 or not all(math.isfinite(x) for x in s['mutation'])
-            or not 0 <= s['mutation'][0] <= s['mutation'][1] < 2
-            or not math.isfinite(s['recombination']) or not 0 <= s['recombination'] <= 1):
-        raise ValueError('invalid DE mutation or crossover settings')
-    for key in ['initial_grid_points', 'refined_intervals_per_round', 'refinement_grid_points', 'refinement_rounds']:
-        value = s['one_dimensional_search'][key]
-        minimum = 0 if key == 'refinement_rounds' else (2 if 'grid_points' in key else 1)
-        if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
-            raise ValueError(f'invalid comparator setting: {key}')
+    if o['name'] == 'pareto_human_ai_depletion':
+        if o.get('pareto_objectives') != ['maximize_expected_human_support', 'maximize_expected_ai_support', 'minimize_expected_spatial_tail_depletion']:
+            raise ValueError('the Pareto objectives must retain human support, AI support, and local depletion')
+        if s.get('method') != 'grid_with_pareto_refinement':
+            raise ValueError('Pareto experiments require the Pareto grid search')
+        for field, minimum in [('initial_points_per_axis', 2), ('refinement_rounds', 0), ('refinement_anchors', 3)]:
+            value = s['pareto'][field]
+            if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
+                raise ValueError(f'invalid Pareto setting: {field}')
+        count = v['maximum_tested_candidates_per_family_and_problem']
+        if isinstance(count, bool) or not isinstance(count, int) or not 3 <= count <= v['maximum_shortlisted_candidates_per_family_and_problem']:
+            raise ValueError('Pareto testing requires 3 or more designs within the validation limit')
+        count = s['one_dimensional_search']['initial_grid_points']
+        if isinstance(count, bool) or not isinstance(count, int) or count < 2:
+            raise ValueError('comparator grid requires at least two points')
+    if o['name'] != 'pareto_human_ai_depletion':
+        if s['explicit_population_size'] < 5 or s['maximum_generations'] < 0 or s['optimizer_restarts'] < 1:
+            raise ValueError('invalid DE budget')
+        for key in ['explicit_population_size', 'maximum_generations', 'optimizer_restarts']:
+            if isinstance(s[key], bool) or not isinstance(s[key], int):
+                raise ValueError(f'integer {key} required')
+        if s['strategy'] != 'best1bin' or s['updating'] != 'deferred' or s['polish']:
+            raise ValueError('unsupported optimizer convention')
+        if s['tol'] != 0 or s['atol'] != 0:
+            raise ValueError('fixed-budget search requires zero tolerance stopping settings')
+        if (len(s['mutation']) != 2 or not all(math.isfinite(x) for x in s['mutation'])
+                or not 0 <= s['mutation'][0] <= s['mutation'][1] < 2
+                or not math.isfinite(s['recombination']) or not 0 <= s['recombination'] <= 1):
+            raise ValueError('invalid DE mutation or crossover settings')
+        for key in ['initial_grid_points', 'refined_intervals_per_round', 'refinement_grid_points', 'refinement_rounds']:
+            value = s['one_dimensional_search'][key]
+            minimum = 0 if key == 'refinement_rounds' else (2 if 'grid_points' in key else 1)
+            if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
+                raise ValueError(f'invalid comparator setting: {key}')
     for mapping in s['payoff_maps']:
         scenario(config, mapping['pressure'])
         count = mapping['points_per_axis']
@@ -188,6 +204,8 @@ def budget_plan(config):
     """Conservative upper bounds; no worlds or simulations are constructed."""
     search, validation, objective = (config[name] for name in ['search', 'validation', 'objective'])
     rows = problems(config)
+    if objective['name'] == 'pareto_human_ai_depletion':
+        return frontier_budget(config, rows)
     de = search['explicit_population_size']*(1+search['maximum_generations'])*search['optimizer_restarts']
     comparison = search['one_dimensional_search']
     one_dimensional = comparison['initial_grid_points']+1+comparison['refined_intervals_per_round']*comparison['refinement_grid_points']*comparison['refinement_rounds']
@@ -210,6 +228,38 @@ def budget_plan(config):
                 model_step_caps=caps, all_model_steps=sum(caps.values()),
                 world=asdict(world_spec(config)), simulations_started=False,
                 interpretation='Upper bounds before cache reuse. Metrics and analysis do not run simulations.')
+
+
+def frontier_budget(config, rows):
+    search, validation, objective = (config[name] for name in ['search', 'validation', 'objective'])
+    settings = search['pareto']
+    refinement = settings['refinement_rounds']*settings['refinement_anchors']
+    line = search['one_dimensional_search']['initial_grid_points']+1+3*refinement
+    global_control = int(bool(search.get('global_composition_reoptimization')))
+    grids = {m['pressure']: m['points_per_axis'] for m in search['payoff_maps']}
+    def grid_cap(pressure):
+        return (grids.get(pressure, settings['initial_points_per_axis'])+1)**2+9*refinement
+    train = sum(grid_cap(p['pressure'])+3*line for p in rows)
+    if global_control:
+        train += grid_cap(search['global_composition_reoptimization']['pressure'])
+    slots = validation['maximum_shortlisted_candidates_per_family_and_problem']
+    tested = validation['maximum_tested_candidates_per_family_and_problem']
+    families = 4*len(rows)+global_control
+    pressures = {p['pressure'] for p in rows}
+    characterization = 3*len(pressures)*validation['characterization_realizations']
+    validation_cap = families*slots
+    # Each family retains a set; references and observation controls are cached.
+    test_cap = families*tested+len(pressures)+3*tested
+    steps = objective['total_steps']
+    robust_steps = sum(variant.get('steps', steps)*((4+global_control)*tested+1)
+                       *validation.get('robustness_realizations', validation['validation_realizations'])
+                       for variant in robustness_variants(config))
+    caps = dict(characterize=characterization*steps, train=train*validation['training_realizations']*steps,
+                validate=validation_cap*validation['validation_realizations']*steps,
+                test=test_cap*validation['test_realizations']*steps, robustness=robust_steps)
+    return dict(candidate_caps=dict(characterize=characterization, train=train, validate=validation_cap, test=test_cap),
+                model_step_caps=caps, all_model_steps=sum(caps.values()), world=asdict(world_spec(config)),
+                simulations_started=False, interpretation='Pareto workflow upper bounds before cache reuse.')
 
 
 def robustness_variants(config):

@@ -67,8 +67,8 @@ def sha256(path):
 
 
 def source_files():
-    # Hash the executed package, even after a normal (non-editable) pip install.
-    paths = {str(Path('src/watertoc_jcs')/p.name): p for p in PACKAGE.glob('*.py')}
+    # Source hashes cover the executed package, including a non-editable installation.
+    paths = {str(Path('src/human_ai_commons')/p.name): p for p in PACKAGE.glob('*.py')}
     paths.update({name: ROOT/name for name in ['pyproject.toml', 'requirements.txt', 'reproduce.py'] if (ROOT/name).exists()})
     return dict(sorted(paths.items()))
 

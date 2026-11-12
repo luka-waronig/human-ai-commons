@@ -2,7 +2,7 @@
 
 The preceding publication is Ivana Malčić, Debraj Roy, and Luka Waronig, *Emergent Spatial Traps in the Coevolutionary Commons: Human-AI Cooperation Under Environmental Feedback*, Computational Science – ICCS 2026 Workshops, pages 95–109. [DOI](https://doi.org/10.1007/978-3-032-29909-3_8). [Official camera-ready paper](https://www.iccs-meeting.org/archive/iccs2026/papers/167870091.pdf). [Supplementary material](https://doi.org/10.5281/zenodo.18713008).
 
-The JCS study inherits the spatial resource setting, two extraction-intensity classes, binary choices, environmental payoff feedback, and local resource renewal. It introduces a parameterized endpoint-game family, expected payoffs against local strategic composition, and constrained optimization of joint support for human and AI activity. Persistent local stress restricts acceptable designs; cooperation and resource stocks describe their dynamics rather than serving as the welfare objective.
+The JCS study inherits the spatial resource setting, two extraction-intensity classes, binary choices, environmental payoff feedback, and local resource renewal. It introduces a parameterized endpoint-game family, expected payoffs against local strategic composition, and constrained Pareto optimization of human support, AI support, and local depletion. Persistent local stress restricts acceptable designs; cooperation and the remaining spatial measurements describe their dynamics.
 
 The original payoff interpolation is
 

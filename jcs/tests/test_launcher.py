@@ -8,10 +8,10 @@ import zipfile
 
 import pytest
 
-from watertoc_jcs.config import load_config
-from watertoc_jcs.experiments import run_stages
-from watertoc_jcs.provenance import ROOT
-from watertoc_jcs.analysis import verify_bundle
+from human_ai_commons.config import load_config
+from human_ai_commons.experiments import run_stages
+from human_ai_commons.provenance import ROOT
+from human_ai_commons.analysis import verify_bundle
 
 
 def launcher():
@@ -76,7 +76,7 @@ def test_launcher_completes_and_resumes_a_tiny_study_without_new_simulations(tmp
     (root/'.venv').symlink_to(sys.prefix, target_is_directory=True)
     module.write(root/'run.json', dict(mode='software-check'))
     module.write(root/'.environment-ready.json', dict(requirements=module.digest(root/'study/requirements.txt')))
-    # The enclosing pytest run checks the software; avoid recursively launching pytest.
+    # The enclosing test run covers the software without a recursive pytest invocation.
     (root/'.software-checked').touch()
     args = [sys.executable, str(ROOT/'run_experiments.py'), '--smoke', '--jobs', '1', '--output', str(root)]
     first = subprocess.run(args, capture_output=True, text=True, timeout=90)
@@ -85,7 +85,7 @@ def test_launcher_completes_and_resumes_a_tiny_study_without_new_simulations(tmp
     with zipfile.ZipFile(root/'releases/software-check.zip') as archive:
         assert 'jcs/run-experiments' in archive.namelist()
         assert 'jcs/run_experiments.py' in archive.namelist()
-    assert (root/'bundles/software-check/analysis/heldout_frontier.csv').exists()
+    assert (root/'bundles/software-check/analysis/pareto_candidates.csv').exists()
     ledger = root/'bundles/software-check/budget_ledger.jsonl'
     before = ledger.read_bytes()
     second = subprocess.run(args, capture_output=True, text=True, timeout=90)
@@ -96,7 +96,7 @@ def test_launcher_completes_and_resumes_a_tiny_study_without_new_simulations(tmp
 
 
 def test_ctrl_c_saves_a_complete_realization_and_allows_verified_resume(tmp_path, monkeypatch):
-    import watertoc_jcs.experiments as experiments
+    import human_ai_commons.experiments as experiments
     config = load_config(ROOT/'configs/smoke.json')
     simulate = experiments.simulate
     requested = False

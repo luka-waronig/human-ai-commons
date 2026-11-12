@@ -226,16 +226,21 @@ def analyze_frontiers(output, destination, manifest, records, training, title):
         for problem in data['problems']:
             reference = problem['families']['reference'][0]
             for family, candidates in problem['families'].items():
-                alternatives = candidates+[reference]
-                empirical = {r['policy_id'] for r in nondominated([r for r in alternatives if r['search_feasible']])}
-                supported = {r['policy_id'] for r in nondominated([r for r in alternatives if r['simultaneous_protection_supported']])}
-                for candidate in candidates:
+                if family == 'reference':
+                    continue
+                alternatives = list({r['policy_id']: r for r in candidates+[reference]}.values())
+                empirical = {r['policy_id'] for r in nondominated([r for r in alternatives if r['search_feasible']], deduplicate=False)}
+                supported = {r['policy_id'] for r in nondominated([r for r in alternatives if r['simultaneous_protection_supported']], deduplicate=False)}
+                for candidate in alternatives:
                     policy = Policy(**candidate['policy'])
                     row = dict(problem_id=problem['problem_id'], **problem['problem'], family=family, policy_id=policy.id,
+                        is_reference=policy.id == reference['policy_id'],
                         u=policy.u, v=policy.v, q_c=policy.q_c, q_d=policy.q_d, payoff_cost=policy.cost(problem['problem']['norm']),
                         human=candidate['mean_human_service'], ai=candidate['mean_ai_service'], depletion=candidate['mean_loss'],
                         realizations=candidate['count'], stress_probability=candidate['stress_probability'],
                         simultaneous_stress_probability_upper=candidate['simultaneous_stress_probability_upper'],
+                        resource_family_confidence=candidate['family_confidence'],
+                        protected_family_size=candidate['protected_family_size'],
                         empirical_constraint_satisfied=candidate['search_feasible'],
                         constraint_supported=candidate['simultaneous_protection_supported'],
                         estimated_family_pareto=policy.id in empirical,
@@ -265,7 +270,7 @@ def analyze_frontiers(output, destination, manifest, records, training, title):
         for ax, pid in zip(axes.flat, ids):
             group = [r for r in table if r['problem_id'] == pid]
             for row in group:
-                if row['family'] == 'reference':
+                if row['is_reference']:
                     ax.scatter(row['human'], row['ai'], marker='*', s=150, color='black', zorder=5)
                 else:
                     marker = markers[row['family']] if row['empirical_constraint_satisfied'] else 'x'
@@ -322,9 +327,14 @@ def analyze_frontiers(output, destination, manifest, records, training, title):
         transferred = json.loads(robustness_path.read_text())
         write_csv(destination/'robustness_comparisons.csv', [dict(variant=v['variant']['name'], family=family,
             policy_id=c['policy_id'], human=c['mean_human_service'], ai=c['mean_ai_service'], depletion=c['mean_loss'],
+            realizations=c['count'], stress_probability=c['stress_probability'],
+            simultaneous_stress_probability_upper=c['simultaneous_stress_probability_upper'],
+            resource_family_confidence=c['family_confidence'], protected_family_size=c['protected_family_size'],
             empirical_constraint_satisfied=c['search_feasible'], constraint_supported=c['simultaneous_protection_supported'],
             scope='frozen-set transfer, not a reoptimized frontier')
             for v in transferred for family, candidates in v['families'].items() for c in candidates])
+        write_csv(destination/'robustness_outcome_comparisons.csv',
+                  [r for v in transferred for r in v['paired_outcome_comparisons']])
         if transferred:
             fig, axes = plt.subplots(1, 3, figsize=(14, max(3, .35*len(transferred))), constrained_layout=True)
             for ax, field, label in zip(axes, ['mean_human_service', 'mean_ai_service', 'mean_loss'],

@@ -31,7 +31,7 @@ def export_release(bundle, destination):
             if not path.is_relative_to(bundle) or not path.is_file() or sha256(path) != expected:
                 raise ValueError('analysis inputs changed; run analyze again before export')
     files = {}
-    for name in ['README.md', 'CITATION.cff', 'pyproject.toml', 'requirements.txt', '.python-version', 'reproduce.py',
+    for name in ['README.md', 'LICENSE', 'CITATION.cff', 'pyproject.toml', 'requirements.txt', '.python-version', 'reproduce.py',
                  'run-experiments', 'run_experiments.py',
                  'configs', 'docs', 'src', 'tests', 'scripts', 'verification']:
         source = ROOT/name

@@ -1,7 +1,7 @@
 {
   "scope": "JCS Pareto package and standalone workflow verification",
-  "tests_passed": 106,
-  "repository_tests_passed": 142,
+  "tests_passed": 123,
+  "repository_tests_passed": 159,
   "test_command": "python -m pytest -q",
   "checks": {
     "three_objective_dominance": true,
@@ -15,7 +15,18 @@
     "wheel_build": true,
     "wheel_install_outside_repository": true,
     "installed_pareto_module": true,
-    "installed_module_planning": true
+    "installed_module_planning": true,
+    "mit_license_in_wheels_and_source_distributions": true,
+    "mit_license_in_result_export": true,
+    "original_game_frontier_assessed_against_alternatives": true,
+    "equal_outcome_policies_not_strictly_dominated": true,
+    "binomial_bounds_match_independent_scipy_calculation": true,
+    "finite_sample_mean_intervals_match_independent_inversion": true,
+    "finite_sample_mean_intervals_exact_bernoulli_coverage": true,
+    "inadequate_resource_assessment_samples_rejected_before_simulation": true,
+    "resource_power_matches_independent_binomial_tests": true,
+    "robustness_resource_correction_covers_all_variants": true,
+    "robustness_representatives_frozen_before_test": true
   },
   "environment": {
     "python": "3.12.14",
@@ -29,24 +40,25 @@
   },
   "wheel_build_backend": "setuptools 82.0.0",
   "source_sha256": {
-    "pyproject.toml": "c3405d95c261a2af6efbc0bb2d1a42b01791bf4647cf5fce803ddc9935385e8b",
+    "LICENSE": "9a512e22ff7a309dd01879c29e806a04e67bf73f5f4ace85d55f218f6d18ec97",
+    "pyproject.toml": "a434eadab85d53f96f4078d13af7be0231d7e618aa6a38264545446d61b35737",
     "reproduce.py": "c184c87a8d393a3b78cc6ee3e7ce4058c0d5fbb82103fea1767a55acfe9f5051",
     "requirements.txt": "5c4f0d21c38e233b1bdb27b2c851cf8b5869cd541edb333b91d8eda84af90c28",
     "src/human_ai_commons/__init__.py": "506676a82c885f52a5fdaeb2e3808ee1cd555d011710a3896f59b2bd77f1525f",
     "src/human_ai_commons/__main__.py": "cf7390a2508a0fcad4777a4a629fc5212ab655cb45845975995f835676a834e3",
-    "src/human_ai_commons/analysis.py": "08ed7058824ae3940b1f895fa927d7accc3bf42f626ce223a1a916532aff8889",
+    "src/human_ai_commons/analysis.py": "7a8f3473c29156e2a80a8522c9090637b30c4b2c43c4c413af094a2d9a2f89a2",
     "src/human_ai_commons/capacity.py": "2355a91b07d2053027398e93e95b744a04c2eb8fe55964eeefd3c86f8233b90f",
     "src/human_ai_commons/cli.py": "610a1433e16f5efa5197913e4b2d62fb43140e9e93c7e5ecaa8bd0ba76b84386",
-    "src/human_ai_commons/config.py": "d47ae9cd5f6bac741f5d4a515eb58990dca1f7f1e14a3b9832a798e1791407da",
+    "src/human_ai_commons/config.py": "3a15a7bf81fc8d1293e5089a5e6068133f882094c758cc6badba36d06171f765",
     "src/human_ai_commons/diagnostics.py": "f30d5ebe1709b0df8690107f34db106215e5d098e52964b6d2defd72d2599350",
     "src/human_ai_commons/dynamics.py": "a56d0f1b64ee6bcb1712f4bc1275065e03547bdc3f1d7fc4d0a2c9a7fc7ae57a",
     "src/human_ai_commons/experiments.py": "2be0feaf068c31178c1824e8abaab3cc0b91e0576aa553181afe34aeeeb8bf93",
-    "src/human_ai_commons/frontiers.py": "3c3107e0b9ac174e4600ef68f9aa4acf625ec0c874b3ec9ff92c2e78d5c3b027",
-    "src/human_ai_commons/metrics.py": "ef3a75d47327a3d0f4c3cc0f987a4f773411d2f34b6ea8b64df99efad7250240",
+    "src/human_ai_commons/frontiers.py": "cdf3f6728e341db3b85594eacb5da29aece2392c415dba15c6e856c495d88eb8",
+    "src/human_ai_commons/metrics.py": "8720991c91c32c819f55de2a8edb4927ae849564a25323a1c65bebef6c1159a4",
     "src/human_ai_commons/optimization.py": "d7364364ef61e23d88e7b1adf77a6f6f7682123f82122e6e26d763851456f879",
     "src/human_ai_commons/payoffs.py": "9b68d7a834d83091ebb99dee28e81a8b5a163f5a02dc58386c8c8ab9f9b15220",
-    "src/human_ai_commons/provenance.py": "fe7f398234ff5c549ef4ae9b3c194d9ace5ff4f5bb5852b7b1f0383b050a5722",
-    "src/human_ai_commons/release.py": "c99c0bfa5e917885c1fcd0bc5584fbaebdc3bccfbaff10d67761f4e84b499b61",
+    "src/human_ai_commons/provenance.py": "36c15a3c6d0af2b28783a120c493d85d9e9410cd8772d45f17dfb1e218cff18d",
+    "src/human_ai_commons/release.py": "12726c06c70bf35cac570925042d962e27a3633ed5ab793f2ab5a4ab17a5d1e8",
     "src/human_ai_commons/world.py": "8fbdc215c7580b48d7a8569082b8dfbd977070a44db5cca3b42d5508b407ca24"
   }
 }

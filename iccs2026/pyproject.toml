@@ -7,6 +7,8 @@ name = "water-toc"
 version = "1.2.1"
 description = "Spatial human-AI commons model and reproducible research analyses"
 requires-python = ">=3.12,<3.13"
+license = "MIT"
+license-files = ["LICENSE"]
 dependencies = [
     "Mesa==1.2.1",
     "numpy==2.3.1",

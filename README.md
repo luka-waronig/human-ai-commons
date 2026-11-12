@@ -21,3 +21,5 @@ Use a Python 3.12 environment with the journal requirements installed. The scrip
 See the [research overview](docs/overview.md) for the publications and model relationships. Citation metadata is in [CITATION.cff](CITATION.cff).
 
 Both studies use Python 3.12. Install the requirements from the relevant study folder. With both dependency sets installed, `python -m pytest -q` from this directory runs both test suites.
+
+Software is distributed under the [MIT License](LICENSE).

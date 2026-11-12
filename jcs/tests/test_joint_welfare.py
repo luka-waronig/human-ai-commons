@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from scipy.stats import binomtest
 
 from human_ai_commons.config import load_config, scenario as configured_scenario, world_spec
 from human_ai_commons.dynamics import Scenario, Simulator, simulate
@@ -187,3 +188,11 @@ def test_delivery_condition_is_a_matched_alternative_not_a_change_to_welfare_or_
 def test_invalid_welfare_assumptions_are_rejected(spec):
     with pytest.raises(ValueError):
         WelfareSpec(**spec)
+
+
+@pytest.mark.parametrize('n,k,confidence', [(16,0,.95), (128,0,1-.05/178),
+                                          (128,2,1-.05/178), (128,128,.95)])
+def test_probability_bound_matches_scipy_exact_one_sided_interval(n,k,confidence):
+    events = np.r_[np.ones(k,dtype=bool),np.zeros(n-k,dtype=bool)]
+    reference = binomtest(k,n,alternative='less').proportion_ci(confidence,method='exact').high
+    assert probability_upper_bound(events,confidence) == pytest.approx(reference,abs=1e-10)

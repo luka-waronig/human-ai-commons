@@ -12,10 +12,10 @@
   },
   "sha256": {
     "scripts/verify_payoff_design.py": "1a3fff768ade220af563d5169a99e3fb75568c80c52aa2bf10cd90f9369e1ab7",
-    "configs/research_protocol.json": "462f64e0931a5afad3fe064f60b707851b66e1ef66e6e98c72f78bbd1075e806",
+    "configs/research_protocol.json": "e7f9f0cf9d1298b39e52c34e0bf271a8538daf73e748995c5e6c58f8556ff6b0",
     "src/human_ai_commons/payoffs.py": "9b68d7a834d83091ebb99dee28e81a8b5a163f5a02dc58386c8c8ab9f9b15220",
     "src/human_ai_commons/optimization.py": "d7364364ef61e23d88e7b1adf77a6f6f7682123f82122e6e26d763851456f879",
-    "docs/research-plan.md": "945bf16bdd2e5482e77f5134a17454fdefbfad3ed8c4d80a2a9d71f19352069b",
+    "docs/research-plan.md": "088c1918dca3f3201d478492be1adaa2d8b0c0bf686e9039c4f812af40783aa3",
     "docs/figures/strategic_geometry.png": "9ea52b551625e5c5c3eaaa4504a8423928e36d574d70e8cc279b6c3710146b3e"
   }
 }

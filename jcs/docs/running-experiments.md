@@ -135,17 +135,22 @@ The main outputs in `analysis/` are:
 | File | Contents |
 | --- | --- |
 | `pareto_frontier.png` and `pareto_frontier.pdf` | Human support versus AI support, with depletion shown by colour; separate panels for pressure, budget, and norm |
-| `pareto_candidates.csv` | Every tested design, its three mean outcomes and descriptive uncertainty intervals, payoff parameters, and resource-constraint status |
+| `pareto_candidates.csv` | Every tested design and original-game reference, with three mean outcomes, descriptive intervals, payoff parameters, and resource-constraint status |
 | `estimated_pareto_frontier.csv` | Non-dominated test sample means among empirically admissible designs, separately by family and including the original game as an alternative |
 | `pareto_frontier.csv` | The corresponding frontier restricted to designs with statistical support for the resource condition |
 | `pareto_summary.json` | Whether any tested design establishes the resource condition in each problem |
-| `paired_outcome_comparisons.csv` | Changes in each outcome from the original game, descriptive bootstrap intervals, and conservative simultaneous bounds |
+| `paired_outcome_comparisons.csv` | Changes from the original game, finite-sample paired-mean intervals, and separate Hoeffding bounds |
 | `training_pareto_candidates.csv` | Evaluated training designs and their three outcomes |
 | `spatial_depletion.png`, `spatial_stress.png` | Matched first-world illustrations of the original game and representative retained designs |
 | `observation_controls.csv` and `.png` | The same payoff matrices under local, global, and fixed observations |
-| `robustness_comparisons.csv` and `robustness.png` | Frozen-design outcomes under the stated changes in model conditions |
+| `robustness_comparisons.csv` and `robustness.png` | Outcomes and exact resource bounds for validation-selected representatives under changed conditions |
+| `robustness_outcome_comparisons.csv` | Simultaneous paired outcome intervals across all robustness variants |
 
-Frontiers describe the finite set of tested designs. They are estimates, not proofs of global optimality or population-level dominance. The figure does not interpolate an unsupported continuous surface. Hollow markers mean the resource requirement was not established; crosses mean it was violated empirically. A supported-frontier CSV can contain only its header when no design establishes the requirement. All tested outcomes remain available in `pareto_candidates.csv`; lack of support is not proof of infeasibility.
+The original game is assessed against the tested alternatives within each family, with `is_reference` identifying its rows. It is not assigned a separate self-only frontier. Frontiers describe the finite set of tested designs. They are estimates, not proofs of global optimality or population-level dominance. The figure does not interpolate an unsupported continuous surface. Hollow markers mean the resource requirement was not established; crosses mean it was violated empirically. A supported-frontier CSV can contain only its header when no design establishes the requirement. All tested outcomes remain available in `pareto_candidates.csv`; lack of support is not proof of infeasibility.
+
+The main tests use 320 independent realizations; each robustness variant uses 256. Robustness assesses up to three validation-selected objective extremes per family. These samples pass an exact planning check: at least 90% power per comparison to establish the 10% persistence limit when the true event rate is 2%, after the stated multiple-comparison correction. The planning rate is an assumption, not a promised property of the designs. `plan` reports these calculations and the revised workload without simulations.
+
+The primary `simultaneous_lower` and `simultaneous_upper` columns give finite-sample confidence bounds for mean changes from the original game, with a correction across comparisons. The method uses the known outcome bounds and independent matched realizations; it also allows for unobserved rare outcomes. `simultaneous_method` identifies the method, while `bounded_lower`/`bounded_upper` retain separate Hoeffding bounds as a conservative diagnostic. Individual bootstrap intervals remain descriptive. Exact resource-probability bounds assess the persistence constraint. The unchanged direct Python command executes this configuration; no additional script is required.
 
 `welfare_assumptions.csv` and `stress_definitions.csv` re-score frozen designs under alternative definitions. They do not establish reoptimized frontiers. `payoff_coordinates.csv` records matrix entries and strategic transitions. `spatial_characterization.csv` reports resource–strategy patterns and actual request fulfillment. Changing the depletion reference or spatial tail fraction is also available through `rescore`, without simulations. The optional single-priority configurations retain their scalar-comparison output format; their `heldout_frontier` files are not the main Pareto result.
 

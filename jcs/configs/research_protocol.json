@@ -149,7 +149,7 @@
     "training_realizations": 8,
     "validation_realizations": 16,
     "maximum_shortlisted_candidates_per_family_and_problem": 12,
-    "test_realizations": 128,
+    "test_realizations": 320,
     "independent_unit": "world_and_trajectory_driver_pair",
     "pair_random_inputs_between_policies": true,
     "base_seed": 20261030,
@@ -164,7 +164,7 @@
     "disjoint_training_validation_test_sets": true,
     "primary_contrast": "three_outcome_frontiers_and_paired_changes_from_original_game",
     "confidence_level": 0.95,
-    "interval_method": "paired_bootstrap_over_complete_independent_realizations",
+    "interval_method": "finite_sample_bounded_paired_mean_intervals; marginal_bootstrap_descriptive_only",
     "forced_action_diagnostics": [
       "always_C",
       "always_D"
@@ -177,7 +177,14 @@
       "u_plus_v_zero_redistribution"
     ],
     "characterization_realizations": 8,
-    "maximum_tested_candidates_per_family_and_problem": 6
+    "maximum_tested_candidates_per_family_and_problem": 6,
+    "robustness_realizations": 256,
+    "robustness_candidates_per_family": 3,
+    "resource_power": {
+      "design_probability": 0.02,
+      "minimum_power": 0.9
+    },
+    "descriptive_bootstrap_samples": 10000
   },
   "secondary_checks": {
     "initial_cooperation": [
@@ -259,7 +266,7 @@
     "stress_reference_scope": "mathematical_reference_sensitivity_not_empirical_ecological_minimum",
     "protection_support": "one_sided_exact_binomial_bound_on_independent_held_out_realizations",
     "pareto_scope": "sample_mean_frontier_of_tested_designs_not_global_optimality_or_proven_dominance",
-    "shared_improvement_support": "simultaneous_bounded_difference_intervals_and_exact_resource_constraint_bound"
+    "shared_improvement_support": "finite_sample_bounded_paired_mean_intervals_and_exact_resource_bounds_with_preallocated_error_budget"
   },
   "depletion_diagnostic": {
     "resource_floor": 0.2,

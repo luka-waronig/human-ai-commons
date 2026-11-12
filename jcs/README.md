@@ -29,3 +29,5 @@ python reproduce.py all
 Use `python reproduce.py smoke` for the tiny software check. Repeating an experiment reuses completed stages when its source, settings, and dependencies still match. The [experiment instructions](docs/running-experiments.md) cover individual stages and the optional automated launcher.
 
 This folder can be copied and run independently of the rest of the repository.
+
+Software is distributed under the [MIT License](LICENSE).

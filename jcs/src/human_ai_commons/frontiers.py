@@ -5,7 +5,7 @@ import json
 import numpy as np
 from .config import metric_spec, problems, robustness_variants, stress_spec, scenario
 from .capacity import strict_safety_bound
-from .metrics import paired_interval, probability_upper_bound
+from .metrics import paired_interval, paired_simultaneous_intervals, probability_upper_bound
 from .payoffs import Policy, effective_change_interval, resource_only_encoding
 from .provenance import identifier, rng, write_json, append_json, read_jsonl
 
@@ -25,13 +25,16 @@ def values(row):
     return result
 
 
-def nondominated(rows):
-    """Exact dominance of sample means, without an assumed welfare weight."""
+def nondominated(rows, deduplicate=True):
+    """Non-dominated sample means, with optional representatives for exact ties."""
     ordered = sorted(rows, key=lambda r: (Policy(**r['policy']).cost(), r['policy_id']))
-    unique = {}
-    for row in ordered:
-        unique.setdefault(tuple(values(row)), row)
-    rows = list(unique.values())
+    if deduplicate:
+        unique = {}
+        for row in ordered:
+            unique.setdefault(tuple(values(row)), row)
+        rows = list(unique.values())
+    else:
+        rows = ordered
     if not rows:
         return []
     matrix = np.array([values(r) for r in rows])
@@ -163,6 +166,8 @@ def validate(ctx):
                 candidate['selection_status'] = ('empirically_feasible' if candidate['search_feasible']
                                                   else 'diagnostic_no_empirically_feasible_candidate')
         frozen.append(dict(problem=row['problem'], problem_id=row['problem_id'], families=families,
+                           robustness_families={family: spread(candidates, ctx.config['validation']['robustness_candidates_per_family'])
+                                                for family, candidates in families.items()},
                            validation_candidates=assessed))
     write_json(ctx.output/'frozen_policies.json', frozen)
 
@@ -174,7 +179,7 @@ def _primary(rows, config):
 
 
 def assess_constraints(rows, confidence, maximum):
-    unique = {(r['problem']['pressure'], c['policy_id']) for r in rows
+    unique = {(r.get('comparison_group', r['problem']['pressure']), c['policy_id']) for r in rows
               for candidates in r['families'].values() for c in candidates}
     adjusted = 1-(1-confidence)/max(1, len(unique))
     for row in rows:
@@ -185,6 +190,66 @@ def assess_constraints(rows, confidence, maximum):
                                  simultaneous_protection_supported=bool(upper <= maximum),
                                  protected_family_size=len(unique), family_confidence=confidence)
     return len(unique)
+
+
+def inference_confidence(config):
+    """Equal error allocation to main and robustness outcome and protection families."""
+    groups = 4 if robustness_variants(config) else 2
+    return 1-(1-config['validation'].get('confidence_level', .95))/groups
+
+
+def outcome_comparisons(results, config, count, group):
+    """Paired simultaneous comparisons of all frozen designs with the original game."""
+    confidence = config['validation'].get('confidence_level', .95)
+    family_confidence = inference_confidence(config)
+    contrasts, paired_worlds = {}, None
+    for row in results:
+        baseline = row['families']['reference'][0]
+        if group == 'main' and paired_worlds is not None and baseline['world_ids'] != paired_worlds:
+            raise ArithmeticError('simultaneous inference requires matched realization indices across problems')
+        paired_worlds = baseline['world_ids']
+        for candidates in row['families'].values():
+            for candidate in candidates:
+                if candidate['world_ids'] != paired_worlds:
+                    raise ArithmeticError('frontier comparison requires paired worlds')
+                if candidate['policy_id'] == baseline['policy_id']:
+                    continue
+                for key, field in [('human', 'human_services'), ('ai', 'ai_services'), ('depletion', 'losses')]:
+                    contrasts[(str(row.get('comparison_group', row['problem']['pressure'])), candidate['policy_id'], key)] = (
+                        np.array(candidate[field])-np.array(baseline[field]))
+    keys = sorted(contrasts)
+    matrix = np.column_stack([contrasts[k] for k in keys]) if keys else np.empty((count, 0))
+    joint = paired_simultaneous_intervals(matrix, confidence=family_confidence)
+    joint = dict(zip(keys, joint))
+    comparisons = []
+    for row in results:
+        baseline = row['families']['reference'][0]
+        for family, candidates in row['families'].items():
+            for candidate in candidates:
+                if candidate['world_ids'] != baseline['world_ids']:
+                    raise ArithmeticError('frontier comparison requires paired worlds')
+                for key, field in [('human', 'human_services'), ('ai', 'ai_services'), ('depletion', 'losses')]:
+                    differences = np.array(candidate[field])-np.array(baseline[field])
+                    interval = paired_interval(differences, rng('pareto-comparison', group, row.get('comparison_group'), row['problem_id'], candidate['policy_id'], key),
+                                               confidence=confidence, samples=config['validation']['descriptive_bootstrap_samples'])
+                    identical = candidate['policy_id'] == baseline['policy_id']
+                    simultaneous = (dict(lower=0., upper=0., bounded_lower=0., bounded_upper=0.,
+                                         standard_error=0., method='identical_policy', coverage='identity') if identical else
+                                    joint[(str(row.get('comparison_group', row['problem']['pressure'])), candidate['policy_id'], key)])
+                    comparisons.append(dict(problem_id=row['problem_id'], comparison_group=row.get('comparison_group', row['problem']['pressure']), **row['problem'], family=family,
+                        policy_id=candidate['policy_id'], outcome=key, difference=float(differences.mean()),
+                        lower=interval['lower'], upper=interval['upper'],
+                        simultaneous_lower=simultaneous['lower'], simultaneous_upper=simultaneous['upper'],
+                        simultaneous_method=simultaneous['method'], simultaneous_confidence=family_confidence,
+                        simultaneous_standard_error=simultaneous['standard_error'],
+                        simultaneous_coverage=simultaneous['coverage'],
+                        bounded_lower=simultaneous['bounded_lower'], bounded_upper=simultaneous['bounded_upper'],
+                        interval_scope='marginal descriptive bootstrap; paired simultaneous inference across distinct contrasts',
+                        constraint_supported=candidate['simultaneous_protection_supported']))
+    return comparisons, dict(target_confidence=confidence, per_group_confidence=family_confidence,
+        distinct_outcome_contrasts=len(keys), method='bounded_mean_betting_mixture',
+        coverage='finite_sample_under_independent_bounded_realizations',
+        descriptive_bootstrap_samples=config['validation']['descriptive_bootstrap_samples'])
 
 
 def test(ctx):
@@ -198,29 +263,8 @@ def test(ctx):
                                   'test', count, record=True)
         families['reference'] = [reference]
         results.append(dict(problem=row['problem'], problem_id=row['problem_id'], families=families))
-    confidence = config['validation'].get('confidence_level', .95)
-    claims = assess_constraints(results, confidence, stress_spec(config).maximum_probability)
-    comparisons = []
-    for row in results:
-        baseline = row['families']['reference'][0]
-        for family, candidates in row['families'].items():
-            for candidate in candidates:
-                if candidate['world_ids'] != baseline['world_ids']:
-                    raise ArithmeticError('frontier comparison requires paired worlds')
-                for key, field in [('human', 'human_services'), ('ai', 'ai_services'), ('depletion', 'losses')]:
-                    differences = np.array(candidate[field])-np.array(baseline[field])
-                    interval = paired_interval(differences, rng('pareto-comparison', row['problem_id'], candidate['policy_id'], key),
-                                               confidence=confidence)
-                    # Differences lie in [-1,1]. A union bound covers all tested
-                    # coordinates without relying on a normal approximation.
-                    radius = np.sqrt(2*np.log(6*max(1, claims)/(1-confidence))/count)
-                    comparisons.append(dict(problem_id=row['problem_id'], **row['problem'], family=family,
-                        policy_id=candidate['policy_id'], outcome=key, difference=float(differences.mean()),
-                        lower=interval['lower'], upper=interval['upper'],
-                        simultaneous_lower=max(-1., float(differences.mean()-radius)),
-                        simultaneous_upper=min(1., float(differences.mean()+radius)),
-                        interval_scope='bootstrap descriptive; simultaneous bounds use bounded independent differences',
-                        constraint_supported=candidate['simultaneous_protection_supported']))
+    assess_constraints(results, inference_confidence(config), stress_spec(config).maximum_probability)
+    comparisons, inference = outcome_comparisons(results, config, count, 'main')
     anchor = _primary(frozen, config)
     existing = {(r['pressure'], r['world_id']) for r in read_jsonl(ctx.output/'capacity_bounds.jsonl')}
     for pressure in sorted({r['problem']['pressure'] for r in results}):
@@ -237,6 +281,7 @@ def test(ctx):
             for observation in ['local', 'global', 'fixed']}))
     write_json(ctx.output/'test_comparisons.json', dict(mode='pareto', problems=results,
         paired_outcome_comparisons=comparisons, same_matrix_observation_controls=controls,
+        inference=inference,
         primary_problem=anchor['problem'], interpretation='Estimated finite-sample frontiers; no global optimality certificate.'))
 
 
@@ -248,10 +293,14 @@ def robustness(ctx):
     for variant in robustness_variants(ctx.config):
         families = {family: [ctx.aggregate(anchor['problem']['pressure'], Policy(**c['policy']), 'robustness', count,
                              variant=variant, record=False) for c in candidates]
-                    for family, candidates in anchor['families'].items()}
+                    for family, candidates in anchor['robustness_families'].items()}
         families['reference'] = [ctx.aggregate(anchor['problem']['pressure'],
             Policy(t=ctx.config['payoffs']['t'], s=ctx.config['payoffs']['s']), 'robustness', count, variant=variant)]
-        assessment = dict(problem=anchor['problem'], families=families)
-        assess_constraints([assessment], ctx.config['validation'].get('confidence_level', .95), stress_spec(ctx.config).maximum_probability)
-        rows.append(dict(variant=variant, families=families, interpretation='Transfer of a frozen set; no reoptimization.'))
+        rows.append(dict(problem=anchor['problem'], problem_id=anchor['problem_id'], comparison_group=variant['name'], variant=variant,
+                         families=families, interpretation='Transfer of validation-frozen objective extremes; no reoptimization.'))
+    assess_constraints(rows, inference_confidence(ctx.config), stress_spec(ctx.config).maximum_probability)
+    comparisons, inference = outcome_comparisons(rows, ctx.config, count, 'robustness')
+    for row in rows:
+        row['paired_outcome_comparisons'] = [r for r in comparisons if r['comparison_group'] == row['comparison_group']]
+        row['inference'] = inference
     write_json(ctx.output/'robustness.json', rows)

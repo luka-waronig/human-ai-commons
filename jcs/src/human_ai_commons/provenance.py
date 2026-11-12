@@ -69,7 +69,7 @@ def sha256(path):
 def source_files():
     # Source hashes cover the executed package, including a non-editable installation.
     paths = {str(Path('src/human_ai_commons')/p.name): p for p in PACKAGE.glob('*.py')}
-    paths.update({name: ROOT/name for name in ['pyproject.toml', 'requirements.txt', 'reproduce.py'] if (ROOT/name).exists()})
+    paths.update({name: ROOT/name for name in ['LICENSE', 'pyproject.toml', 'requirements.txt', 'reproduce.py'] if (ROOT/name).exists()})
     return dict(sorted(paths.items()))
 
 

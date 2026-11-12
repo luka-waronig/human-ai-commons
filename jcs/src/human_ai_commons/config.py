@@ -3,10 +3,12 @@ from dataclasses import asdict, replace
 import json
 import math
 from pathlib import Path
+import numpy as np
 from .dynamics import Scenario
 from .metrics import MetricSpec, StressSpec, WelfareSpec
 from .world import WorldSpec
 from .payoffs import Policy
+from scipy.stats import beta, binom
 
 
 def merge(base, changes):
@@ -138,6 +140,21 @@ def validate_config(config):
         count = s['one_dimensional_search']['initial_grid_points']
         if isinstance(count, bool) or not isinstance(count, int) or count < 2:
             raise ValueError('comparator grid requires at least two points')
+        for field, minimum in [('descriptive_bootstrap_samples', 99), ('robustness_realizations', 2),
+                               ('robustness_candidates_per_family', 3)]:
+            value = v[field]
+            if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
+                raise ValueError(f'invalid {field}')
+        if v['robustness_candidates_per_family'] > v['maximum_tested_candidates_per_family_and_problem']:
+            raise ValueError('robustness representatives must fit inside the frozen test set')
+        specification = v['resource_power']
+        if (not 0 < specification['design_probability'] < stress_spec(config).maximum_probability
+                or not 0 < specification['minimum_power'] < 1):
+            raise ValueError('invalid resource-constraint power specification')
+        if not config.get('execution', {}).get('label', '').startswith('smoke'):
+            for phase, assessment in resource_power_plan(config).items():
+                if assessment['power'] < specification['minimum_power']:
+                    raise ValueError(f'{phase} sample cannot meet the stated resource-assessment power')
     if o['name'] != 'pareto_human_ai_depletion':
         if s['explicit_population_size'] < 5 or s['maximum_generations'] < 0 or s['optimizer_restarts'] < 1:
             raise ValueError('invalid DE budget')
@@ -251,7 +268,8 @@ def frontier_budget(config, rows):
     # Each family retains a set; references and observation controls are cached.
     test_cap = families*tested+len(pressures)+3*tested
     steps = objective['total_steps']
-    robust_steps = sum(variant.get('steps', steps)*((4+global_control)*tested+1)
+    robust_representatives = validation['robustness_candidates_per_family']
+    robust_steps = sum(variant.get('steps', steps)*((4+global_control)*robust_representatives+1)
                        *validation.get('robustness_realizations', validation['validation_realizations'])
                        for variant in robustness_variants(config))
     caps = dict(characterize=characterization*steps, train=train*validation['training_realizations']*steps,
@@ -259,7 +277,36 @@ def frontier_budget(config, rows):
                 test=test_cap*validation['test_realizations']*steps, robustness=robust_steps)
     return dict(candidate_caps=dict(characterize=characterization, train=train, validate=validation_cap, test=test_cap),
                 model_step_caps=caps, all_model_steps=sum(caps.values()), world=asdict(world_spec(config)),
+                resource_assessment=resource_power_plan(config),
                 simulations_started=False, interpretation='Pareto workflow upper bounds before cache reuse.')
+
+
+def resource_power_plan(config):
+    """Exact pre-run power at a declared event rate, not a promise about observed results."""
+    v, search = config['validation'], config['search']
+    variants = robustness_variants(config)
+    confidence = 1-(1-v.get('confidence_level', .95))/(4 if variants else 2)
+    rows = problems(config)
+    global_control = int(bool(search.get('global_composition_reoptimization')))
+    maximum = stress_spec(config).maximum_probability
+    main_count = (4*len(rows)+global_control)*v['maximum_tested_candidates_per_family_and_problem']
+    main_count += len({p['pressure'] for p in rows})
+    specifications = dict(test=(v['test_realizations'], main_count))
+    if variants:
+        specifications['robustness'] = (v['robustness_realizations'],
+            len(variants)*((4+global_control)*v['robustness_candidates_per_family']+1))
+    result = {}
+    for phase, (n, comparisons) in specifications.items():
+        levels = beta.ppf(1-(1-confidence)/comparisons, np.arange(1,n+1), np.arange(n,0,-1))
+        admissible = np.flatnonzero(levels <= maximum)
+        failures = int(admissible[-1]) if len(admissible) else -1
+        probability = v['resource_power']['design_probability']
+        result[phase] = dict(realizations=n, maximum_comparisons=comparisons,
+            maximum_supported_failures=failures, zero_failure_upper_bound=float(levels[0]),
+            design_probability=probability, power=float(binom.cdf(failures,n,probability)),
+            required_power=v['resource_power']['minimum_power'], family_confidence=confidence,
+            power_scope='per_comparison_at_design_probability')
+    return result
 
 
 def robustness_variants(config):

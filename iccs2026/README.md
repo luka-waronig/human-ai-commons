@@ -12,3 +12,5 @@ python -m pip install --require-hashes -r requirements.txt
 python -m pytest -q
 solara run server.py
 ```
+
+Software is distributed under the [MIT License](LICENSE).

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import numpy as np
 from scipy.stats import beta
+from scipy.special import logsumexp
 
 
 @dataclass(frozen=True)
@@ -233,3 +234,48 @@ def paired_interval(reductions, generator, confidence=.95, samples=10000):
     low, high = np.quantile(means, [alpha, 1-alpha])
     return dict(mean_reduction=float(values.mean()), lower=float(low), upper=float(high),
                 confidence=confidence, paired_realizations=len(values), bootstrap_samples=samples)
+
+
+def paired_simultaneous_intervals(differences, confidence=.95):
+    """Finite-sample mean intervals for bounded independent paired realizations.
+
+    Each one-sided test mixes fixed nonnegative wealth processes. For X in
+    [0,1] and E[X] <= m, every factor 1-rho+rho*X/m has expectation <= 1.
+    The mixture therefore has expectation <= 1; Markov's inequality and
+    Bonferroni give simultaneous coverage without a distributional shape
+    assumption. Independent realizations are rows; contrasts are columns.
+    """
+    data = np.asarray(differences, dtype=float)
+    if (data.ndim != 2 or data.shape[0] < 2 or not np.isfinite(data).all()
+            or np.any(np.abs(data) > 1+1e-12) or not 0 < confidence < 1):
+        raise ValueError('bounded paired contrast matrix and confidence required')
+    data = np.clip(data, -1., 1.)
+    n, columns = data.shape
+    if not columns:
+        return []
+    fractions = np.array([.02,.05,.1,.2,.4,.6,.8,.95,1.])
+    log_weights = np.log(np.r_[np.full(8,.5/8),.5])
+    log_threshold = np.log(2*columns/(1-confidence))
+    def lower_bound(observations):
+        low, high = np.zeros(columns), observations.mean(axis=0)
+        for _ in range(55):
+            middle = (low+high)/2
+            safe = np.where(middle > 0, middle, 1.)
+            factors = 1-fractions+fractions*observations[:,:,None]/safe[None,:,None]
+            with np.errstate(divide='ignore'):
+                log_wealth = np.log(factors).sum(axis=0)
+            rejected = logsumexp(log_wealth+log_weights,axis=1) >= log_threshold
+            low = np.where(rejected,middle,low)
+            high = np.where(rejected,high,middle)
+        return low
+    normalized = (data+1)/2
+    lower = 2*lower_bound(normalized)-1
+    upper = 1-2*lower_bound(1-normalized)
+    mean = data.mean(axis=0)
+    error = data.std(axis=0,ddof=1)/np.sqrt(n)
+    radius = np.sqrt(2*np.log(2*columns/(1-confidence))/n)
+    return [dict(difference=float(mean[j]),lower=float(lower[j]),upper=float(upper[j]),
+        standard_error=float(error[j]),confidence=confidence,comparisons=columns,
+        method='bounded_mean_betting_mixture',coverage='finite_sample_independent_bounded_pairs',
+        bounded_lower=float(max(-1.,mean[j]-radius)),bounded_upper=float(min(1.,mean[j]+radius)))
+        for j in range(columns)]

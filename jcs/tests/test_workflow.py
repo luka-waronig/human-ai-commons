@@ -66,6 +66,9 @@ def test_smoke_stages_holdouts_integrity_and_exact_replay(tmp_path, basis):
     frozen = json.loads((output/'frozen_policies.json').read_text())
     assert all('winners' not in problem for problem in frozen)
     assert all(candidate['count'] == 2 for problem in frozen for candidates in problem['families'].values() for candidate in candidates)
+    assert all(len(candidates) <= config['validation']['robustness_candidates_per_family']
+               and {r['policy_id'] for r in candidates} <= {r['policy_id'] for r in problem['families'][family]}
+               for problem in frozen for family,candidates in problem['robustness_families'].items())
     analyze(output)
     assert (output/'analysis/pareto_frontier.png').exists()
     assert (output/'analysis/pareto_frontier.pdf').exists()
@@ -92,6 +95,7 @@ def test_smoke_stages_holdouts_integrity_and_exact_replay(tmp_path, basis):
     with zipfile.ZipFile(exported['archive']) as archive:
         names = archive.namelist()
         assert 'jcs/src/human_ai_commons/dynamics.py' in names
+        assert archive.read('jcs/LICENSE') == (ROOT/'LICENSE').read_bytes()
         assert 'jcs/results/paper/frozen_policies.json' in names
         assert 'jcs/docs/research-plan.md' in names
         assert 'jcs/scripts/verify_payoff_design.py' in names

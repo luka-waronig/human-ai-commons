@@ -2,6 +2,7 @@ cff-version: 1.2.0
 message: Cite the previous conference study and identify the exact JCS software and output-bundle versions used.
 title: 'Human-AI Commons: constrained payoff design study'
 type: software
+license: MIT
 version: 0.2.0
 repository-code: https://github.com/luka-waronig/human-ai-commons
 authors:

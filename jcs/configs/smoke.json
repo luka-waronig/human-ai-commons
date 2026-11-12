@@ -67,7 +67,8 @@
     "test_realizations": 3,
     "robustness_realizations": 2,
     "characterization_realizations": 2,
-    "maximum_tested_candidates_per_family_and_problem": 3
+    "maximum_tested_candidates_per_family_and_problem": 3,
+    "descriptive_bootstrap_samples": 199
   },
   "secondary_checks": {
     "stress_duration_steps": [

@@ -52,7 +52,7 @@ def test_simultaneous_observations_are_not_contaminated_by_agent_order():
     sync = Simulator(world, Scenario(pressure=.1, theta=0, epsilon=0), policy)
     sequential = Simulator(world, Scenario(pressure=.1, theta=0, epsilon=0, schedule='sequential_planning'), policy)
     for sim in [sync, sequential]:
-        sim.water[:] = .4  # Replenishment gives exactly n=0.5 before both agents plan.
+        sim.water[:] = .4  # replenishment gives exactly n=0.5 before both agents plan.
         sim.step(np.array([.1, .1]), np.array([.5, .5]), np.array([0, 1]))
     np.testing.assert_array_equal(sync.strategies, [False, True])
     np.testing.assert_array_equal(sequential.strategies, [False, False])

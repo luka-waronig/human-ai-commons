@@ -28,7 +28,7 @@ def compute_cwt_power(x, t, min_period=5., max_period=None, n_freqs=64):
     scales = pywt.central_frequency('morl') / (frequencies * dt)
     coefficients, _ = pywt.cwt(x - np.mean(x), scales, 'morl', sampling_period=dt)
     power = np.abs(coefficients) ** 2
-    # Approximate Morlet e-folding edge exclusion; not a significance criterion.
+    # approximate Morlet e-folding edge exclusion; not a significance criterion.
     edge_distance = np.minimum(np.arange(len(x)), np.arange(len(x))[::-1])
     power[edge_distance[None, :] < np.sqrt(2) * scales[:, None]] = np.nan
     return power, dt, scales
@@ -72,7 +72,7 @@ def main():
     for key, runs in panels.items():
         t,power,dt,scales,metadata = runs[0]
         if any(not np.array_equal(item[0],t) for item in runs):
-            continue  # Per-run scores remain valid; unequal time grids are not averaged.
+            continue  # per-run scores remain valid; unequal time grids are not averaged.
         stack = np.stack([item[1] for item in runs])
         count = np.isfinite(stack).sum(axis=0)
         mean = np.divide(np.nansum(stack,axis=0),count,out=np.full_like(power,np.nan),where=count>0)

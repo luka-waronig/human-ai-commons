@@ -51,7 +51,7 @@ def strict_safety_bound(world, scenario, window, floor):
     amplitude = scenario.theta if scenario.feedback == 'manuscript' else max(scenario.theta-1, 0)
     maximum_multiplier = min(3, 1+amplitude/8)
     capacities = (1-floor)*world.capacity+window*world.renewal*maximum_multiplier
-    # Isolated agents cannot withdraw water and cannot force depletion. The main
+    # isolated agents cannot withdraw water and cannot force depletion. The main
     # ensemble has none; the unconditioned robustness ensemble can contain them.
     active = simulator.access.any(axis=1)
     result = routing_bound(simulator.access[active], window*simulator.cooperative_request[active], capacities)

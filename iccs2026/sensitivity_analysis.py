@@ -48,7 +48,7 @@ class WaterToCeSensitivityAnalyzer:
         self.seed = seed
         self.height, self.width = height, width
         
-        # Define parameter space
+        # define parameter space
         self.param_bounds = {
             'initial_humans': [5, 20],
             'initial_ai': [5, 20],
@@ -59,7 +59,7 @@ class WaterToCeSensitivityAnalyzer:
             'theta': [1.0, 10.0]
         }
         
-        # Define baseline parameters
+        # define baseline parameters
         self.baseline_params = {
             'initial_humans': 10,
             'initial_ai': 10,
@@ -79,7 +79,7 @@ class WaterToCeSensitivityAnalyzer:
             if len(bounds) != 2 or not np.isfinite(bounds).all() or bounds[0] >= bounds[1]:
                 raise ValueError(f"Invalid bounds for {name}: {bounds}")
         
-        # Key output metrics to analyze
+        # key output metrics to analyze
         self.output_metrics = [
             'final_coop_fraction',
             'final_environment_state', 
@@ -104,7 +104,7 @@ class WaterToCeSensitivityAnalyzer:
         config = {**self.baseline_params, **params}
         for name in ("initial_humans", "initial_ai"):
             config[name] = int(np.rint(config[name]))
-        # Do not turn failed simulations into apparently usable NaN records.
+        # simulation failures propagate instead of becoming NaN observations.
         model = WaterToC(
             height=self.height, width=self.width, **config,
             seed=seed, save_snapshots=False, record_spatial=False,
@@ -112,7 +112,7 @@ class WaterToCeSensitivityAnalyzer:
         for _ in range(self.max_steps):
             model.step()
         data = model.datacollector.get_model_vars_dataframe()
-        post = data.iloc[1:]  # Initialization is not an observation of consumption.
+        post = data.iloc[1:]  # initialization is not an observation of consumption.
         return {
             'final_coop_fraction': float(post['Coop_Fraction'].iloc[-1]),
             'final_environment_state': float(post['Environment_State'].iloc[-1]),
@@ -120,7 +120,7 @@ class WaterToCeSensitivityAnalyzer:
             'avg_coop_fraction': float(post['Coop_Fraction'].mean()),
             'avg_environment_state': float(post['Environment_State'].mean()),
             'water_depletion_rate': float((data['Total_Water'].iloc[0] - data['Total_Water'].iloc[-1]) / self.max_steps),
-            # Descriptive inverse dispersion, not proof of dynamical stability.
+            # descriptive inverse dispersion, not proof of dynamical stability.
             'stability_index': float(1.0 / (1.0 + post['Coop_Fraction'].std(ddof=0))),
         }
 
@@ -166,7 +166,7 @@ class WaterToCeSensitivityAnalyzer:
         for param_name in self.param_bounds.keys():
             print(f"Analyzing parameter: {param_name}")
             
-            # Create parameter configurations
+            # create parameter configurations
             param_configs = []
             param_values = np.linspace(
                 self.param_bounds[param_name][0],
@@ -179,17 +179,17 @@ class WaterToCeSensitivityAnalyzer:
                 config[param_name] = value
                 param_configs.append(config)
             
-            # Run simulations
+            # run simulations
             results_df = self.run_batch_simulations(param_configs)
             
-            # Calculate sensitivity metrics
+            # calculate sensitivity metrics
             param_effects = {}
             for metric in self.output_metrics:
                 if metric in results_df.columns:
-                    # Group by parameter value and calculate mean
+                    # group by parameter value and calculate mean
                     grouped = results_df.groupby(param_name)[metric].mean()
                     
-                    # Calculate sensitivity measures
+                    # calculate sensitivity measures
                     param_effects[metric] = {
                         'range': grouped.max() - grouped.min(),
                         'std': grouped.std(),
@@ -218,26 +218,26 @@ class WaterToCeSensitivityAnalyzer:
         if n_samples < 2 or n_samples & (n_samples - 1):
             raise ValueError("Sobol base sample count must be a power of two >= 2")
         
-        # Define problem for SALib
+        # define problem for SALib
         problem = {
             'num_vars': len(self.param_bounds),
             'names': list(self.param_bounds.keys()),
             'bounds': list(self.param_bounds.values())
         }
         
-        # Generate samples
+        # generate samples
         param_values = sobol.sample(problem, n_samples, seed=self.seed)
         
-        # Create parameter configurations
+        # create parameter configurations
         param_configs = []
         for values in param_values:
             config = dict(zip(problem['names'], values))
             param_configs.append(config)
         
-        # Run simulations
+        # run simulations
         results_df = self.run_batch_simulations(param_configs)
         # SALib requires exactly one output per sampling-design row, in order.
-        # Replicates estimate E[Y | parameters]; flattening them breaks the design.
+        # replicates estimate E[Y | parameters]; flattening them breaks the design.
         means = results_df.groupby('config_id')[self.output_metrics].mean().reindex(range(len(param_configs)))
         within_variances = results_df.groupby('config_id')[self.output_metrics].var(ddof=1).reindex(means.index)
         counts = results_df.groupby('config_id').size().reindex(means.index, fill_value=0)
@@ -246,22 +246,22 @@ class WaterToCeSensitivityAnalyzer:
                 or not (counts == self.n_runs_per_config).all()):
             raise ValueError("Incomplete or non-finite simulation output; Sobol analysis aborted")
         
-        # Calculate Sobol indices for each output metric
+        # calculate Sobol indices for each output metric
         sobol_results = {}
         
         for metric in self.output_metrics:
             if metric in results_df.columns and not results_df[metric].isna().all():
                 y = means[metric].to_numpy()
                 if np.var(y) == 0:
-                    # Variance-based indices are undefined for a constant output.
+                    # variance-based indices are undefined for a constant output.
                     sobol_results[metric] = None
                 else:
                     Si = sobol_analyze.analyze(problem, y, print_to_console=False, seed=self.seed)
                     sobol_results[metric] = {
-                        'S1': Si['S1'],  # First-order indices
-                        'ST': Si['ST'],  # Total-order indices
-                        'S2': Si['S2'] if 'S2' in Si else None,  # Second-order indices
-                        'S1_conf': Si['S1_conf'],  # Confidence intervals
+                        'S1': Si['S1'],  # first-order indices
+                        'ST': Si['ST'],  # total-order indices
+                        'S2': Si['S2'] if 'S2' in Si else None,  # second-order indices
+                        'S1_conf': Si['S1_conf'],  # confidence intervals
                         'ST_conf': Si['ST_conf']
                     }
         
@@ -291,7 +291,7 @@ class WaterToCeSensitivityAnalyzer:
         if n_samples < 2 or n_perturbations < 2:
             raise ValueError("KS sample counts must be at least two")
         rng = np.random.default_rng(self.seed)
-        # Draw a common background ensemble. For each parameter, compare the
+        # draw a common background ensemble. For each parameter, compare the
         # ensemble with that parameter fixed to its baseline (same other inputs).
         baseline_configs = []
         for _ in range(n_samples):
@@ -312,7 +312,7 @@ class WaterToCeSensitivityAnalyzer:
             
             perturbed_results = self.run_batch_simulations(perturbed_configs)
             
-            # Perform KS tests for each output metric
+            # perform KS tests for each output metric
             param_ks_results = {}
             for metric in self.output_metrics:
                 if metric in baseline_results.columns and metric in perturbed_results.columns:
@@ -320,7 +320,7 @@ class WaterToCeSensitivityAnalyzer:
                     perturbed_values = perturbed_results[metric].dropna()
                     
                     if len(baseline_values) > 0 and len(perturbed_values) > 0:
-                        # Average stochastic replications first. The paired ensemble
+                        # average stochastic replications first. The paired ensemble
                         # supplies a descriptive distance, not an iid-test p-value.
                         base_means = baseline_results.groupby('config_id')[metric].mean()
                         fixed_means = perturbed_results.groupby('config_id')[metric].mean()
@@ -361,7 +361,7 @@ class WaterToCeSensitivityAnalyzer:
                 
                 if metric in results['effects']:
                     data = results['data']
-                    # Plot mean and one standard deviation (not a confidence interval).
+                    # plot mean and one standard deviation (not a confidence interval).
                     grouped = data.groupby(param_name)[metric].agg(['mean', 'std'])
                     
                     ax.plot(grouped.index, grouped['mean'], 'o-', linewidth=2)
@@ -388,10 +388,10 @@ class WaterToCeSensitivityAnalyzer:
         sobol_indices = sobol_results['sobol_indices']
         problem = sobol_results['problem']
         
-        # Create heatmap of first-order and total-order indices
+        # create heatmap of first-order and total-order indices
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
         
-        # First-order indices
+        # first-order indices
         s1_data = []
         st_data = []
         metrics_with_data = []
@@ -427,7 +427,7 @@ class WaterToCeSensitivityAnalyzer:
         """
         Plot KS sensitivity analysis results
         """
-        # Create heatmap of KS statistics
+        # create heatmap of KS statistics
         ks_matrix = []
         param_names = []
         
@@ -460,7 +460,7 @@ class WaterToCeSensitivityAnalyzer:
         """
         Generate comprehensive sensitivity report
         """
-        # Keep estimands and output units separate: one row per parameter/metric.
+        # each parameter/metric pair retains its own estimand and output units.
         rows = []
         names = sobol_results['problem']['names']
         for name in self.param_bounds:
@@ -481,28 +481,28 @@ class WaterToCeSensitivityAnalyzer:
                 rows.append(row)
         return pd.DataFrame(rows)
 
-# Example usage functions
+# example usage functions
 def run_full_sensitivity_analysis():
     """
     Run complete sensitivity analysis suite
     """
     analyzer = WaterToCeSensitivityAnalyzer(
         n_runs_per_config=5,
-        max_steps=50,  # Reduced for faster execution
+        max_steps=50,  # reduced for faster execution
         n_jobs=4
     )
     
-    # Run all three types of analysis
+    # run all three types of analysis
     oat_results = analyzer.oat_sensitivity_analysis(n_samples=8)
     sobol_results = analyzer.sobol_sensitivity_analysis(n_samples=128)
     ks_results = analyzer.ks_sensitivity_analysis(n_samples=50, n_perturbations=30)
     
-    # Generate plots
+    # generate plots
     analyzer.plot_oat_results(oat_results, 'oat_sensitivity.png')
     analyzer.plot_sobol_results(sobol_results, 'sobol_sensitivity.png')
     analyzer.plot_ks_results(ks_results, 'ks_sensitivity.png')
     
-    # Generate report
+    # generate report
     report = analyzer.generate_sensitivity_report(oat_results, sobol_results, ks_results)
     
     return {
@@ -514,7 +514,7 @@ def run_full_sensitivity_analysis():
     }
 
 if __name__ == "__main__":
-    # Run example analysis
+    # run example analysis
     results = run_full_sensitivity_analysis()
     print("\nSensitivity Analysis Report:")
     print(results['report'])

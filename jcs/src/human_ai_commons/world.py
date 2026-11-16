@@ -57,7 +57,7 @@ class World:
     draw_attempts: int = 1
 
     def __post_init__(self):
-        # Owned immutable arrays prevent policies from modifying shared worlds.
+        # owned immutable arrays prevent policies from modifying shared worlds.
         for name, dtype in [('resources', int), ('capacity', float), ('renewal', float),
                             ('positions', int), ('kinds', bool), ('initial', bool)]:
             raw = np.asarray(getattr(self, name))
@@ -137,7 +137,7 @@ def generate_world(spec, world_seed):
         counts = np.zeros(len(eligible), dtype=int)
         chosen = []
         for _ in range(n):
-            # Uniform among positions with remaining occupancy, without a retry cap bias.
+            # uniform among positions with remaining occupancy, without a retry cap bias.
             available = np.flatnonzero(counts < spec.maximum_occupancy)
             index = available[generator.integers(len(available))]
             counts[index] += 1
@@ -159,6 +159,6 @@ def transform_world(world, *, initial_fraction=None, cluster_ai=False, transform
         kinds[:] = False
         kinds[order[:world.spec.ai]] = True
     fraction = world.spec.initial_cooperation if initial_fraction is None else initial_fraction
-    # Original per-position strategies remain fixed when only demand labels change.
+    # original per-position strategies remain fixed when only demand labels change.
     initial = world.initial if initial_fraction is None else initial_strategies(kinds, fraction, rng(transform_seed, 'initial-strategies'))
     return replace(world, spec=replace(world.spec, initial_cooperation=fraction), kinds=kinds, initial=initial)

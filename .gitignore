@@ -1,42 +1,53 @@
-
+# python environments, caches and build products
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-
-
 *.so
-
-
 build/
 dist/
 *.egg-info/
 *.egg
-
-
 .venv/
 venv/
 env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+.matplotlib-cache/
+.tox/
+.nox/
+.ipynb_checkpoints/
 
-
+# local editor and operating-system files
 .vscode/
 .idea/
 *.sublime-workspace
 *.sublime-project
-
-
 .DS_Store
 Thumbs.db
 
+# local credentials and environment values
+.env
+.env.*
+!.env.example
+!.env.template
+credentials.json
+secrets.json
+*.pem
+*.key
+*.p12
+*.pfx
 
-*.log
-
-# Generated research artifacts; provenance manifests and test fixtures are tracked.
+# generated research artifacts; reference data and fixtures remain tracked
 snapshots/
 results/
 sweep_outputs/
 water_toc_sweep_results.csv
-.pytest_cache/
-
-
-.env
+*.zip
+*.log
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/

@@ -233,7 +233,7 @@ def budget_plan(config):
     validation_cap = len(rows)*4*slots+global_control*slots
     pressures = sorted(set(p['pressure'] for p in rows))
     characterization = 3*len(pressures)*validation['characterization_realizations']
-    # Five extra policies cover same-matrix observation controls and forced diagnostics.
+    # five extra policies cover same-matrix observation controls and forced diagnostics.
     test_cap = len(rows)*4+global_control+len(pressures)*3+5
     steps = objective['total_steps']
     variants = robustness_variants(config)
@@ -265,7 +265,7 @@ def frontier_budget(config, rows):
     pressures = {p['pressure'] for p in rows}
     characterization = 3*len(pressures)*validation['characterization_realizations']
     validation_cap = families*slots
-    # Each family retains a set; references and observation controls are cached.
+    # each family retains a set; references and observation controls are cached.
     test_cap = families*tested+len(pressures)+3*tested
     steps = objective['total_steps']
     robust_representatives = validation['robustness_candidates_per_family']

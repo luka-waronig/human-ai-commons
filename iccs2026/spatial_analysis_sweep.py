@@ -62,7 +62,7 @@ def _roll_sum_8(arr: np.ndarray, periodic: bool) -> np.ndarray:
         2D array of neighbor sums with same shape as arr.
     """
     if periodic:
-        # Match Mesa's distinct cells, excluding wrapped copies of the focal cell.
+        # match Mesa's distinct cells, excluding wrapped copies of the focal cell.
         offsets = {(dx % arr.shape[0], dy % arr.shape[1])
                    for dx in [-1,0,1] for dy in [-1,0,1]} - {(0,0)}
         result = np.zeros_like(arr)
@@ -157,7 +157,7 @@ def agent_cluster_metrics_agents_only(agents, height: int, width: int) -> Tuple[
     Returns:
         (n_clusters_agents, largest_cluster_size_in_agents, mean_cluster_size_in_agents).
     """
-    # Model arrays are indexed [x, y], with shape (width, height).
+    # model arrays are indexed [x, y], with shape (width, height).
     coop_counts = np.zeros((width, height), dtype=int)
     if isinstance(agents, (list, tuple)):
         for a in agents:

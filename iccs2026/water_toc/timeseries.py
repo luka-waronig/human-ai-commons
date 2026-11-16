@@ -10,7 +10,7 @@ def safe_adf_p(values, min_points=20):
     """Return NaN when the test is undefined or the supplied tail is too short.
 
     ADF tests a unit-root null; rejection is not evidence of a deterministic fixed
-    point. A constant series is described separately, not assigned a fake p-value.
+    point. A constant series has an undefined unit-root test p-value.
     """
     values = np.asarray(values, dtype=float)
     if values.ndim != 1 or not np.isfinite(values).all():
@@ -87,7 +87,7 @@ def estimate_oscillation(times, values, min_points=50, min_cycles=4, min_period=
             -amplitude * u * exponential * sine,
             -amplitude * exponential * sine])
 
-    # Fit dimensionless decay over the observed window to avoid exp overflow.
+    # fit dimensionless decay over the observed window to avoid exp overflow.
     guess = [np.mean(y), spread / 2, 0.01, 2 * np.pi * initial_frequency * duration, 0.0]
     lower = [np.min(y) - spread, 0, -8, 2 * np.pi * min_cycles, -2 * np.pi]
     upper = [np.max(y) + spread, 2 * spread, 8, 2 * np.pi * duration / min_period, 2 * np.pi]

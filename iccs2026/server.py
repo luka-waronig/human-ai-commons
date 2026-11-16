@@ -4,7 +4,7 @@ Interactive Solara app to run and visualize the WaterToC agent-based model.
 Purpose
 -------
 This app exposes model parameters via interactive controls, runs the simulation,
-and renders four views for analysis and paper-ready figures:
+and renders four analysis views:
 1) Time-series of cooperation, environment, and agent counts.
 2) Phase-space trajectory (cooperation vs. environment).
 3) Optional limit-cycle fit when periodic behavior is detected.
@@ -350,7 +350,7 @@ def LimitCyclePlot():
     try:
         tck, _ = splprep([cx, cy], s=0.001, per=True)
     except ValueError:
-        return  # Repeated/degenerate points do not define a fitted closed curve.
+        return  # repeated/degenerate points do not define a fitted closed curve.
     u = np.linspace(0, 1, 300)
     xs, ys = splev(u, tck)
     fig = go.Figure()
@@ -408,7 +408,7 @@ def StabilityAnalysis():
 @solara.component
 def DescriptionText():
     """
-    Plain-language overview and figure for contextualizing the app in a paper/demo.
+    Model overview and resource-feedback diagram.
     """
     solara.Markdown("""
 ## Coevolutionary Dynamics of Cooperation and Environmental Sustainability in Shared Resource Systems

@@ -128,7 +128,7 @@ def train(ctx):
         families['local'] = grid_search(evaluate, [axis, axis],
             lambda q: Policy.from_relative(*q, t, s), admissible,
             settings['refinement_rounds'], settings['refinement_anchors'])
-        # The local family contains both of these one-dimensional families.
+        # the local family contains both of these one-dimensional families.
         families['local'] += families['equal_relative']+families['redistribution']
         global_problem = search.get('global_composition_reoptimization')
         if norm == 'L2' and global_problem and all(problem[k] == global_problem[k] for k in ['pressure', 'budget']):
@@ -138,7 +138,7 @@ def train(ctx):
         for family, rows in families.items():
             archive.setdefault((pressure, family), {}).update({r['policy_id']: r for r in rows})
         design.append(dict(problem=problem, problem_id=identifier(problem)[:16], families=list(families)))
-    # Evaluation sharing before shortlisting gives larger admissible sets
+    # evaluation sharing before shortlisting gives larger admissible sets
     # access to all smaller-budget designs in the same family.
     for row in design:
         problem = row['problem']
@@ -157,7 +157,7 @@ def validate(ctx):
         assessed = {family: [ctx.aggregate(row['problem']['pressure'], Policy(**r['policy']), 'validation',
                     ctx.config['validation']['validation_realizations']) for r in candidates]
                     for family, candidates in row['families'].items()}
-        # Independently assessed nested candidates also belong to the local family.
+        # independently assessed nested candidates also belong to the local family.
         assessed['local'] += assessed['equal_relative']+assessed['redistribution']
         families = {family: select(candidates, ctx.config['validation']['maximum_tested_candidates_per_family_and_problem'])
                     for family, candidates in assessed.items()}

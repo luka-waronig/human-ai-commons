@@ -9,7 +9,7 @@ from human_ai_commons.world import World,WorldSpec
 
 @pytest.mark.parametrize('initial',[[.38,.38],[0.,.76]])
 def test_constructed_low_reserve_state_can_supply_every_request(initial):
-    # This is a mechanically valid constructed state, not a claim about typical runs.
+    # this is a mechanically valid constructed state, not a claim about typical runs.
     world=World(WorldSpec(width=10,height=1,humans=1,ai=1,capacity=1),
                 [[0,0],[5,0]],[1.,1.],[.1,.1],[[0,0],[5,0]],[False,True],[False,False])
     scenario=Scenario(pressure=2/3,demand_ratio=1,theta=0,epsilon=0,allocation='proportional')

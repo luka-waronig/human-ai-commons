@@ -214,7 +214,7 @@ def test_report_separates_empirical_and_supported_frontiers(tmp_path, monkeypatc
     assert {r['policy_id'] for r in empirical} == {uncertain['policy_id']}
     assert (destination/'pareto_frontier.png').stat().st_size > 1000
     assert (destination/'pareto_frontier.pdf').stat().st_size > 1000
-    # An original game that dominates the tested alternatives remains an
+    # an original game that dominates the tested alternatives remains an
     # available design in the actual family's frontier, not a self-only group.
     reference['mean_human_service'] = 1.
     reference['mean_ai_service'] = 1.
@@ -229,3 +229,34 @@ def test_report_separates_empirical_and_supported_frontiers(tmp_path, monkeypatc
     assert len(supported) == 1
     assert supported[0]['policy_id'] == reference['policy_id']
     assert supported[0]['family'] == 'local' and supported[0]['is_reference'] == 'True'
+
+
+def test_combined_frontier_retains_three_objectives_and_deduplicates_memberships():
+    pd = pytest.importorskip('pandas')
+    rows = [dict(problem_id='one', policy_id=pid, human=h, ai=a, depletion=l)
+            for pid, h, a, l in [('a', .8, .2, .1), ('a', .8, .2, .1),
+                                 ('b', .7, .3, .05), ('c', .6, .1, .2),
+                                 ('d', .7, .1, 0.)]]
+    frame = pd.DataFrame(rows)
+    result = analysis.combined_frontiers(frame)
+    assert len(result) == 4
+    assert set(result.loc[result.unconstrained_combined_sample_frontier, 'policy_id']) == {'a', 'b', 'd'}
+    # d is dominated in the activity projection, but not in three objectives.
+    normalized = frame.copy()
+    for name, baseline in [('human', .75), ('ai', .25), ('depletion', .1)]:
+        normalized[name] = analysis.relative_change_percent(frame[name], baseline)
+    assert analysis.combined_frontiers(normalized).unconstrained_combined_sample_frontier.tolist() == result.unconstrained_combined_sample_frontier.tolist()
+
+
+def test_combined_frontiers_do_not_compare_different_settings():
+    pd = pytest.importorskip('pandas')
+    frame = pd.DataFrame([dict(problem_id='small', policy_id='a', human=.4, ai=.4, depletion=.4),
+                          dict(problem_id='large', policy_id='b', human=.9, ai=.9, depletion=.1)])
+    assert analysis.combined_frontiers(frame).unconstrained_combined_sample_frontier.all()
+
+
+def test_relative_change_requires_a_positive_reference():
+    assert analysis.relative_change_percent(.6, .5) == pytest.approx(20.)
+    for baseline in [0, -.1, np.nan, np.inf]:
+        with pytest.raises(ValueError, match='positive reference'):
+            analysis.relative_change_percent(.6, baseline)

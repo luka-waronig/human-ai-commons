@@ -97,7 +97,7 @@ def test_ks_is_descriptive_and_report_preserves_output_units():
         baseline_params={'u':0.,'v':0.,'w':0.})
     result = analyzer.ks_sensitivity_analysis(n_samples=8)
     assert all(np.isnan(item['p_value']) for row in result.values() for item in row['ks_tests'].values())
-    # Missing Sobol indices remain undefined, not fabricated zero effects.
+    # variance-based indices are undefined for constant outputs.
     sobol = {'problem':{'names':['u','v','w']},'sobol_indices':{}}
     report = analyzer.generate_sensitivity_report({},sobol,result)
     assert 'Overall_Sensitivity' not in report

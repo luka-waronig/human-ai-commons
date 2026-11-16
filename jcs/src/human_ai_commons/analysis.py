@@ -10,13 +10,15 @@ from .payoffs import Policy
 from .diagnostics import spatial_summary
 
 
-def verify_bundle(output):
+def verify_bundle(output, progress=None):
     output = Path(output)
     checksums = json.loads((output/'checksums.json').read_text())
-    for relative, expected in checksums.items():
+    for completed, (relative, expected) in enumerate(checksums.items(), 1):
         path = (output/relative).resolve()
         if not path.is_relative_to(output.resolve()) or not path.is_file() or sha256(path) != expected:
             raise ValueError(f'artifact checksum mismatch: {relative}')
+        if progress is not None and (completed % 2000 == 0 or completed == len(checksums)):
+            progress(completed, len(checksums))
     return dict(verified=True, files=len(checksums))
 
 
@@ -124,7 +126,7 @@ def analyze(output, destination=None):
         names, means, lower, upper = [], [], [], []
         for name, row in controls.items():
             values = np.asarray(row['welfares'] if joint else row['losses'])
-            # An interval for a mean is the same bootstrap construction as a
+            # an interval for a mean is the same bootstrap construction as a
             # paired reduction against zero, resampling whole realizations.
             interval = paired_interval(values, rng('control-mean', manifest['run_id'], name))
             names.append(name)
@@ -251,7 +253,7 @@ def analyze_frontiers(output, destination, manifest, records, training, title):
                         row[name+'_lower'], row[name+'_upper'] = interval['lower'], interval['upper']
                     table.append(row)
         write_csv(destination/'pareto_candidates.csv', table)
-        # Headers are retained even when no design establishes the constraint.
+        # headers are retained even when no design establishes the constraint.
         for name, flag in [('pareto_frontier.csv', 'supported_family_pareto'),
                            ('estimated_pareto_frontier.csv', 'estimated_family_pareto')]:
             with (destination/name).open('w', newline='', encoding='utf-8') as stream:
@@ -455,3 +457,226 @@ def metric_sensitivity(output, floor, tail, destination):
     destination.parent.mkdir(parents=True, exist_ok=True)
     write_csv(destination, rows)
     return dict(output=str(destination), rescored_realizations=len(rows), simulations_started=False)
+
+
+def relative_change_percent(values, reference):
+    """Descriptive change relative to a positive reference, in percent."""
+    if not np.isfinite(reference) or reference <= 0:
+        raise ValueError('a finite positive reference is required')
+    return 100 * (np.asarray(values, dtype=float) / reference - 1)
+
+
+def combined_frontiers(candidates):
+    """Combined three-objective sample frontiers within identical problem settings."""
+    import pandas as pd
+    rows = []
+    for _, group in candidates.groupby('problem_id', sort=False):
+        group = group.drop_duplicates('policy_id').copy()
+        objectives = np.column_stack([-group.human, -group.ai, group.depletion])
+        if not np.isfinite(objectives).all():
+            raise ValueError('frontier outcomes must be finite')
+        dominated = np.any(np.all(objectives[:, None, :] <= objectives[None, :, :], axis=2)
+                           & np.any(objectives[:, None, :] < objectives[None, :, :], axis=2), axis=0)
+        group['unconstrained_combined_sample_frontier'] = ~dominated
+        rows.append(group)
+    return pd.concat(rows, ignore_index=True)
+
+
+def study_plots(bundle, derived, destination):
+    """Study plots from archived outcomes and explicitly supplied derived data; no simulations."""
+    import hashlib
+    import pandas as pd
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
+    from matplotlib.ticker import FuncFormatter, MaxNLocator
+    bundle, D, destination = Path(bundle).resolve(), Path(derived).resolve(), Path(destination).resolve()
+    if destination.is_relative_to(bundle) or destination == D or destination.is_relative_to(D):
+        raise ValueError('Plot output must be separate from archived and derived inputs')
+    manifest = json.loads((bundle/'manifest.json').read_text())
+    provenance = json.loads((D/'provenance_and_verification.json').read_text())
+    if provenance['run_id'] != manifest['run_id']:
+        raise ValueError('Derived results belong to a different recorded run')
+    destination.mkdir(parents=True, exist_ok=True)
+    F = destination/'figures'
+    F.mkdir(exist_ok=True)
+    plt.rcParams.update({'font.family':'DejaVu Serif','font.size':14,'axes.labelsize':14,'axes.titlesize':14,'axes.spines.top':False,'axes.spines.right':False,'pdf.fonttype':42,'svg.fonttype':'none'})
+    blue='#244867';gray='#777777';B='db0eed394e20c822b2a6beb3';A='8b24b6293b7838f8ae4cf9e4';O='de23924de8b26afc53a5dc84';E='fdb3c78ea72489620aec414d';N='9ca5ba4d95825c02d01d9888';G='73bea62e1e1318e4d8974bc6';Low='e9883'
+    cand=pd.read_csv(bundle/'analysis/pareto_candidates.csv');f=combined_frontiers(cand);c=pd.read_csv(bundle/'analysis/paired_outcome_comparisons.csv').drop_duplicates(['pressure','policy_id','outcome']);m=pd.read_csv(D/'trajectory_condition_means.csv');m=m[m.split=='test'];means={(r.pressure,r.policy_id):r for _,r in m.iterrows()};bands=pd.read_csv(D/'all_one_action_responses_and_bands.csv')
+    for row in cand.drop_duplicates(['pressure','policy_id']).itertuples():
+        q=means.get((row.pressure,row.policy_id))
+        if q is None or not np.allclose([q.late_human_support,q.late_ai_support],[row.human,row.ai],rtol=0,atol=1e-10):
+            raise ValueError('Derived activity summary disagrees with archived test means: '+row.policy_id)
+    labels={B:'Original',A:'A',O:'B',E:'C',N:'D',G:'G'}
+    primary=f[(f.pressure==1)&(f.budget==.5)&(f.norm=='L2')].copy();others=sorted(set(primary.policy_id)-set(labels))
+    labels.update({p:f'P{i+1:02d}' for i,p in enumerate(others)})
+    (destination/'plot_labels.json').write_text(json.dumps(labels,indent=2))
+    def save(fig,n):
+     fig.savefig(F/(n+'.pdf'),bbox_inches='tight',metadata={'CreationDate':None,'ModDate':None});fig.savefig(F/(n+'.png'),dpi=150,bbox_inches='tight');plt.close(fig)
+    def coords(g):
+     b=g[g.policy_id==B].iloc[0]
+     return np.column_stack([relative_change_percent(g.human,b.human),relative_change_percent(g.ai,b.ai),relative_change_percent(g.depletion,b.depletion)])
+    def dots(ax,g,x,y,annotate=False):
+     v=coords(g)
+     if y==2: v[:,2] *= -10000
+     for flag in [False,True]:
+      q=g.unconstrained_combined_sample_frontier.to_numpy()==flag
+      ax.scatter(v[q,x],v[q,y],s=38,facecolors=blue if flag else 'white',edgecolors=blue if flag else gray,lw=.9,zorder=3)
+     k=np.flatnonzero(g.policy_id.to_numpy()==B)[0];ax.scatter(v[k,x],v[k,y],marker='*',s=130,c='black',zorder=5)
+     if annotate:
+      for pid in [A,O,E,G]:
+       z=np.flatnonzero(g.policy_id.to_numpy()==pid)
+       if len(z):k=z[0];ax.annotate(labels[pid],(v[k,x],v[k,y]),xytext=(4,5 if pid!=O else -11),textcoords='offset points',fontsize=13)
+     ax.axhline(0,color='#bbb',lw=.6);ax.axvline(0,color='#bbb',lw=.6);ax.grid(alpha=.1);ax.ticklabel_format(useOffset=False,style='plain');ax.xaxis.set_major_locator(MaxNLocator(4));ax.yaxis.set_major_locator(MaxNLocator(4))
+    fig,axs=plt.subplots(1,3,figsize=(11,3.8),layout='constrained')
+    for ax,(x,y,title) in zip(axs,[(0,1,'a  Human–AI activity trade-offs'),(0,2,'b  Human activity and depletion'),(1,2,'c  AI activity and depletion')]):
+     dots(ax,primary,x,y,x==0 and y==1);names=['Human support gain\n(% of original)','AI support gain\n(% of original)','Depletion reduction\n(ppm of original)'];ax.set(xlabel=names[x],ylabel=names[y],title=title)
+     if y==2:
+            ax.set_yticks([0,.1,.2,.3]);ax.set_ylim(-.04,.3)
+            ax.yaxis.set_major_formatter(FuncFormatter(lambda x,p:f'{x:.1f}'))
+    fig.legend(handles=[Line2D([],[],marker='o',ls='',color=blue,label='On three-objective mean frontier'),Line2D([],[],marker='o',ls='',markerfacecolor='white',color=gray,label='Other tested design'),Line2D([],[],marker='*',ls='',color='black',ms=10,label='Original game')],loc='outside lower center',ncol=3,frameon=False,fontsize=14)
+    save(fig,'primary_tradeoffs')
+    primary.assign(human_relative_change=coords(primary)[:,0],ai_relative_change=coords(primary)[:,1],depletion_relative_change=coords(primary)[:,2],depletion_reduction_ppm=-10000*coords(primary)[:,2]).to_csv(destination/'primary_pareto_values.csv',index=False)
+    # original simultaneous outcome intervals: examples span the actual principal settings and families.
+    low=c[(c.pressure==.25)&(c.outcome=='depletion')].sort_values('difference').iloc[0].policy_id
+    specs=[(1,A,'A: local participation'),(1,O,'B: offsetting changes'),(1,E,'C: earlier restraint'),(1,G,'G: global participation'),(1,N,'D: later restraint, budget 1'),(.25,low,'Lowest mean depletion, pressure 0.25')]
+    (destination/'interval_examples.json').write_text(json.dumps(specs))
+    fig,axs=plt.subplots(1,3,figsize=(10,4.6),layout='constrained')
+    for ax,field,title in zip(axs,['human','ai','depletion'],['a  Human support','b  AI support','c  Depletion score']):
+     for j,(p,pid,label) in enumerate(specs):
+      q=c[(c.pressure==p)&(c.policy_id==pid)&(c.outcome==field)].iloc[0]
+      ax.errorbar(q.difference*100,j,xerr=[[100*(q.difference-q.simultaneous_lower)],[100*(q.simultaneous_upper-q.difference)]],fmt='o',color=blue,capsize=2,ms=4)
+     ax.axvline(0,color='black',lw=.8);ax.set(title=title,xlabel='Difference\n(percentage points)',yticks=range(len(specs)));ax.invert_yaxis();ax.grid(axis='y',alpha=.12)
+    axs[0].set_yticklabels([s[2] for s in specs],fontsize=13)
+    for ax in axs[1:]:ax.set_yticklabels([])
+    save(fig,'paired_outcomes')
+    pd.concat([c[(c.pressure==p)&(c.policy_id==pid)] for p,pid,_ in specs]).to_csv(destination/'planned_comparison_values.csv',index=False)
+    # coverage ratios, within-group tails and affected-source fractions.
+    b=m[m.policy_id==B].sort_values('pressure');p=b.pressure.to_numpy()
+    fig,axs=plt.subplots(1,3,figsize=(10.5,3.7),layout='constrained')
+    axs[0].plot(p,100*b.late_ai_support/b.late_human_support,'o-',color=blue);axs[0].set(title='a  Relative activity\ncoverage',ylabel='AI support / human support\n(%)',ylim=(0,105))
+    for metric,den,label,col,ls in [('human_worst10_agent_support','late_human_support','Human',blue,'-'),('ai_worst10_agent_support','late_ai_support','AI',gray,'--')]:axs[1].plot(p,100*b[metric]/b[den],marker='o',color=col,ls=ls,label=label)
+    axs[1].set(title='b  Within-group\ndisadvantage',ylabel='Worst tenth / group mean\n(%)',ylim=(0,105));axs[1].legend(frameon=False)
+    axs[2].plot(p,100*b.persistent_cell_fraction,'o-',color=blue);axs[2].set(title='c  Breadth of\nprolonged low stocks',ylabel='Sources with prolonged\nlow stocks (%)',ylim=(0,105))
+    for ax in axs:ax.set(xlabel='Cooperative demand /\nbaseline renewal',xticks=p,xticklabels=[f'{value:g}' for value in p]);ax.grid(alpha=.12)
+    save(fig,'spatial_burdens')
+    b.assign(ai_to_human_support_ratio=b.late_ai_support/b.late_human_support,human_tail_to_mean=b.human_worst10_agent_support/b.late_human_support,ai_tail_to_mean=b.ai_worst10_agent_support/b.late_ai_support).to_csv(destination/'spatial_burden_values.csv',index=False)
+    # one-action stock and neighborhood-cooperation responses.
+    def response(pid,stem):
+     q=bands[(bands.pressure==1)&(bands.policy_id==pid)&(bands.comparison=='one_action_cooperate_minus_defect')&bands.metric.str.startswith(stem)].copy();q['h']=q.metric.str.rsplit('h',n=1).str[-1].astype(int);return q.sort_values('h')
+    fig,axs=plt.subplots(1,2,figsize=(9.5,4.2),layout='constrained')
+    for stem,label,col,ls in [('late_ipw_source_stock_h','At the source used',blue,'-'),('late_ipw_future_sensed_stock_h',"At the actor’s later source",gray,'--')]:
+     q=response(B,stem);q=q[q.h>=1];axs[0].plot(q.h,q['mean']*100,marker='o',label=label,color=col,ls=ls);axs[0].fill_between(q.h,q.exploratory_joint_lower*100,q.exploratory_joint_upper*100,color=col,alpha=.12)
+    axs[0].set(title='a  Resource benefits at\ndifferent sources',xlabel='Steps after one lower request',ylabel='Extra stock\n(percentage points of capacity)');axs[0].legend(frameon=False,fontsize=13)
+    for pid,label,col,ls in [(B,'Original',gray,':'),(A,'Local A',blue,'-'),(O,'Offsetting B',blue,'--'),(E,'Earlier restraint C','black','-.')]:
+     q=response(pid,'late_ipw_neighborhood_cooperation_h');q=q[q.h.isin([1,2,5,10])];axs[1].plot(q.h,q['mean']*100,marker='o',color=col,ls=ls,label=label);axs[1].fill_between(q.h,q.exploratory_joint_lower*100,q.exploratory_joint_upper*100,color=col,alpha=.07)
+    axs[1].set(title='b  A brief change in\ncooperation feedback',xlabel='Steps after one lower request',ylabel='Nearby cooperation change\n(percentage points)');axs[1].legend(frameon=False,fontsize=13)
+    axs[1].set_xticks([1,2,5,10])
+    for ax in axs:ax.axhline(0,color='#999',lw=.6)
+    save(fig,'action_responses')
+    bands[(bands.pressure==1)&bands.policy_id.isin([B,A,O,E])].to_csv(destination/'feedback_values.csv',index=False)
+    # matched-window activity and resource comparisons.
+    profiles={g['policy_id']:g['profiles'] for g in json.loads((D/'complete_profiles.json').read_text()) if g['split']=='test' and g['pressure']==1}
+    # first-500-step cooperation and stock paths at the same permitted payoff budget.
+    fig, axes = plt.subplots(1, 2, figsize=(9.5, 4.2), layout='constrained')
+    formation_values = []
+    for pid, color, style, label in [(A, blue, '-', 'Local participation A'),
+                                      (O, gray, '--', 'Offsetting payoffs B'),
+                                      (E, 'black', '-.', 'Earlier restraint C')]:
+        cooperation = np.asarray(profiles[pid]['mean_cooperation'][:500])
+        original_cooperation = np.asarray(profiles[B]['mean_cooperation'][:500])
+        stock = np.asarray(profiles[pid]['mean_stock'][:500])
+        original_stock = np.asarray(profiles[B]['mean_stock'][:500])
+        steps = np.arange(1, 501)
+        axes[0].plot(steps, 100*(cooperation-original_cooperation), color=color, ls=style, lw=1.8, label=label)
+        axes[1].plot(steps, 100*(stock-original_stock), color=color, ls=style, lw=1.8, label=label)
+        formation_values.extend(dict(policy_id=pid, step=int(t), cooperation_mean=float(c0),
+                                     reference_cooperation_mean=float(c1), cooperation_change_pp=float(100*(c0-c1)),
+                                     stock_mean=float(n0), reference_stock_mean=float(n1), stock_change_pp=float(100*(n0-n1)))
+                                for t, c0, c1, n0, n1 in zip(steps, cooperation, original_cooperation, stock, original_stock))
+    axes[0].set(title='a  Changes in lower requests', xlabel='Simulation step',
+                ylabel='Cooperation change\n(percentage points)')
+    axes[1].set(title='b  Extra water remaining', xlabel='Simulation step',
+                ylabel='Stock change\n(percentage points of capacity)')
+    for ax in axes:
+        ax.axhline(0, color='#999999', lw=.7)
+        ax.grid(axis='y', alpha=.12)
+    fig.legend(handles=axes[0].get_lines()[:3], loc='outside lower center', ncol=3, frameon=False, fontsize=14)
+    save(fig, 'early_behavior')
+    pd.DataFrame(formation_values).to_csv(destination/'formation_equal_budget_values.csv', index=False)
+    # cumulative renewal and withdrawal contributions to stock differences.
+    budgets=pd.read_csv(D/'paired_resource_budget_means.csv')
+    selected_budget=budgets[(budgets.split=='test')&(budgets.pressure==1)&budgets.policy_id.isin([E,N])]
+    fig,axs=plt.subplots(1,2,figsize=(9.5,4.8),layout='constrained')
+    for ax,pid,title in zip(axs,[E,N],['a  Earlier restraint C','b  Later restraint D']):
+        q=selected_budget[selected_budget.policy_id==pid].sort_values('step');x=np.arange(len(q))
+        renewal=100*q.actual_renewal.to_numpy();saved=-100*q.withdrawal.to_numpy();net=100*q.stock.to_numpy()
+        ax.bar(x-.17,renewal,width=.30,color=blue,label='Change in water renewed')
+        ax.bar(x+.17,saved,width=.30,color=gray,label='Water retained through lower withdrawals')
+        ax.scatter(x,net,color='black',marker='D',s=35,zorder=5,label='Net extra water remaining')
+        ax.axhline(0,color='#999',lw=.7);ax.set(title=title,xticks=x,xticklabels=['100','500','2,000'],xlabel='Simulation step',ylabel='Water difference\n(% of total source capacity)');ax.grid(axis='y',alpha=.1)
+    handles,legend_labels=axs[0].get_legend_handles_labels();fig.legend(handles,legend_labels,loc='outside lower center',ncol=1,frameon=False,fontsize=12)
+    save(fig,'resource_budgets');selected_budget.to_csv(destination/'resource_accounting_values.csv',index=False)
+    fig,axs=plt.subplots(1,2,figsize=(9.5,4.2),layout='constrained')
+    profile_values=[];activity_values=[]
+    for pid,col,ls,label in [(E,blue,'-','Earlier restraint C'),(N,gray,'--','Later restraint D')]:
+     a=np.array(profiles[pid]['mean_stock'][:500]);base=np.array(profiles[B]['mean_stock'][:500]);axs[0].plot(np.arange(1,501),100*(a/base-1),color=col,ls=ls,label=label,lw=1.8)
+     fields=['first100_human_support','first100_ai_support','late_human_support','late_ai_support'];vals=[100*(means[(1,pid)][f]/means[(1,B)][f]-1) for f in fields];y=np.arange(4)+(-.17 if pid==E else .17);axs[1].barh(y,vals,color=col,height=.3,label=label)
+     profile_values.extend(dict(policy_id=pid,step=int(t),design_mean=float(v),reference_mean=float(b0),relative_change_percent=float(delta)) for t,v,b0,delta in zip(range(1,501),a,base,100*(a/base-1)))
+     activity_values.extend(dict(policy_id=pid,window_metric=f,design_mean=float(means[(1,pid)][f]),reference_mean=float(means[(1,B)][f]),relative_change_percent=float(v)) for f,v in zip(fields,vals))
+     for v,yy in zip(vals,y):axs[1].text(v+(.04 if v>=0 else -.04),yy,f'{v:+.2f}' if abs(v)>=.01 else f'{v:+.4f}',ha='left' if v>=0 else 'right',va='center',fontsize=13)
+    axs[0].set(title='a  Water during the early period',xlabel='Simulation step',ylabel='Mean stock change\n(% of original stock)');axs[0].legend(frameon=False,fontsize=13)
+    axs[1].set(title='b  Activity gains across\nearly and late windows',xlabel='Support change\n(% of original support)',yticks=range(4),yticklabels=['Human: first 100','AI: first 100','Human: late period','AI: late period']);axs[1].invert_yaxis();axs[1].set_xlim(-2.8,2.8)
+    for ax in axs:ax.axvline(0,color='#aaa',lw=.5) if ax==axs[1] else ax.axhline(0,color='#aaa',lw=.5)
+    save(fig,'activity_windows')
+    pd.DataFrame(profile_values).to_csv(destination/'formation_stock_values.csv',index=False)
+    pd.DataFrame(activity_values).to_csv(destination/'formation_activity_values.csv',index=False)
+    # robustness: physical scenario effects compared with payoff effects within each scenario.
+    r=pd.read_csv(bundle/'analysis/robustness_comparisons.csv').drop_duplicates(['variant','policy_id']);vs=sorted(r.variant.unique());names={'clustered_ai':'AI concentration','demand_ratio_40':'AI demand ratio 40','demand_ratio_5':'AI demand ratio 5','epsilon_0.05':'Reversal probability 0.05','epsilon_0.2':'Reversal probability 0.2','human_priority_allocation':'Human priority','initial_0.1':'Initial cooperation 0.1','initial_0.9':'Initial cooperation 0.9','larger_grid':'Larger world','long_horizon':'10,000 steps','manuscript_feedback':'Conference renewal law','sequential_planning':'Sequential planning','theta_1.4':'Renewal response 1.4','theta_5':'Renewal response 5','unconditioned_placement':'Unconditioned placement'}
+    fig,axs=plt.subplots(1,3,figsize=(11,6.8),layout='constrained');robustbase=r[(r.variant=='initial_0.1')&(r.policy_id==B)].iloc[0]
+    for j,v in enumerate(vs):
+     q=r[r.variant==v].set_index('policy_id');b0=q.loc[B]
+     for k,(field,col,off) in enumerate([('human',blue,-.13),('ai',gray,.13)]):
+      base=robustbase[field];x=100*(b0[field]/base-1);axs[0].plot(x,j+off,marker='o' if k==0 else 's',color=col,ms=4)
+      d=100*(q.loc[q.index!=B,field]/b0[field]-1);ax=axs[k+1];ax.plot([d.min(),d.max()],[j,j],color=col,lw=2);ax.plot([d.min(),d.max()],[j,j],color=col,marker='|',ls='',ms=7)
+    axs[0].set(title='a  Changed assumptions',xlabel='Original-game support\nvs matched default (%)',yticks=range(15),yticklabels=[names[v] for v in vs]);fig.legend(handles=[Line2D([],[],color=blue,marker='o',ls='',label='Human'),Line2D([],[],color=gray,marker='s',ls='',label='AI')],frameon=False,loc='outside lower center',ncol=2)
+    for ax,title in zip(axs[1:],['b  Frozen designs: human','c  Frozen designs: AI']):ax.set(title=title,xlabel='Mean-change range\n(% of own original)',yticks=range(15),yticklabels=[])
+    for ax in axs:ax.invert_yaxis();ax.axvline(0,color='black',lw=.6);ax.grid(axis='y',alpha=.1)
+    save(fig,'assumption_sensitivity')
+    r.to_csv(destination/'robustness_values.csv',index=False)
+    # all other search settings, with all objectives represented by frontier membership.
+    settings=f[['pressure','budget','norm']].drop_duplicates();secondary=settings[~((settings.pressure==1)&(settings.budget==.5)&(settings.norm=='L2'))]
+    fig,axs=plt.subplots(3,2,figsize=(9,10.5),layout='constrained')
+    for ax,(_,s) in zip(axs.flat,secondary.iterrows()):
+     q=f[(f.pressure==s.pressure)&(f.budget==s.budget)&(f.norm==s['norm'])];dots(ax,q,0,1);ax.set(title=f"Pressure {s.pressure:g}; budget {s.budget:g}; {s['norm']} ({int(q.unconstrained_combined_sample_frontier.sum())}/{len(q)})",xlabel='Human support change (%)',ylabel='AI support change (%)')
+    save(fig,'other_tradeoffs')
+    f.to_csv(destination/'combined_tested_frontiers.csv',index=False)
+
+    coverage=pd.read_csv(D/'coverage_accounting_means.csv');coverage=coverage[(coverage.split=='test')&(coverage.policy_id==B)].sort_values('pressure')
+    fig,axs=plt.subplots(1,2,figsize=(9.5,4.5),layout='constrained');x=np.arange(len(coverage))
+    axs[0].plot(x,100*coverage.human_mean_cooperation,'o-',color=blue,label='Human');axs[0].plot(x,100*coverage.ai_mean_cooperation,'s--',color=gray,label='AI')
+    axs[0].set(title='a  Who makes lower requests?',ylabel='Lower requests (%)');axs[0].legend(frameon=False,fontsize=13)
+    axs[1].bar(x,100*coverage.lower_request_contribution,color=blue,label='Lower share of target requested')
+    axs[1].bar(x,100*coverage.unfilled_request_contribution,bottom=100*coverage.lower_request_contribution,color=gray,label='Requested but not delivered')
+    axs[1].set(title='b  Two parts of the coverage gap',ylabel='Human minus AI coverage\n(percentage points)')
+    for ax in axs:ax.set(xticks=x,xticklabels=[f'{p:g}' for p in coverage.pressure],xlabel='Demand relative to renewal');ax.grid(axis='y',alpha=.1)
+    handles,legend_labels=axs[1].get_legend_handles_labels();fig.legend(handles,legend_labels,loc='outside lower center',ncol=1,frameon=False,fontsize=12);save(fig,'coverage_components');coverage.to_csv(destination/'coverage_accounting_values.csv',index=False)
+    events=pd.read_csv(D/'paired_source_events_means.csv');event_specs=[(1,A,'A'),(1,O,'B'),(1,E,'C'),(1,N,'D'),(.25,'e9883b257b7c3a524aafbff6','Low-pressure design')]
+    fig,ax=plt.subplots(figsize=(8.5,4.5),layout='constrained');event_rows=[]
+    for j,(p,pid,label) in enumerate(event_specs):
+        q=events[(events.pressure==p)&(events.policy_id==pid)].iloc[0];event_rows.append(q)
+        ax.barh(j-.16,100*q.relieved_source_fraction,height=.28,color=blue,label='Previously affected sources relieved' if j==0 else None)
+        ax.barh(j+.16,-100*q.newly_affected_source_fraction,height=.28,color=gray,label='Previously unaffected sources newly affected' if j==0 else None)
+    ax.set(yticks=range(len(event_specs)),yticklabels=[v[2] for v in event_specs],xlabel='Source locations (%): new burdens left, relief right');ax.axvline(0,color='black',lw=.6);ax.invert_yaxis();handles,legend_labels=ax.get_legend_handles_labels();fig.legend(handles,legend_labels,loc='outside lower center',ncol=1,frameon=False,fontsize=12);ax.grid(axis='x',alpha=.1)
+    save(fig,'source_events');pd.DataFrame(event_rows).to_csv(destination/'source_event_values.csv',index=False)
+
+    inputs = [bundle/'analysis'/n for n in ['pareto_candidates.csv','paired_outcome_comparisons.csv','robustness_comparisons.csv']]
+    inputs += [D/n for n in ['trajectory_condition_means.csv','all_one_action_responses_and_bands.csv','complete_profiles.json','provenance_and_verification.json','paired_resource_budget_means.csv','coverage_accounting_means.csv','paired_source_events_means.csv']]
+    record = {'run_id': manifest['run_id'], 'source_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+              'input_sha256': {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs},
+              'scope': 'Saved-data analysis only. Ratios are ratios of ensemble means; original intervals retain difference units.',
+              'primary_tested_designs': len(primary), 'primary_unconstrained_frontier': int(primary.unconstrained_combined_sample_frontier.sum()),
+              'figures': sorted(p.name for p in F.glob('*.pdf'))}
+    write_json(destination/'plot_manifest.json', record)
+    return record

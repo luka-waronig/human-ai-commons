@@ -51,7 +51,7 @@ def test_smoke_stages_holdouts_integrity_and_exact_replay(tmp_path, basis):
     assert set(manifest['stages'].values()) == {'complete'}
     assert manifest['model_steps_logged'] <= budget_plan(config)['all_model_steps']
     assert verify_bundle(output)['verified']
-    # Completed stages are reused without charging any additional simulations.
+    # completed stages are reused without charging any additional simulations.
     before = (output/'budget_ledger.jsonl').read_text()
     run_stages(config, output, 'all', 1)
     assert (output/'budget_ledger.jsonl').read_text() == before
@@ -72,8 +72,8 @@ def test_smoke_stages_holdouts_integrity_and_exact_replay(tmp_path, basis):
     analyze(output)
     assert (output/'analysis/pareto_frontier.png').exists()
     assert (output/'analysis/pareto_frontier.pdf').exists()
-    # The software check cannot establish the production probability limit.
-    # Its supported-frontier table must retain its header without false claims.
+    # the software check cannot establish the production probability limit.
+    # its supported-frontier table must retain its header without false claims.
     assert len((output/'analysis/pareto_frontier.csv').read_text().splitlines()) == 1
     assert (output/'analysis/spatial_depletion.png').exists()
     assert (output/'analysis/observation_controls.png').exists()
@@ -143,22 +143,10 @@ def test_direct_python_experiment_runs_and_resumes_outside_repository(tmp_path):
     assert (output/'budget_ledger.jsonl').read_bytes() == before
 
 
-def test_direct_all_dispatch_uses_all_configured_stages_and_budgets_without_simulating(monkeypatch):
-    import human_ai_commons.config as configuration
-    import human_ai_commons.analysis as analysis
-    calls = []
-    def record(config, output, stage, limit):
-        expected = configuration.budget_plan(config)['model_step_caps'][stage]
-        assert limit == expected
-        calls.append((output.name, stage))
-    monkeypatch.setattr(experiments, 'run_stages', record)
-    monkeypatch.setattr(analysis, 'verify_bundle', lambda *args: None)
-    monkeypatch.setattr(analysis, 'analyze', lambda *args: None)
-    monkeypatch.setattr(analysis, 'metric_sensitivity', lambda *args: None)
-    monkeypatch.setattr(sys, 'argv', ['reproduce.py', 'all'])
-    runpy.run_path(str(ROOT/'reproduce.py'), run_name='__main__')
-    expected = []
-    for name in ['research_protocol', 'human_only_priority', 'ai_only_priority', 'delivery_reliability']:
-        config = configuration.load_config(ROOT/'configs'/f'{name}.json')
-        expected.extend((name, stage) for stage, cap in configuration.budget_plan(config)['model_step_caps'].items() if cap)
-    assert calls == expected
+def test_direct_all_dispatch_uses_all_experiments_without_simulating(monkeypatch):
+    from human_ai_commons import execution
+    calls=[]
+    monkeypatch.setattr(execution,'run_experiment',lambda name,workers: calls.append((name,workers)))
+    monkeypatch.setattr(sys,'argv',['reproduce.py','all','--workers','3'])
+    runpy.run_path(str(ROOT/'reproduce.py'),run_name='__main__')
+    assert calls==[(name,3) for name in ['research_protocol','human_only_priority','ai_only_priority','delivery_reliability']]

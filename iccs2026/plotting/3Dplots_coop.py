@@ -68,7 +68,7 @@ vmin = float(agg["Coop_tail_median"].min())
 vmax = float(agg["Coop_tail_median"].max())
 norm = colors.Normalize(vmin=vmin, vmax=vmax)
 
-# Inferno matches the environmental-state plots.
+# inferno matches the environmental-state plots.
 cmap = cm.viridis
 
 fig = plt.figure(figsize=(13, 10))

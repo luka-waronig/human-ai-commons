@@ -31,7 +31,7 @@ def main():
         if u/a==v/b:
             assert qc==qd
         assert (qc>qd)==(u/a>v/b)
-    # The least squared relative change at fixed u+v follows this identity.
+    # the least squared relative change at fixed u+v follows this identity.
     for r in [F(-1,2),F(0),F(1,2),F(1)]:
         for z in [F(-1,4),F(0),F(1,2)]:
             other=(z-a*r)/b

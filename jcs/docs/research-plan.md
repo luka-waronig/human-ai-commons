@@ -31,7 +31,7 @@ $$
 
 Rows and columns are ordered cooperation, defection. The abundant-state game is held fixed. $u$ changes the depleted-state payoff for cooperating against a cooperator; $v$ changes it against a defector. Their contributions decrease linearly with abundance. The main values $t=2$ and $s=-0.5$ are obtained from the original payoffs by subtracting $P$ and dividing by $R-P$. At $u=v=0$, multiplying the normalized matrix by two and adding one to every entry recovers the conference matrix.
 
-Require $t>1$, $s<0$, $u>-(t-1)$, and $v>s$. These preserve cooperation preference against either opponent at complete depletion and defection preference at complete abundance. Negative changes remain admissible; the study is not restricted to making cooperation more attractive.
+The admissible family satisfies $t>1$, $s<0$, $u>-(t-1)$, and $v>s$. These preserve cooperation preference against either opponent at complete depletion and defection preference at complete abundance. Negative changes remain admissible; the study is not restricted to making cooperation more attractive.
 
 The search uses relative changes $r_C=\frac{u}{t-1}$ and $r_D=\frac{v}{-s}$, with bounds $[-0.95,2]$. The primary budget is
 
@@ -56,7 +56,7 @@ q_C=\frac{t-1+u}{2(t-1)+u},
 q_D=\frac{-s+v}{-2s+v}.
 $$
 
-These are strategic transition levels, not ecological safety limits. Equal relative changes keep them equal; unequal changes separate them. The slope ratio also changes with $u$ and $v$ and is never fixed independently.
+These are strategic transition levels, not ecological safety limits. Equal relative changes keep them equal; unequal changes separate them. The slope ratio follows from $u$ and $v$; it is not an independent parameter.
 
 Holding resource stock constant gives a simple discrete response calculation. If cooperation is preferable at composition $x$, the next large-population cooperation fraction is $1-\epsilon$; otherwise it is $\epsilon$. Matching incentives can reinforce either response level, whereas opposite-action incentives can alternate between them. This calculation concerns the fixed-environment synchronous response, not a replicator equation or a proof about the full spatial system.
 
@@ -64,16 +64,16 @@ Holding resource stock constant gives a simple discrete response calculation. If
 
 - Full local family: search $u$ and $v$ using actual local composition.
 - Equal relative changes: $r_C=r_D$. The action depends on resources alone despite using the local observation rule.
-- Optimized resource-only rule: hold $x=\frac{1}{2}$ and search $k=\frac{u+v}{t-1-s}$. Choose the least-cost matrix encoding of each $k$ under the same bounds and norm. This is stronger than unnecessarily restricting the encoding to $r_C=r_D$.
+- Optimized resource-only rule: hold $x=\frac{1}{2}$ and search $k=\frac{u+v}{t-1-s}$. Each $k$ uses its least-cost matrix encoding under the same bounds and norm. This is stronger than unnecessarily restricting the encoding to $r_C=r_D$.
 - Payoff redistribution: $u+v=0$. The original row sums are unchanged at every resource level, but local composition can change decisions. This isolates a mechanism that the original row-sum rule cannot detect.
 
 All families use the same welfare definition and persistence requirement. Equal-relative and redistribution candidates are included in validation for the full family. The payoff objective does not alter agent targets, physical supply, or the outcome definition.
 
 ## Welfare: support for both kinds of activity
 
-For agent $i$, fix an activity target $d_i$ before evaluating any candidate payoff structure. The reference target is the original model's higher, defection-level request: 1.5 times its cooperative request in the main scenario. The target does not decrease when an agent chooses cooperation. This allows additional delivery above the cooperative baseline to support additional activity; it does not label higher consumption as waste.
+Agent $i$ has a fixed activity target $d_i$, set before payoff evaluation. The reference target is the original model's higher, defection-level request: 1.5 times its cooperative request in the main scenario. The target does not decrease when an agent chooses cooperation. This allows additional delivery above the cooperative baseline to support additional activity; it does not label higher consumption as waste.
 
-At each observed time step, calculate supported activity as
+Supported activity at each observed time step is
 
 $$
 s_i(t)=\min\left\{\frac{\mathrm{delivered}_i(t)}{d_i},1\right\}.
@@ -99,11 +99,11 @@ The primary $e=1$ reduces to $\frac{\mathrm{delivered}}{d_i}$, capped at one. At
 
 ## Persistent local stress
 
-The ICCS spatial trap is a persistent resource–strategy pattern, not a published numerical stock cutoff or a demonstrated delivery-shortage condition. Cooperative regions and chronically stressed peripheral regions are part of that description. Its welfare consequences must be measured rather than inferred from its name. A mean stock of 0.38 does not determine which locations are stressed or whether requests are being met.
+The ICCS spatial trap is a persistent resource–strategy pattern, not a published numerical stock cutoff or a demonstrated delivery-shortage condition. Cooperative regions and chronically stressed peripheral regions are part of that description. Resource persistence, request fulfillment and supported activity are measured separately. A mean stock of 0.38 does not determine which locations are stressed or whether requests are being met.
 
 The conference paper's moderately stressed equilibria are distinct from total collapse. The reference stock-based constraint measures sustained local stress separately from the continuous depletion objective below 0.2.
 
-For every geometrically accessible resource cell, track consecutive observed steps below a fixed resource reference. In the main specification, the reference is $n=0.5$ and the duration is 150 consecutive steps. The reference corresponds to the preferred-action change in the original game; it is not an empirically established ecological minimum. The duration is held fixed when the observation horizon changes.
+The persistence measurement counts consecutive observed steps below a fixed resource reference at each geometrically accessible cell. In the main specification, the reference is $n=0.5$ and the duration is 150 consecutive steps. The reference corresponds to the preferred-action change in the original game; it is not an empirically established ecological minimum. The duration is held fixed when the observation horizon changes.
 
 A realization has a persistent local stress event if any accessible cell remains below the reference for at least the specified duration. All accessible cells remain in the assessment, including empty ones. The metric also detects uniform persistent stress; it is a protective condition broader than the particular spatial pattern reported in the conference paper. A spatial trap is investigated through resource maps, strategy patterns, persistence, and longer-horizon behavior rather than inferred from this indicator alone.
 
@@ -131,9 +131,9 @@ A second matched experiment, `delivery_reliability.json`, restricts persistent u
 
 Constructed model states can maintain low reserves while serving every request. This rules out a logical identification of low stock with delivery failure; it does not establish the frequency of such states in the reference ensemble. Conversely, a group mean can conceal local shortfalls. `spatial_characterization.csv` reports stock heterogeneity, spatial clustering of cooperation, local resource–cooperation association, request fulfillment, and the worst agent's mean fulfillment. Constant fields have undefined spatial correlation and are reported as missing, not as evidence of no spatial structure.
 
-An escape claim requires paired evidence that the resource–strategy pattern changes and welfare improves under the same physical conditions. The stock-persistence indicator alone is insufficient. If a reference spatial pattern has no measured welfare cost, the result is a persistent spatial pattern without that demonstrated cost; delivery failures must not be invented or the old phenomenon renamed to fit the objective.
+Changes in resource–strategy patterns and changes in supported activity are separate comparisons under matched physical conditions. Stock persistence alone identifies neither a feedback mechanism nor a delivery failure.
 
-Training starts with fixed payoff grids. In the two-dimensional families, the headline pressure uses 17 points per axis and the remaining mapped pressures use 9; the original game is included explicitly. One-dimensional comparisons start with 65 points. Two refinement rounds evaluate shrinking neighborhoods around up to eight diverse non-dominated designs, preserving the ends of each objective. Bounds and payoff budgets are enforced before simulations. Evaluations are shared across budgets before shortlisting. This is a transparent finite search in two parameters, not a global-optimality certificate.
+Payoff search starts with fixed payoff grids. In the two-dimensional families, the headline pressure uses 17 points per axis and the remaining mapped pressures use 9; the original game is included explicitly. One-dimensional comparisons start with 65 points. Two refinement rounds evaluate shrinking neighborhoods around up to eight diverse non-dominated designs, preserving the ends of each objective. Bounds and payoff budgets are enforced before simulations. Evaluations are shared across budgets before shortlisting. This is a transparent finite search in two parameters, not a global-optimality certificate.
 
 The resource restriction is first screened using the observed stress-event fraction. Up to 12 diverse candidates per family and problem are assessed on 16 independent validation realizations. Up to six validation designs per family are frozen before any test data are observed. Selection preserves objective extremes and fills gaps by distance in the three normalized outcomes; the geometric-mean score has no role. Equal-relative and redistribution candidates are also assessed as members of the full local family.
 
@@ -153,27 +153,27 @@ The numerical configuration declares a resource-assessment planning probability 
 
 The figure projects the three objectives onto human and AI support, with local depletion shown by colour. Designs without established resource protection remain visible with distinct markers. An empty supported frontier is reported explicitly; it is not replaced by a purported winner.
 
-## Experiments and interpretation
+## Experimental sequence
 
-1. Establish the original game's deliveries and spatial resource–strategy patterns on separate characterization worlds.
-2. Search the full local payoff family and the resource-only, equal-relative, and redistribution comparisons. Retain their trade-offs rather than one combined-score winner.
-3. Validate a diverse candidate set, freeze the retained designs, and test them against the original game on new paired worlds. Generate the three-objective frontier tables and figure.
-4. Compare frontiers across payoff-change budgets and resource pressures. The headline setting remains pressure 1 and budget 0.5. Investigate shared gains, competing outcomes, and changes in resource stress.
-5. Transfer the validation-selected objective extremes to the stated spatial, physical, and behavioral variations. These are robustness checks of existing designs, not reoptimized frontiers. Re-score archived trajectories under alternative outcome definitions.
-6. Optionally run the human-only and AI-only preference comparisons, or repeat the Pareto workflow with the unmet-request persistence condition. These separate runs are not needed to generate the main frontier.
+1. Separate characterization worlds provide original-game deliveries and spatial resource–strategy measurements.
+2. Payoff search compares the full local family with resource-only, equal-relative and redistribution families, retaining three-objective trade-offs.
+3. Independent selection freezes a diverse candidate set before testing against the original game on new paired worlds.
+4. The tested frontiers are compared across payoff-change budgets and resource pressures. The primary setting is pressure 1 and budget 0.5.
+5. Robustness transfers the selected objective extremes to the specified spatial, physical and behavioral variants. Measurement sensitivity re-scores archived trajectories under alternative outcome definitions.
+6. Separate optional configurations implement human-only and AI-only priorities and a persistence condition based on unmet requests.
 
-The intended finding is a characterization of when payoff redesign can improve joint support, what trade-offs remain, and where persistent local stress prevents otherwise attractive activity levels. A negative result, or an improvement limited to a narrow regime, remains part of that characterization. The model cannot establish that a particular social priority is morally correct, or that a real location can support a specified infrastructure project.
+The analysis distinguishes shared improvements, competing activity outcomes and persistent local resource stress. Its scope is the tested model and design space; the outputs do not establish an empirically preferred social priority or the infrastructure capacity of a real location.
 
 ## Reproducibility and scope
 
-The main configuration uses 2,000 steps, excluding the first 500; 8 separate characterization realizations, 8 training, 16 validation, and 320 held-out realizations; and disjoint indexed random inputs. Candidate policies are frozen before held-out evaluation. All targets, welfare assumptions, stress definitions, random inputs, source versions, individual outcomes, and analysis settings are archived. Replaying a realization checks the recorded individual deliveries and welfare results as well as the physical trajectory.
+The main configuration uses 2,000 steps, excluding the first 500; 8 separate characterization realizations, 8 payoff search, 16 validation, and 320 held-out realizations; and disjoint indexed random inputs. Candidate policies are frozen before held-out evaluation. All targets, welfare assumptions, stress definitions, random inputs, source versions, individual outcomes, and analysis settings are archived. Replaying a realization checks the recorded individual deliveries and welfare results as well as the physical trajectory.
 
 The `smoke.json` configuration is a short software check, not evidence for scientific conclusions. Production experiments require an explicit execution budget. [Running the experiments](running-experiments.md) describes commands and [implementation](implementation.md) specifies the event order and output records.
 
-## Discussion questions tied to the evidence
+## Interpretation
 
-- Joint gains: determine whether changing the payoff structure improves support for both groups relative to the embedded conference game, and where gains require a trade-off. An improved combined score alone does not establish gains for both groups.
-- Competing outcomes: identify which improvements can be achieved together and which require a sacrifice elsewhere. Optional priority-specific searches illustrate declared preferences rather than determine a universally best design.
-- Spatial traps and consequences: distinguish a persistent resource–strategy pattern from demonstrated lost activity, unmet requests, or limited recovery. State whether the same conclusion survives both protection specifications and different definitions of additional-use benefit.
-- Mathematical limits: examine the limits imposed by spatial access, demand pressure, the permitted payoff changes, and the fixed abundant-state game. Failure to find a successful design is not a proof that none exists.
-- Political interpretation: discuss why shared physical dependence complicates both automatic rejection of AI demand and disregard for human access. Identify which conclusions follow from the simulations and which remain philosophical commitments. The model measures supported activity, not the full social value of an AI system or a person's life.
+Human support, AI support and depletion remain separate outcomes. A higher combined welfare score can accompany a loss for one group. Priority-specific searches express declared preferences rather than determine a universally best design.
+
+Spatial persistence, lost activity, unmet requests and delayed recovery describe different aspects of the dynamics. The stock-event condition alone does not identify the self-maintaining spatial feedback process discussed in the conference study. Outcome-definition sensitivity concerns the same frozen designs; it does not supply a reoptimized frontier.
+
+Spatial access, demand pressure, payoff bounds and the fixed abundant-state game limit the intervention space. Failure to find a successful design does not prove that no such design exists. The activity measures quantify resource support rather than the full social value of an AI system or a person's life.

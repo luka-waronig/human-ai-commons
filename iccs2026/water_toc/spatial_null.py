@@ -70,7 +70,7 @@ def main():
     result = conditional_moran_test(model._get_agent_pos_strategies_list(),model.width,model.height,
                                     args.permutations,args.seed)
     args.output.parent.mkdir(parents=True,exist_ok=True)
-    # Undefined spatial statistics are represented explicitly by null in JSON.
+    # undefined spatial statistics are represented explicitly by null in JSON.
     serializable = {key:(value if np.isfinite(value) else None) for key,value in result.items()}
     args.output.write_text(json.dumps(serializable,indent=2,allow_nan=False)+'\n')
     write_manifest(args.output.with_suffix('.manifest.json'),

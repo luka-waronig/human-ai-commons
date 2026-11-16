@@ -1,47 +1,55 @@
-"""Direct journal experiment execution and individual reproduction commands."""
+"""Single entry point for study execution, analysis, verification and replay."""
 from pathlib import Path
+import os
 import sys
 
-ROOT = Path(__file__).resolve().parent
-sys.path.insert(0, str(ROOT / 'src'))
-from human_ai_commons.cli import main
+ROOT=Path(__file__).resolve().parent
+# resumption selects the original package before importing any model code.
+# the current execution wrapper is available as a fallback, never a replacement model.
+if os.environ.get('COMMONS_SAVED_SOURCE'):
+    snapshot=Path(os.environ['COMMONS_SAVED_SOURCE']).resolve()
+    sys.path.insert(0,str(snapshot/'src'))
+    import human_ai_commons
+    human_ai_commons.__path__.append(str(ROOT/'src/human_ai_commons'))
+    from human_ai_commons import provenance
+    provenance.ROOT=snapshot
+else:
+    sys.path.insert(0,str(ROOT/'src'))
 
-EXPERIMENTS = ('research_protocol', 'human_only_priority', 'ai_only_priority', 'delivery_reliability')
-
-
-def run_experiment(name):
-    from human_ai_commons.config import load_config, budget_plan
-    from human_ai_commons.experiments import run_stages
-    from human_ai_commons.analysis import analyze, metric_sensitivity, verify_bundle
-
-    config = load_config(ROOT / 'configs' / (name + '.json'))
-    output = ROOT / 'results' / name
-    plan = budget_plan(config)
-    print('Experiment: ' + name, flush=True)
-    print('Results: ' + str(output), flush=True)
-
-    for stage, limit in plan['model_step_caps'].items():
-        if limit:
-            print('  ' + stage, flush=True)
-            run_stages(config, output, stage, limit)
-
-    verify_bundle(output)
-    analyze(output)
-    if name == 'research_protocol':
-        for floor in (.1, .3):
-            for tail in (.05, .2):
-                metric_sensitivity(output, floor, tail,
-                    output / 'analysis' / f'depletion-floor-{floor}-tail-{tail}.csv')
-    print('Finished: ' + str(output / 'analysis'), flush=True)
+EXPERIMENTS=('research_protocol','human_only_priority','ai_only_priority','delivery_reliability')
 
 
-if __name__ == '__main__':
-    if len(sys.argv) == 1:
-        run_experiment('research_protocol')
-    elif len(sys.argv) == 2 and sys.argv[1] == 'all':
-        for experiment in EXPERIMENTS:
-            run_experiment(experiment)
-    elif len(sys.argv) == 2 and sys.argv[1] in (*EXPERIMENTS, 'smoke'):
-        run_experiment(sys.argv[1])
+def run_experiment(name,workers=8):
+    from human_ai_commons.execution import run_experiment as execute
+    return execute(name,workers)
+
+
+def main(argv=None):
+    import argparse
+    args=list(sys.argv[1:] if argv is None else argv)
+    if args and args[0]=='--resume-saved':
+        import json
+        from human_ai_commons.execution import run_config
+        bundle=Path(args[1]);config=json.loads((bundle/'manifest.json').read_text())['configuration']
+        return run_config(config,bundle,args[2],int(args[3]),int(args[4]))
+    if not args or args[0] in (*EXPERIMENTS,'smoke','all') or args[0]=='--workers':
+        parser=argparse.ArgumentParser(description=__doc__)
+        parser.add_argument('experiment',nargs='?',choices=(*EXPERIMENTS,'smoke','all'),default='research_protocol')
+        parser.add_argument('--workers',type=int,default=min(8,os.cpu_count() or 1))
+        options=parser.parse_args(args)
+        if options.workers<1:parser.error('workers must be positive')
+        for name in EXPERIMENTS if options.experiment=='all' else [options.experiment]:
+            run_experiment(name,options.workers)
     else:
-        main()
+        from human_ai_commons.cli import main as commands
+        return commands(args)
+
+
+if __name__=='__main__':
+    try:main()
+    except KeyboardInterrupt:
+        print('Stopped. Completed simulations remain saved; repeat the command to resume.',flush=True)
+        sys.exit(130)
+    except (ValueError,RuntimeError) as error:
+        print('Error: '+str(error),file=sys.stderr)
+        sys.exit(2)

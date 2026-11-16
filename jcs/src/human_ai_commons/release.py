@@ -32,7 +32,6 @@ def export_release(bundle, destination):
                 raise ValueError('analysis inputs changed; run analyze again before export')
     files = {}
     for name in ['README.md', 'LICENSE', 'CITATION.cff', 'pyproject.toml', 'requirements.txt', '.python-version', 'reproduce.py',
-                 'run-experiments', 'run_experiments.py',
                  'configs', 'docs', 'src', 'tests', 'scripts', 'verification']:
         source = ROOT/name
         paths = source.rglob('*') if source.is_dir() else [source]
@@ -42,7 +41,7 @@ def export_release(bundle, destination):
             if path.is_symlink():
                 raise ValueError('release files must not be symbolic links')
             files[str(Path('jcs')/path.relative_to(ROOT))] = path
-    # A normal installation may execute a wheel rather than ROOT/src. The
+    # a normal installation may execute a wheel rather than ROOT/src. The
     # exported source matches the executed package rather than another copy.
     for relative, path in source_files().items():
         files[str(Path('jcs')/relative)] = path

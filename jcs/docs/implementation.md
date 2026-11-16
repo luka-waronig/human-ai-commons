@@ -32,9 +32,9 @@ Generated worlds are immutable and identified by content. Held-out trajectories 
 
 ## Stages and controls
 
-`characterize` evaluates the original normalized game and forced-action controls on a separate realization split before any search. It records individual deliveries and resource/strategy trajectories. Its purpose is to establish the reference pattern and measured consequences independently of optimized candidates. The stage can run and be analyzed on its own; training includes it automatically if needed.
+`characterize` evaluates the original normalized game and forced-action controls on a separate realization split before any search. It records individual deliveries and resource/strategy trajectories. Its purpose is to establish the reference pattern and measured consequences independently of optimized candidates. The stage can run and be analyzed on its own; payoff search includes it automatically if needed.
 
-`train` evaluates fixed grids and two rounds of Pareto refinement. It minimizes the vector of negative human support, negative AI support, and spatial-tail depletion. The original game and feasible grid nodes are evaluated explicitly. Refinement samples shrinking neighborhoods of diverse current trade-offs. Evaluations are cached and shared across budgets; no welfare weight guides the main search. The scalar differential-evolution implementation is used only by optional human-only and AI-only configurations.
+`search` evaluates fixed grids and two rounds of Pareto refinement. It minimizes the vector of negative human support, negative AI support, and spatial-tail depletion. The original game and feasible grid nodes are evaluated explicitly. Refinement samples shrinking neighborhoods of diverse current trade-offs. Evaluations are cached and shared across budgets; no welfare weight guides the main search. The scalar differential-evolution implementation is used only by optional human-only and AI-only configurations.
 
 `validate` assesses up to 12 candidates per family and problem on a disjoint realization set. Non-dominated feasible candidates are reduced to at most six diverse designs, preserving each objective's end. Equal-relative and redistribution candidates are included in local-family assessment. Least-violation candidates remain labelled diagnostics when no empirically feasible design is found. The frozen artifact stores `families` containing lists, not `winners` containing one design.
 
@@ -63,3 +63,14 @@ The main sample contains 320 matched realizations. Each robustness variant uses 
 Preflight computes workload upper bounds and exact resource-assessment power at the configured planning probability without generating worlds. Insufficient production sample sizes are rejected before simulations. Execution refuses a stage whose cap exceeds the supplied limit; the default is 10,000 model steps. Checkpoint files record completed evaluations, and bundles reject configuration, dependency, source, or checksum changes. Interrupted stages may reuse completed cached evaluations and complete once their full outputs are written.
 
 The source version is part of the computation identity. After code changes, create a new bundle rather than mixing different implementations. Once production results exist, release their full bundle and exact source together. Reports from `analyze` identify their input hashes; regenerate them after additional stages finish.
+
+
+## Analysis of saved histories
+
+`python reproduce.py analyze results/research_protocol --output /path/to/empty-analysis --workers 8` runs the numerical analysis and plots for the completed research protocol. Install `.[analysis]` for the pandas dependency. This is saved-data analysis: no simulation is executed. The [execution guide](running-experiments.md) documents the command and cached plotting route.
+
+Scientific calculations are organized in `trajectory_analysis/`: reference source episodes, complete trajectory summaries, spatial and distributional measurements, resource conservation, action responses, recurrence and sensitivity checks. `analysis.py` produces the study plots and their numeric CSV values.
+
+`derived/` contains the numerical calculations, and `plots/` contains plots and their values. The reproduction manifest records input and source hashes. Original simultaneous comparisons remain separate from additional exploratory comparisons. Initial cooperation 0.1 and 0.9 are structurally redundant under full starting sources and conditioned access; they count once as a default-equivalent repeat. The additional 10,000-resample joint world bootstrap does not replace the original bounded simultaneous guarantee.
+
+The archived simulation source and original results remain unchanged. Historical split names, configuration keys and filenames are retained for identity and compatibility; public stage commands call the payoff search `search`.

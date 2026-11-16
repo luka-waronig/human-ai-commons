@@ -59,7 +59,7 @@ class WaterToC(Model):
             raise ValueError(f"feedback_rule must be one of {FEEDBACK_RULES}")
         super().__init__(seed=seed)
         self.seed = seed
-        self.snapshot_run_id = uuid.uuid4().hex  # Does not consume the model RNG.
+        self.snapshot_run_id = uuid.uuid4().hex  # does not consume the model RNG.
         self.feedback_rule = feedback_rule
         self.record_spatial = record_spatial
 
@@ -189,7 +189,7 @@ class WaterToC(Model):
             if len(self.grid.get_cell_list_contents([pos])) < 3:
                 return pos
             attempts += 1
-        # A crowded valid grid may need more than 100 random attempts. Preserve
+        # a crowded valid grid may need more than 100 random attempts. Preserve
         # the historical random path unless the fallback is actually needed.
         for x in range(self.width):
             for y in range(self.height):

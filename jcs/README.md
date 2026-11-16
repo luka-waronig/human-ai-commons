@@ -3,6 +3,7 @@
 This JCS Special Issue study investigates patterns in the coevolution of behavioral and environmental parameters in a spatial and resource-bound Human-AI commons. 
 This directory contains all code and documentation for reproducing the self-contained experiments that optimize payoff structures to support human and AI activity together, retaining human support, AI support, and local depletion as separate objectives under restrictions on persistent local resource stress.
 
+- [Interactive notebooks](notebooks/README.md)
 - [Installation and reproduction](docs/running-experiments.md)
 - [Research protocol](docs/research-plan.md)
 - [Model implementation](docs/implementation.md)

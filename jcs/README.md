@@ -9,25 +9,39 @@ This directory contains all code and documentation for reproducing the self-cont
 - [Model implementation](docs/implementation.md)
 - [Continuity with the conference model](docs/model-continuity.md)
 
-With Python 3.12 and the dependencies installed, run the main experiment from this folder:
+Follow the repository's [JCS quick start](../README.md#jcs-quick-start) first. It sets up one Python 3.12 environment at the repository root for experiments, analysis and notebooks. Run all commands below from that root (`WaterToC/`, the folder containing `jcs/`).
 
-```text
-python reproduce.py --workers 8
+Open the notebooks:
+
+```sh
+.venv/bin/jupyter lab jcs/notebooks/
 ```
 
-For a fresh installation with uv, follow [Set up Python once](docs/running-experiments.md#set-up-python-once). The script runs the original-game measurements, payoff search, validation, independent tests, and robustness experiments, then generates numerical summaries and plots. Independent worlds use CPU worker processes, with progress in the same terminal. Detailed spatial and temporal plots are written alongside the bundle in `results/research_protocol-analysis/plots/`. Results are written to `results/research_protocol/`, which is ignored by Git. The main Pareto figure is `analysis/pareto_frontier.png` (also PDF); `analysis/pareto_candidates.csv` contains every tested design and its three outcomes. This main run produces the frontier without the separate priority-comparison runs.
+Check the installation with the tiny software run:
+
+```sh
+.venv/bin/python jcs/reproduce.py smoke --workers 2
+```
+
+Run the full main experiment with:
+
+```text
+.venv/bin/python jcs/reproduce.py --workers 8
+```
+
+The full experiment is a substantial simulation workload. The script runs the original-game measurements, payoff search, validation, independent tests, and robustness experiments, then generates numerical summaries and plots. Independent worlds use CPU worker processes, with progress in the same terminal. Detailed spatial and temporal plots are written alongside the bundle in `jcs/results/research_protocol-analysis/plots/`. Results are written to `jcs/results/research_protocol/`, which is ignored by Git. The main Pareto figure within the bundle is `analysis/pareto_frontier.png` (also PDF); `analysis/pareto_candidates.csv` contains every tested design and its three outcomes. This main run produces the frontier without the separate priority-comparison runs.
 
 Optional comparisons can be run separately; `all` runs the main study and all three comparisons in order:
 
 ```text
-python reproduce.py human_only_priority
-python reproduce.py ai_only_priority
-python reproduce.py delivery_reliability
-python reproduce.py all
+.venv/bin/python jcs/reproduce.py human_only_priority
+.venv/bin/python jcs/reproduce.py ai_only_priority
+.venv/bin/python jcs/reproduce.py delivery_reliability
+.venv/bin/python jcs/reproduce.py all
 ```
 
-Use `python reproduce.py smoke` for the tiny software check. Repeating an experiment reuses completed stages when its source, settings, and dependencies still match. The [experiment instructions](docs/running-experiments.md) cover individual stages and CPU execution.
+Repeating an experiment reuses completed stages when its source, settings, and dependencies still match. The [experiment instructions](docs/running-experiments.md) cover individual stages and CPU execution.
 
-This folder can be copied and run independently of the rest of the repository.
+The JCS code has no runtime dependency on `iccs2026/`.
 
 Software is distributed under the [MIT License](LICENSE).

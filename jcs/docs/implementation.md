@@ -67,7 +67,7 @@ The source version is part of the computation identity. After code changes, crea
 
 ## Analysis of saved histories
 
-`python reproduce.py analyze results/research_protocol --output /path/to/empty-analysis --workers 8` runs the numerical analysis and plots for the completed research protocol. Install `.[analysis]` for the pandas dependency. This is saved-data analysis: no simulation is executed. The [execution guide](running-experiments.md) documents the command and cached plotting route.
+From the repository root, `.venv/bin/python jcs/reproduce.py analyze jcs/results/research_protocol --output /path/to/empty-analysis --workers 8` runs the numerical analysis and plots for the completed research protocol. The [JCS quick start](../../README.md#jcs-quick-start) includes pandas for this analysis. This is saved-data analysis: no simulation is executed. The [execution guide](running-experiments.md) documents the command and cached plotting route.
 
 Scientific calculations are organized in `trajectory_analysis/`: reference source episodes, complete trajectory summaries, spatial and distributional measurements, resource conservation, action responses, recurrence and sensitivity checks. `analysis.py` produces the study plots and their numeric CSV values.
 

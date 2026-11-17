@@ -2,25 +2,37 @@
 
 ## Set up Python once
 
-Use Python 3.12 and the recorded numerical dependencies. From `jcs/`:
+Follow the repository's [JCS quick start](../../README.md#jcs-quick-start). It installs Python 3.12, the recorded numerical dependencies and the notebook interface into a single `.venv/` at the repository root. Keep using that environment for every JCS task.
+
+**Run every command in this guide from the repository root** (`WaterToC/`, the folder containing `jcs/`). Commands select `.venv/` explicitly; no activation or directory changes are needed. Execution supports macOS and Linux.
+
+## Interactive notebooks
 
 ```sh
-uv venv --python 3.12 .venv
-source .venv/bin/activate
-uv pip install --python .venv/bin/python --require-hashes -r requirements.txt
-uv pip install --python .venv/bin/python -e '.[analysis]'
-python reproduce.py smoke --workers 2
+.venv/bin/jupyter lab jcs/notebooks/
 ```
 
-The smoke configuration is a software check, not research evidence. An existing compatible environment can be used directly. On Windows, replace the activation and interpreter paths with their Windows equivalents; the execution lock currently requires macOS or Linux.
+JupyterLab opens in your browser. Open either notebook, select **Python 3** and choose **Run → Run All Cells**, or use **Shift+Enter** to run one cell at a time. The [notebook guide](../notebooks/README.md) explains both notebooks and their data requirements.
+
+## Installation check
+
+```sh
+.venv/bin/python jcs/reproduce.py smoke --workers 2
+```
+
+The smoke configuration is a tiny software check, not research evidence. To run the JCS tests:
+
+```sh
+.venv/bin/python -m pytest jcs/tests -q
+```
 
 ## Experiments
 
 There is one entry point:
 
 ```sh
-python reproduce.py
-python reproduce.py --workers 4
+.venv/bin/python jcs/reproduce.py
+.venv/bin/python jcs/reproduce.py --workers 4
 ```
 
 The default runs `research_protocol` with up to eight CPU worker processes. Each process calculates independent worlds; the parent saves results in index order. Each numerical library uses one thread per worker. Worker count changes execution, not the equations or indexed random inputs. `--workers 1` provides the single-worker comparison.
@@ -28,10 +40,10 @@ The default runs `research_protocol` with up to eight CPU worker processes. Each
 The other configurations are explicit choices:
 
 ```sh
-python reproduce.py human_only_priority --workers 4
-python reproduce.py ai_only_priority --workers 4
-python reproduce.py delivery_reliability --workers 4
-python reproduce.py all --workers 4
+.venv/bin/python jcs/reproduce.py human_only_priority --workers 4
+.venv/bin/python jcs/reproduce.py ai_only_priority --workers 4
+.venv/bin/python jcs/reproduce.py delivery_reliability --workers 4
+.venv/bin/python jcs/reproduce.py all --workers 4
 ```
 
 `all` runs these four configurations sequentially, using CPU workers within each. The main command starts the full research workload; it is not a quick check. Results are written to `jcs/results/<configuration>/` regardless of the invoking directory. Generated results are ignored by Git.
@@ -43,9 +55,9 @@ Ctrl+C stops after the submitted batch is saved. Wait for the shell prompt, then
 ## Stage commands and planning
 
 ```sh
-python reproduce.py plan --config configs/research_protocol.json
-python reproduce.py run --config configs/smoke.json --output /absolute/path/to/bundle --stage characterize --max-model-steps 10000 --workers 2
-python reproduce.py run --config configs/smoke.json --output /absolute/path/to/bundle --stage search --max-model-steps 10000 --workers 2
+.venv/bin/python jcs/reproduce.py plan --config jcs/configs/research_protocol.json
+.venv/bin/python jcs/reproduce.py run --config jcs/configs/smoke.json --output /absolute/path/to/bundle --stage characterize --max-model-steps 10000 --workers 2
+.venv/bin/python jcs/reproduce.py run --config jcs/configs/smoke.json --output /absolute/path/to/bundle --stage search --max-model-steps 10000 --workers 2
 ```
 
 The stages are `characterize`, `search`, `validate`, `test`, `robustness` and `all`. Search includes characterization if needed. Selection requires search; testing requires the frozen selected designs. The explicit model-step cap is checked before simulation starts. Planning reports ceilings, not completion percentages or promised runtimes. Historical saved files retain the internal `train` split and `training_*` field names to preserve the original random streams and identifiers.
@@ -55,17 +67,17 @@ For an existing bundle made with an earlier source version, resumption verifies 
 ## Analysis and plots
 
 ```sh
-python reproduce.py analyze results/research_protocol --output /absolute/path/to/empty-analysis --workers 8
+.venv/bin/python jcs/reproduce.py analyze jcs/results/research_protocol --output /absolute/path/to/empty-analysis --workers 8
 ```
 
 For the completed research protocol, this command calculates the saved-data spatial and temporal analyses and produces the study plots. It never simulates. Use an empty output directory outside the saved bundle. The detailed analysis follows the reported protocol's phase windows and selected designs; a different protocol needs a separately specified analysis, not silently reused assumptions. Tiny or other configurations use their standard outcome analysis.
 
-The trajectory analysis needs pandas (`.[analysis]`) as well as the original numerical environment. It reads all stored test and characterization histories, recovers the summary statistics, computes resource budgets and coverage components, estimates exploratory action responses, and checks recurrence, sensitivity and provenance. `derived/` contains numerical results; `plots/figures/` contains the PNG and vector PDF plots, with the underlying plotted values alongside them. A completed main experiment also runs this analysis after its outcome summaries and sensitivity checks. An identical completed analysis is reused only after its source and inputs are checked. If an output directory belongs to another analysis version, choose a new empty directory with the explicit analysis command. The same plots can be used in any report.
+The quick-start installation includes pandas for the trajectory analysis alongside the recorded numerical environment. It reads all stored test and characterization histories, recovers the summary statistics, computes resource budgets and coverage components, estimates exploratory action responses, and checks recurrence, sensitivity and provenance. `derived/` contains numerical results; `plots/figures/` contains the PNG and vector PDF plots, with the underlying plotted values alongside them. A completed main experiment also runs this analysis after its outcome summaries and sensitivity checks. An identical completed analysis is reused only after its source and inputs are checked. If an output directory belongs to another analysis version, choose a new empty directory with the explicit analysis command. The same plots can be used in any report.
 
 To redraw plots from already calculated summaries:
 
 ```sh
-python reproduce.py analyze /path/to/saved-bundle --derived /path/to/derived --output /path/to/new-plots
+.venv/bin/python jcs/reproduce.py analyze /path/to/saved-bundle --derived /path/to/derived --output /path/to/new-plots
 ```
 
 This route verifies the run identity and activity means, recomputes combined three-objective frontiers, and records the plotting-source and input hashes. It does not independently repeat trajectory extraction. Full extraction needs the saved detailed histories; the compact plotting inputs alone are insufficient for that step.
@@ -75,9 +87,9 @@ The plots cover primary and other tested trade-offs, original paired outcome int
 ## Verification, replay and rescoring
 
 ```sh
-python reproduce.py verify results/research_protocol
-python reproduce.py replay /path/to/bundle EVALUATION_ID --max-model-steps 10000
-python reproduce.py rescore /path/to/bundle --floor .1 --tail .05 --output /path/to/rescored.csv
+.venv/bin/python jcs/reproduce.py verify jcs/results/research_protocol
+.venv/bin/python jcs/reproduce.py replay /path/to/bundle EVALUATION_ID --max-model-steps 10000
+.venv/bin/python jcs/reproduce.py rescore /path/to/bundle --floor .1 --tail .05 --output /path/to/rescored.csv
 ```
 
 Verification and rescoring never simulate. Replay intentionally reruns one archived realization; the entry point selects the verified source snapshot when needed; use the recorded numerical environment. Bundle checksums cover immutable inputs and results. Regenerated outcome analyses have their own input manifest. Exporting a verified result bundle and its exact source remains available through `reproduce.py export`; the export contains the study source, the verified result bundle and a SHA256 inventory.

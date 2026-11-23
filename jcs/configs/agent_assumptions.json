@@ -1,0 +1,615 @@
+{
+  "extends": "original_game.json",
+  "paper": {
+    "protocol": "paper-agent-assumptions-2026-11-21",
+    "role": "confirmatory companion: key designs under assumptions that could produce the main findings by construction (source choice, size of the higher request, graded action response, planning order with participation-dependent designs, and a payoff that reads the sources an agent can reach), on the confirmatory split; written after the other final runs had been read, and repeated after a first complete run on other worlds showed a tie-breaking flaw (see docs/experiments.md)",
+    "experiments": [
+      "interventions",
+      "feedback"
+    ],
+    "policies": {
+      "consequence_reach": {
+        "r_c": 0,
+        "r_d": 0,
+        "consequence_weight": 1,
+        "consequence_scope": "access"
+      }
+    },
+    "interventions": {
+      "designs": [
+        "threshold_up",
+        "threshold_down",
+        "threshold_down_large",
+        "join_cooperators",
+        "offset_defectors",
+        "consequence_full",
+        "consequence_reach",
+        "no_reversals",
+        "always_ordinary",
+        "always_intensified"
+      ],
+      "cells": [
+        "reference",
+        "stock_weighted_choice",
+        "fullest_choice",
+        "stock_weighted_choice_t10",
+        "fullest_choice_t10",
+        "higher_request_2x",
+        "higher_request_3x",
+        "graded_response_050",
+        "graded_response_025",
+        "graded_response_010",
+        "sequential_planning",
+        "stock_weighted_choice_fixed_requests"
+      ],
+      "from_initialization_cells": []
+    },
+    "feedback": {
+      "hysteresis_designs": [],
+      "cells": [
+        "stock_weighted_choice",
+        "fullest_choice",
+        "stock_weighted_choice_t10",
+        "fullest_choice_t10",
+        "higher_request_2x",
+        "higher_request_3x",
+        "stock_weighted_choice_fixed_requests",
+        "stock_weighted_choice_t10_p075"
+      ],
+      "hysteresis_design_cells": [],
+      "parts": [
+        "start_dependence"
+      ]
+    },
+    "cells": {
+      "stock_weighted_choice": {
+        "scenario": {
+          "selection": "stock_weighted"
+        }
+      },
+      "fullest_choice": {
+        "scenario": {
+          "selection": "fullest"
+        }
+      },
+      "stock_weighted_choice_t10": {
+        "scenario": {
+          "selection": "stock_weighted",
+          "theta": 10
+        }
+      },
+      "fullest_choice_t10": {
+        "scenario": {
+          "selection": "fullest",
+          "theta": 10
+        }
+      },
+      "higher_request_2x": {
+        "scenario": {
+          "defect_ratio": 2
+        }
+      },
+      "higher_request_3x": {
+        "scenario": {
+          "defect_ratio": 3
+        }
+      },
+      "graded_response_050": {
+        "scenario": {
+          "response": "logit",
+          "temperature": 0.5
+        }
+      },
+      "graded_response_025": {
+        "scenario": {
+          "response": "logit",
+          "temperature": 0.25
+        }
+      },
+      "graded_response_010": {
+        "scenario": {
+          "response": "logit",
+          "temperature": 0.1
+        }
+      },
+      "sequential_planning": {
+        "scenario": {
+          "schedule": "sequential_planning"
+        }
+      },
+      "stock_weighted_choice_fixed_requests": {
+        "scenario": {
+          "selection": "stock_weighted"
+        },
+        "requests": "fixed"
+      },
+      "stock_weighted_choice_t10_p075": {
+        "scenario": {
+          "selection": "stock_weighted",
+          "theta": 10,
+          "pressure": 0.75
+        }
+      }
+    },
+    "confirmatory": {
+      "contrasts": [
+        {
+          "name": "threshold_up_late_ai_stock_weighted_choice",
+          "question": "Do payoff changes move sustained activity under this assumption?",
+          "experiment": "interventions",
+          "cell": "stock_weighted_choice",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_up",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_ai_stock_weighted_choice",
+          "question": "Do payoff changes move sustained activity under this assumption?",
+          "experiment": "interventions",
+          "cell": "stock_weighted_choice",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_up_late_ai_fullest_choice",
+          "question": "Do payoff changes move sustained activity under this assumption?",
+          "experiment": "interventions",
+          "cell": "fullest_choice",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_up",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_ai_fullest_choice",
+          "question": "Do payoff changes move sustained activity under this assumption?",
+          "experiment": "interventions",
+          "cell": "fullest_choice",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_up_late_ai_stock_weighted_choice_t10",
+          "question": "Do payoff changes move sustained activity under this assumption?",
+          "experiment": "interventions",
+          "cell": "stock_weighted_choice_t10",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_up",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_ai_stock_weighted_choice_t10",
+          "question": "Do payoff changes move sustained activity under this assumption?",
+          "experiment": "interventions",
+          "cell": "stock_weighted_choice_t10",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_up_late_ai_fullest_choice_t10",
+          "question": "Do payoff changes move sustained activity under this assumption?",
+          "experiment": "interventions",
+          "cell": "fullest_choice_t10",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_up",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_ai_fullest_choice_t10",
+          "question": "Do payoff changes move sustained activity under this assumption?",
+          "experiment": "interventions",
+          "cell": "fullest_choice_t10",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_up_late_ai_higher_request_2x",
+          "question": "Do payoff changes move sustained activity under this assumption?",
+          "experiment": "interventions",
+          "cell": "higher_request_2x",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_up",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_ai_higher_request_2x",
+          "question": "Do payoff changes move sustained activity under this assumption?",
+          "experiment": "interventions",
+          "cell": "higher_request_2x",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_up_late_ai_higher_request_3x",
+          "question": "Do payoff changes move sustained activity under this assumption?",
+          "experiment": "interventions",
+          "cell": "higher_request_3x",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_up",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_ai_higher_request_3x",
+          "question": "Do payoff changes move sustained activity under this assumption?",
+          "experiment": "interventions",
+          "cell": "higher_request_3x",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_up_late_ai_graded_response_050",
+          "question": "Do payoff changes move sustained activity under this assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_050",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_up",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_ai_graded_response_050",
+          "question": "Do payoff changes move sustained activity under this assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_050",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_up_late_ai_graded_response_025",
+          "question": "Do payoff changes move sustained activity under this assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_025",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_up",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_ai_graded_response_025",
+          "question": "Do payoff changes move sustained activity under this assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_025",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_up_late_ai_graded_response_010",
+          "question": "Do payoff changes move sustained activity under this assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_010",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_up",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_ai_graded_response_010",
+          "question": "Do payoff changes move sustained activity under this assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_010",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "join_cooperators_late_ai_sequential_planning",
+          "question": "Does the planning order matter for a design that depends on what others do?",
+          "experiment": "interventions",
+          "cell": "sequential_planning",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "join_cooperators",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "offset_defectors_late_ai_sequential_planning",
+          "question": "Does the planning order matter for a design that depends on what others do?",
+          "experiment": "interventions",
+          "cell": "sequential_planning",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "offset_defectors",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_reach_late_human",
+          "question": "Does a payoff that reads the sources an agent can reach help?",
+          "experiment": "interventions",
+          "cell": "reference",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "consequence_reach",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_reach_late_ai",
+          "question": "Does a payoff that reads the sources an agent can reach help?",
+          "experiment": "interventions",
+          "cell": "reference",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "consequence_reach",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "start_dependence_stock_weighted_choice",
+          "question": "Does the late state depend on starting empty rather than full under this assumption?",
+          "experiment": "feedback",
+          "cell": "stock_weighted_choice",
+          "outcome": "contested_stock",
+          "select": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|empty",
+            "window": "steps_2000_3000"
+          },
+          "reference": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|full",
+            "window": "steps_2000_3000"
+          }
+        },
+        {
+          "name": "start_dependence_fullest_choice",
+          "question": "Does the late state depend on starting empty rather than full under this assumption?",
+          "experiment": "feedback",
+          "cell": "fullest_choice",
+          "outcome": "contested_stock",
+          "select": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|empty",
+            "window": "steps_2000_3000"
+          },
+          "reference": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|full",
+            "window": "steps_2000_3000"
+          }
+        },
+        {
+          "name": "start_dependence_stock_weighted_choice_t10",
+          "question": "Does the late state depend on starting empty rather than full under this assumption?",
+          "experiment": "feedback",
+          "cell": "stock_weighted_choice_t10",
+          "outcome": "contested_stock",
+          "select": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|empty",
+            "window": "steps_2000_3000"
+          },
+          "reference": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|full",
+            "window": "steps_2000_3000"
+          }
+        },
+        {
+          "name": "start_dependence_fullest_choice_t10",
+          "question": "Does the late state depend on starting empty rather than full under this assumption?",
+          "experiment": "feedback",
+          "cell": "fullest_choice_t10",
+          "outcome": "contested_stock",
+          "select": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|empty",
+            "window": "steps_2000_3000"
+          },
+          "reference": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|full",
+            "window": "steps_2000_3000"
+          }
+        },
+        {
+          "name": "start_dependence_stock_weighted_choice_fixed_requests",
+          "question": "Does the late state depend on starting empty rather than full under this assumption?",
+          "experiment": "feedback",
+          "cell": "stock_weighted_choice_fixed_requests",
+          "outcome": "contested_stock",
+          "select": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|empty",
+            "window": "steps_2000_3000"
+          },
+          "reference": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|full",
+            "window": "steps_2000_3000"
+          }
+        },
+        {
+          "name": "start_dependence_stock_weighted_choice_t10_p075",
+          "question": "Does the late state depend on starting empty rather than full under this assumption?",
+          "experiment": "feedback",
+          "cell": "stock_weighted_choice_t10_p075",
+          "outcome": "contested_stock",
+          "select": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|empty",
+            "window": "steps_2000_3000"
+          },
+          "reference": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|full",
+            "window": "steps_2000_3000"
+          }
+        }
+      ]
+    }
+  }
+}

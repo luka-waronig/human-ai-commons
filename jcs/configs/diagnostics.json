@@ -1,0 +1,153 @@
+{
+  "extends": "pilot.json",
+  "paper": {
+    "protocol": "paper-diagnostics-2026-11-20",
+    "role": "exploratory diagnostics on the pilot worlds, run after the two pilots to choose the final run; not confirmatory",
+    "worlds": 8,
+    "policies": {
+      "unchanged_no_reversals": {
+        "r_c": 0,
+        "r_d": 0,
+        "epsilon": 0
+      },
+      "very_high_threshold": {
+        "r_c": 18,
+        "r_d": 18,
+        "diagnostic": true
+      },
+      "consequence_half": {
+        "r_c": 0,
+        "r_d": 0,
+        "consequence_weight": 0.5
+      },
+      "consequence_full": {
+        "r_c": 0,
+        "r_d": 0,
+        "consequence_weight": 1
+      },
+      "consequence_full_threshold_up": {
+        "r_c": 1,
+        "r_d": 1,
+        "consequence_weight": 1
+      },
+      "consequence_full_threshold_down": {
+        "r_c": -0.5,
+        "r_d": -0.5,
+        "consequence_weight": 1
+      }
+    },
+    "interventions": {
+      "designs": [
+        "threshold_up",
+        "threshold_down",
+        "threshold_down_large",
+        "always_ordinary",
+        "always_intensified",
+        "unchanged_no_reversals",
+        "very_high_threshold",
+        "consequence_half",
+        "consequence_full",
+        "consequence_full_threshold_up",
+        "consequence_full_threshold_down"
+      ],
+      "cells": [
+        "reference",
+        "t5_p1",
+        "t10_p1",
+        "t3_conf",
+        "t10_conf"
+      ],
+      "from_initialization_cells": []
+    },
+    "feedback": {
+      "hysteresis_designs": [
+        "consequence_full"
+      ],
+      "cells": [
+        "reference",
+        "t3_p075",
+        "t3_p15",
+        "t3_conf",
+        "t5_p075",
+        "t5_p1",
+        "t5_p15",
+        "t5_conf",
+        "t10_p075",
+        "t10_p1",
+        "t10_p15",
+        "t10_conf"
+      ],
+      "parts": [
+        "start_dependence"
+      ]
+    },
+    "cells": {
+      "t3_p075": {
+        "scenario": {
+          "theta": 3,
+          "pressure": 0.75
+        }
+      },
+      "t3_p15": {
+        "scenario": {
+          "theta": 3,
+          "pressure": 1.5
+        }
+      },
+      "t3_conf": {
+        "scenario": {
+          "theta": 3
+        },
+        "requests": "fixed"
+      },
+      "t5_p075": {
+        "scenario": {
+          "theta": 5,
+          "pressure": 0.75
+        }
+      },
+      "t5_p1": {
+        "scenario": {
+          "theta": 5,
+          "pressure": 1
+        }
+      },
+      "t5_p15": {
+        "scenario": {
+          "theta": 5,
+          "pressure": 1.5
+        }
+      },
+      "t5_conf": {
+        "scenario": {
+          "theta": 5
+        },
+        "requests": "fixed"
+      },
+      "t10_p075": {
+        "scenario": {
+          "theta": 10,
+          "pressure": 0.75
+        }
+      },
+      "t10_p1": {
+        "scenario": {
+          "theta": 10,
+          "pressure": 1
+        }
+      },
+      "t10_p15": {
+        "scenario": {
+          "theta": 10,
+          "pressure": 1.5
+        }
+      },
+      "t10_conf": {
+        "scenario": {
+          "theta": 10
+        },
+        "requests": "fixed"
+      }
+    }
+  }
+}

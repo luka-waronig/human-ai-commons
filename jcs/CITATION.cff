@@ -1,17 +1,17 @@
 cff-version: 1.2.0
-message: Cite the previous conference study and identify the exact JCS software and output-bundle versions used.
-title: 'Human-AI Commons: constrained payoff design study'
+message: Cite the journal study and the previous conference study, and identify the exact JCS software version used.
+title: 'Strategic Incentives and Joint Welfare in Human-AI Commons'
 type: software
 license: MIT
 version: 0.2.0
 repository-code: https://github.com/luka-waronig/human-ai-commons
 authors:
+  - family-names: Waronig
+    given-names: Luka
   - family-names: Malčić
     given-names: Ivana
   - family-names: Roy
     given-names: Debraj
-  - family-names: Waronig
-    given-names: Luka
 references:
   - type: conference-paper
     title: 'Emergent Spatial Traps in the Coevolutionary Commons: Human-AI Cooperation Under Environmental Feedback'

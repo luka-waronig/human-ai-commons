@@ -1,0 +1,11 @@
+{
+  "extends": "pilot.json",
+  "paper": {
+    "protocol": "paper-pilot-strong-feedback-2026-11-20",
+    "role": "bounded exploratory follow-up chosen after the reference pilot: same worlds and designs with renewal responsiveness theta 10; not confirmatory",
+    "worlds": 8,
+    "reference_scenario": {
+      "theta": 10
+    }
+  }
+}

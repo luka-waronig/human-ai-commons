@@ -7,10 +7,10 @@ repository-code: https://github.com/luka-waronig/human-ai-commons
 authors:
   - family-names: Waronig
     given-names: Luka
-  - family-names: Roy
-    given-names: Debraj
   - family-names: Malčić
     given-names: Ivana
+  - family-names: Roy
+    given-names: Debraj
 preferred-citation:
   type: conference-paper
   title: 'Emergent Spatial Traps in the Coevolutionary Commons: Human-AI Cooperation Under Environmental Feedback'

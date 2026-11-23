@@ -1,0 +1,69 @@
+{
+  "extends": "original_game.json",
+  "paper": {
+    "protocol": "paper-payoff-grid-2026-11-20",
+    "role": "map of the admissible payoff family from developed states, followed by a test of the designs it selects on worlds the map never used; objectives, requirement and selection rule fixed before any world of either split was simulated",
+    "split": "paper-payoff-grid",
+    "worlds": 32,
+    "experiments": [
+      "search",
+      "search_test"
+    ],
+    "search": {
+      "cells": [
+        "reference",
+        "t10_p1"
+      ],
+      "develop_steps": 1000,
+      "after_steps": 1500,
+      "windows_after": [
+        [
+          0,
+          1500
+        ],
+        [
+          0,
+          150
+        ],
+        [
+          500,
+          1500
+        ]
+      ],
+      "points_per_axis": 17,
+      "objectives": [
+        {
+          "outcome": "human_activity",
+          "window": "0-1500"
+        },
+        {
+          "outcome": "ai_activity",
+          "window": "0-1500"
+        },
+        {
+          "outcome": "contested_stock",
+          "window": "500-1500"
+        }
+      ],
+      "requirement": {
+        "outcome": "contested_empty_share",
+        "window": "500-1500",
+        "allowance": 0.0
+      },
+      "selection_budget": 1.0,
+      "selected_per_cell": 8,
+      "test_split": "paper-payoff-grid-test",
+      "test_worlds": 64,
+      "budgets": [
+        0.25,
+        0.5,
+        1.0
+      ]
+    },
+    "confirmatory": {
+      "alpha": 0.05,
+      "smallest_difference_of_interest": 0.01,
+      "contrasts": []
+    }
+  }
+}

@@ -1,0 +1,245 @@
+{
+  "extends": "local_measures.json",
+  "paper": {
+    "protocol": "paper-siting-across-settings-2026-11-23",
+    "role": "companion to the local measures: siting of all AI agents in the five settings in which the local measures run tested the price and the cap without siting (source density 0.2 and 0.5, AI share of demand 50% and 20%, fixed requests), on the same 64 worlds; added after the results of the local measures had been read, so its comparisons are not prospective",
+    "experiments": [
+      "interventions"
+    ],
+    "interventions": {
+      "designs": [
+        "price_4",
+        "cap_25"
+      ],
+      "cells": [
+        "density_02",
+        "sited_density_02",
+        "density_05",
+        "sited_density_05",
+        "large_share_50",
+        "sited_large_share_50",
+        "large_share_20",
+        "sited_large_share_20",
+        "t3_conf",
+        "sited_t3_conf"
+      ]
+    },
+    "cells": {
+      "sited_density_02": {
+        "world_spec": {
+          "density": 0.2
+        },
+        "siting": "sited"
+      },
+      "sited_density_05": {
+        "world_spec": {
+          "density": 0.5
+        },
+        "siting": "sited"
+      },
+      "sited_large_share_50": {
+        "scenario": {
+          "demand_ratio": 1
+        },
+        "siting": "sited"
+      },
+      "sited_large_share_20": {
+        "scenario": {
+          "demand_ratio": 0.25
+        },
+        "siting": "sited"
+      },
+      "sited_t3_conf": {
+        "scenario": {
+          "theta": 3
+        },
+        "requests": "fixed",
+        "siting": "sited"
+      }
+    },
+    "confirmatory": {
+      "contrasts": [
+        {
+          "name": "sited_human_density_02",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups in this setting?",
+          "experiment": "interventions",
+          "cell": "sited_density_02",
+          "reference_cell": "density_02",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_ai_density_02",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups in this setting?",
+          "experiment": "interventions",
+          "cell": "sited_density_02",
+          "reference_cell": "density_02",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_human_density_05",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups in this setting?",
+          "experiment": "interventions",
+          "cell": "sited_density_05",
+          "reference_cell": "density_05",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_ai_density_05",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups in this setting?",
+          "experiment": "interventions",
+          "cell": "sited_density_05",
+          "reference_cell": "density_05",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_human_large_share_50",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups in this setting?",
+          "experiment": "interventions",
+          "cell": "sited_large_share_50",
+          "reference_cell": "large_share_50",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_ai_large_share_50",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups in this setting?",
+          "experiment": "interventions",
+          "cell": "sited_large_share_50",
+          "reference_cell": "large_share_50",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_human_large_share_20",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups in this setting?",
+          "experiment": "interventions",
+          "cell": "sited_large_share_20",
+          "reference_cell": "large_share_20",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_ai_large_share_20",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups in this setting?",
+          "experiment": "interventions",
+          "cell": "sited_large_share_20",
+          "reference_cell": "large_share_20",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_human_t3_conf",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups in this setting?",
+          "experiment": "interventions",
+          "cell": "sited_t3_conf",
+          "reference_cell": "t3_conf",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_ai_t3_conf",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups in this setting?",
+          "experiment": "interventions",
+          "cell": "sited_t3_conf",
+          "reference_cell": "t3_conf",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        }
+      ]
+    }
+  }
+}

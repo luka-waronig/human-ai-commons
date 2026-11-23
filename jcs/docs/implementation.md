@@ -1,5 +1,7 @@
 # Implementation and experiment contract
 
+The model sections apply to every experiment. The stages `characterize`, `search`, `validate`, `test` and `robustness` belong to the earlier staged payoff search, which the paper does not report; the [experiments of the paper](experiments.md) describe their own design.
+
 ## Independent numerical model
 
 The `human_ai_commons` package uses NumPy and SciPy directly. Geometry is represented by unique resource coordinates, fixed agent coordinates, and toroidal Chebyshev-distance incidence matrices. Neighbor cells are counted once even on a thin or small torus. There are no imports from the conference implementation.
@@ -36,7 +38,7 @@ Generated worlds are immutable and identified by content. Held-out trajectories 
 
 `search` evaluates fixed grids and two rounds of Pareto refinement. It minimizes the vector of negative human support, negative AI support, and spatial-tail depletion. The original game and feasible grid nodes are evaluated explicitly. Refinement samples shrinking neighborhoods of diverse current trade-offs. Evaluations are cached and shared across budgets; no welfare weight guides the main search. The scalar differential-evolution implementation is used only by optional human-only and AI-only configurations.
 
-`validate` assesses up to 12 candidates per family and problem on a disjoint realization set. Non-dominated feasible candidates are reduced to at most six diverse designs, preserving each objective's end. Equal-relative and redistribution candidates are included in local-family assessment. Least-violation candidates remain labelled diagnostics when no empirically feasible design is found. The frozen artifact stores `families` containing lists, not `winners` containing one design.
+`validate` assesses up to 12 candidates per family and problem on a disjoint realization set. Non-dominated feasible candidates are reduced to at most six diverse designs, preserving each objective's end. Equal-relative and redistribution candidates are included in local-family assessment. Least-violation candidates remain labeled diagnostics when no empirically feasible design is found. The frozen artifact stores `families` containing lists, not `winners` containing one design.
 
 `test` evaluates the complete frozen sets and original game on new paired realizations. It records all three objectives and exact one-sided binomial bounds, corrected across distinct tested policy/pressure pairs. Test results never guide another search or shortlist. Analysis recomputes empirical frontiers among the tested designs using sample means; this is estimation, not proof of global optimality or population-level dominance. Individual mean and paired-change bootstrap intervals are descriptive. Primary paired-mean intervals have finite-sample coverage for independent bounded realizations; their construction is given below. The total error allowance is preallocated across main/robustness outcome and resource groups.
 
@@ -64,6 +66,24 @@ Preflight computes workload upper bounds and exact resource-assessment power at 
 
 The source version is part of the computation identity. After code changes, create a new bundle rather than mixing different implementations. Once production results exist, release their full bundle and exact source together. Reports from `analyze` identify their input hashes; regenerate them after additional stages finish.
 
+
+## Continuations, fixed requests and renewal controls
+
+`Simulator` accepts two optional arguments used only by the [experiments of the paper](experiments.md). `cooperative_request` fixes each agent's ordinary request in resource units instead of scaling requests to accessible baseline renewal. `renewal_control` selects `coupled` (the model), `fixed_cooperation` (the renewal multiplier reads a time-invariant cooperation value per source instead of current behavior) or `baseline` (multiplier one). Their defaults leave the staged study's computation and identifiers unchanged; neither enters `Scenario` or an evaluation identifier.
+
+A third optional argument, `consequence_weight`, with `consequence_scope` to choose which sources it reads, changes which stock enters an agent's payoff: with weight $w$ it is $(1-w)$ times the stock of the selected source plus $w$ times the mean stock of all sources whose renewal the agent's behavior enters. Zero is the inherited rule and leaves the computation unchanged. Renewal, requests per action, access and source selection are not affected.
+
+`Simulator.restore()` sets the complete dynamical state between steps: stocks and current strategies. `paper_experiments.run_segment` simulates absolute steps `[start, stop)`. A continuation must supply the state reached at `start`, and random inputs are always drawn for the absolute step, so an unchanged continuation reproduces the uninterrupted history exactly; the intervention experiment checks this identity in every world. Measurement windows are given in absolute steps and must lie inside the simulated segment, so a continuation never inherits accumulators from the steps before it.
+
+`Scenario` carries further options that the experiments of the paper switch on in named settings and conditions. Each has a default that leaves the staged study's computation unchanged, and at their defaults they do not enter its evaluation identifiers (`dynamics.scenario_record`). `selection` decides how an agent picks among the sources it can reach: `uniform` (the inherited rule), `stock_weighted`, `fullest`, or `priced`, in which a source is chosen with probability proportional to $e^{\kappa n}$ for stock level $n$ and `price` $\kappa$. `floor` is a local cap: withdrawals at a source are cut back, in proportion, to the stock above that share of its capacity. `regulated` states whom the price and the cap bind: `all` agents, or `ai`, in which case human agents keep choosing at random and the cap never restricts a human withdrawal. `response` and `temperature` replace the sign rule of the payoff difference by a graded response.
+
+The experiments of the paper also place AI agents deliberately in some settings. `paper_experiments.site_ai_agents` moves a stated share of the AI agents, each to a cell where the sources it reaches can carry the load, and among such cells to one that shares the fewest sources with human agents. Sources, human agents and initial strategies stay as generated, and requests keep the size in resource units that they have under random placement.
+
+A run writes its measurements and summary tables only. Each figure of the paper is drawn by one script in `figures/`, and the numbers typed into the paper's tables are printed by the scripts in `analysis/`; both read the saved tables of a run.
+
+A disturbance is either a common renewal factor during a stated interval or a common stock factor applied once before a stated step. The resource balance is checked at every step under every control and disturbance.
+
+The payoff grid of the paper evaluates the grid of the staged study from developed states and records every design. The designs it selects are written to `selected_designs.json` in the run folder before any test world is simulated, and a repeated command reads that file instead of selecting again. The configurations of the paper extend the research protocol and are read with `load_config`, `world_spec` and `scenario`, so the world, the reference scenario and the payoff family have one definition.
 
 ## Analysis of saved histories
 

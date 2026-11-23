@@ -1,0 +1,78 @@
+{
+  "extends": "original_game.json",
+  "paper": {
+    "protocol": "paper-original-game-long-horizon-2026-11-20",
+    "role": "confirmatory companion: start dependence over 12000 steps under strong renewal feedback, on the first 32 worlds of the confirmatory split; declared before any world of that split was simulated",
+    "worlds": 32,
+    "experiments": [
+      "feedback"
+    ],
+    "feedback": {
+      "hysteresis_steps": 12000,
+      "hysteresis_windows": [
+        [
+          "steps_2000_3000",
+          2000,
+          3000
+        ],
+        [
+          "steps_4000_6000",
+          4000,
+          6000
+        ],
+        [
+          "steps_10000_12000",
+          10000,
+          12000
+        ]
+      ],
+      "hysteresis_designs": [],
+      "cells": [
+        "t10_p075",
+        "t10_p1"
+      ],
+      "hysteresis_design_cells": [],
+      "parts": [
+        "start_dependence"
+      ]
+    },
+    "confirmatory": {
+      "contrasts": [
+        {
+          "name": "start_dependence_after_12000_steps_t10_p075",
+          "question": "Is the dependence on starting stocks still present after 12000 steps?",
+          "experiment": "feedback",
+          "cell": "t10_p075",
+          "outcome": "contested_stock",
+          "select": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|empty",
+            "window": "steps_10000_12000"
+          },
+          "reference": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|full",
+            "window": "steps_10000_12000"
+          }
+        },
+        {
+          "name": "start_dependence_after_12000_steps_t10_p1",
+          "question": "Is the dependence on starting stocks still present after 12000 steps?",
+          "experiment": "feedback",
+          "cell": "t10_p1",
+          "outcome": "contested_stock",
+          "select": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|empty",
+            "window": "steps_10000_12000"
+          },
+          "reference": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|full",
+            "window": "steps_10000_12000"
+          }
+        }
+      ]
+    }
+  }
+}

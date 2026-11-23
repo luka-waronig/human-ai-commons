@@ -1,0 +1,736 @@
+{
+  "extends": "pilot.json",
+  "paper": {
+    "protocol": "paper-original-game-2026-11-20",
+    "role": "confirmatory: settings, designs, windows and the declared contrasts were fixed after the exploratory pilots and diagnostics and before any world of this split was simulated",
+    "split": "paper-original-game",
+    "worlds": 64,
+    "policies": {
+      "no_reversals": {
+        "r_c": 0,
+        "r_d": 0,
+        "epsilon": 0
+      },
+      "reversals_5_percent": {
+        "r_c": 0,
+        "r_d": 0,
+        "epsilon": 0.05
+      },
+      "reversals_20_percent": {
+        "r_c": 0,
+        "r_d": 0,
+        "epsilon": 0.2
+      },
+      "very_high_threshold": {
+        "r_c": 18,
+        "r_d": 18,
+        "diagnostic": true
+      },
+      "consequence_half": {
+        "r_c": 0,
+        "r_d": 0,
+        "consequence_weight": 0.5
+      },
+      "consequence_full": {
+        "r_c": 0,
+        "r_d": 0,
+        "consequence_weight": 1
+      }
+    },
+    "interventions": {
+      "designs": [
+        "threshold_up",
+        "threshold_up_small",
+        "threshold_down",
+        "threshold_down_large",
+        "join_cooperators",
+        "offset_defectors",
+        "offsetting_toward_cooperators",
+        "offsetting_toward_defectors",
+        "searched_equal_0345",
+        "searched_lower_bound",
+        "always_ordinary",
+        "always_intensified",
+        "no_reversals",
+        "reversals_5_percent",
+        "reversals_20_percent",
+        "very_high_threshold",
+        "consequence_half",
+        "consequence_full"
+      ],
+      "cells": [
+        "reference",
+        "t3_p075",
+        "t3_p15",
+        "t5_p1",
+        "t10_p1",
+        "t3_conf",
+        "t10_conf"
+      ],
+      "from_initialization_cells": [
+        "reference"
+      ]
+    },
+    "feedback": {
+      "hysteresis_designs": [
+        "threshold_up",
+        "threshold_down",
+        "consequence_full"
+      ],
+      "recovery_designs": [
+        "threshold_up",
+        "threshold_down",
+        "consequence_full"
+      ],
+      "cells": [
+        "reference",
+        "t3_p075",
+        "t3_p15",
+        "t3_conf",
+        "t5_p075",
+        "t5_p1",
+        "t5_p15",
+        "t5_conf",
+        "t10_p075",
+        "t10_p1",
+        "t10_p15",
+        "t10_conf"
+      ],
+      "hysteresis_design_cells": [
+        "reference",
+        "t5_p075",
+        "t10_p075",
+        "t10_p1"
+      ],
+      "part_cells": {
+        "controls": [
+          "reference",
+          "t10_p075",
+          "t10_p1"
+        ],
+        "recovery": [
+          "reference",
+          "t10_p075",
+          "t10_p1"
+        ]
+      }
+    },
+    "cells": {
+      "t3_p075": {
+        "scenario": {
+          "theta": 3,
+          "pressure": 0.75
+        }
+      },
+      "t3_p15": {
+        "scenario": {
+          "theta": 3,
+          "pressure": 1.5
+        }
+      },
+      "t3_conf": {
+        "scenario": {
+          "theta": 3
+        },
+        "requests": "fixed"
+      },
+      "t5_p075": {
+        "scenario": {
+          "theta": 5,
+          "pressure": 0.75
+        }
+      },
+      "t5_p1": {
+        "scenario": {
+          "theta": 5,
+          "pressure": 1
+        }
+      },
+      "t5_p15": {
+        "scenario": {
+          "theta": 5,
+          "pressure": 1.5
+        }
+      },
+      "t5_conf": {
+        "scenario": {
+          "theta": 5
+        },
+        "requests": "fixed"
+      },
+      "t10_p075": {
+        "scenario": {
+          "theta": 10,
+          "pressure": 0.75
+        }
+      },
+      "t10_p1": {
+        "scenario": {
+          "theta": 10,
+          "pressure": 1
+        }
+      },
+      "t10_p15": {
+        "scenario": {
+          "theta": 10,
+          "pressure": 1.5
+        }
+      },
+      "t10_conf": {
+        "scenario": {
+          "theta": 10
+        },
+        "requests": "fixed"
+      }
+    },
+    "confirmatory": {
+      "alpha": 0.05,
+      "smallest_difference_of_interest": 0.01,
+      "contrasts": [
+        {
+          "name": "capacity_100_steps_journal",
+          "question": "Which conference relationships recur?",
+          "experiment": "continuity",
+          "outcome": "cooperation",
+          "select": {
+            "condition": "storage_journal_K40_full",
+            "window": "conference_final"
+          },
+          "reference": {
+            "condition": "storage_journal_K20_full",
+            "window": "conference_final"
+          }
+        },
+        {
+          "name": "capacity_100_steps_fixed_requests",
+          "question": "Which conference relationships recur?",
+          "experiment": "continuity",
+          "outcome": "cooperation",
+          "select": {
+            "condition": "storage_fixed_requests_K40_full",
+            "window": "conference_final"
+          },
+          "reference": {
+            "condition": "storage_fixed_requests_K20_full",
+            "window": "conference_final"
+          }
+        },
+        {
+          "name": "capacity_100_steps_equal_start_volume",
+          "question": "Which conference relationships recur?",
+          "experiment": "continuity",
+          "outcome": "cooperation",
+          "select": {
+            "condition": "storage_journal_K40_equal_volume",
+            "window": "conference_final"
+          },
+          "reference": {
+            "condition": "storage_journal_K20_full",
+            "window": "conference_final"
+          }
+        },
+        {
+          "name": "capacity_late_cooperation",
+          "question": "Which conference relationships recur?",
+          "experiment": "continuity",
+          "outcome": "cooperation",
+          "select": {
+            "condition": "storage_journal_K40_full",
+            "window": "late"
+          },
+          "reference": {
+            "condition": "storage_journal_K20_full",
+            "window": "late"
+          }
+        },
+        {
+          "name": "capacity_late_ai_activity",
+          "question": "Which conference relationships recur?",
+          "experiment": "continuity",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "storage_journal_K40_full",
+            "window": "late"
+          },
+          "reference": {
+            "condition": "storage_journal_K20_full",
+            "window": "late"
+          }
+        },
+        {
+          "name": "density_late_cooperation_fixed_requests",
+          "question": "Which conference relationships recur?",
+          "experiment": "continuity",
+          "outcome": "cooperation",
+          "select": {
+            "condition": "supply_fixed_requests_density0.5",
+            "window": "late"
+          },
+          "reference": {
+            "condition": "supply_fixed_requests_density0.2",
+            "window": "late"
+          }
+        },
+        {
+          "name": "start_dependence_reference",
+          "question": "Does the late state depend on starting empty rather than full?",
+          "experiment": "feedback",
+          "cell": "reference",
+          "outcome": "contested_stock",
+          "select": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|empty",
+            "window": "steps_2000_3000"
+          },
+          "reference": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|full",
+            "window": "steps_2000_3000"
+          }
+        },
+        {
+          "name": "start_dependence_strong_feedback",
+          "question": "Does the late state depend on starting empty rather than full?",
+          "experiment": "feedback",
+          "cell": "t10_p1",
+          "outcome": "contested_stock",
+          "select": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|empty",
+            "window": "steps_2000_3000"
+          },
+          "reference": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|full",
+            "window": "steps_2000_3000"
+          }
+        },
+        {
+          "name": "start_dependence_strong_feedback_lower_load",
+          "question": "Does the late state depend on starting empty rather than full?",
+          "experiment": "feedback",
+          "cell": "t10_p075",
+          "outcome": "contested_stock",
+          "select": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|empty",
+            "window": "steps_2000_3000"
+          },
+          "reference": {
+            "part": "hysteresis",
+            "condition": "unchanged|coupled|full",
+            "window": "steps_2000_3000"
+          }
+        },
+        {
+          "name": "start_dependence_strong_feedback_lower_threshold",
+          "question": "Does the late state depend on starting empty rather than full?",
+          "experiment": "feedback",
+          "cell": "t10_p1",
+          "outcome": "contested_stock",
+          "select": {
+            "part": "hysteresis",
+            "condition": "threshold_down|coupled|empty",
+            "window": "steps_2000_3000"
+          },
+          "reference": {
+            "part": "hysteresis",
+            "condition": "threshold_down|coupled|full",
+            "window": "steps_2000_3000"
+          }
+        },
+        {
+          "name": "drought_lasting_ai_reference",
+          "question": "Does activity return after a common drought?",
+          "experiment": "feedback",
+          "cell": "reference",
+          "outcome": "ai_activity",
+          "select": {
+            "part": "recovery",
+            "condition": "unchanged|drought",
+            "window": "800-1500"
+          },
+          "reference": {
+            "part": "recovery",
+            "condition": "unchanged|none",
+            "window": "800-1500"
+          }
+        },
+        {
+          "name": "drought_lasting_ai_strong_feedback",
+          "question": "Does activity return after a common drought?",
+          "experiment": "feedback",
+          "cell": "t10_p1",
+          "outcome": "ai_activity",
+          "select": {
+            "part": "recovery",
+            "condition": "unchanged|drought",
+            "window": "800-1500"
+          },
+          "reference": {
+            "part": "recovery",
+            "condition": "unchanged|none",
+            "window": "800-1500"
+          }
+        },
+        {
+          "name": "renewal_term_removed_ai_reference",
+          "question": "What does the cooperation term of renewal contribute?",
+          "experiment": "feedback",
+          "cell": "reference",
+          "outcome": "ai_activity",
+          "select": {
+            "part": "control",
+            "condition": "unchanged|baseline_only",
+            "window": "800-1500"
+          },
+          "reference": {
+            "part": "control",
+            "condition": "unchanged|coupled",
+            "window": "800-1500"
+          }
+        },
+        {
+          "name": "renewal_term_removed_ai_strong_feedback",
+          "question": "What does the cooperation term of renewal contribute?",
+          "experiment": "feedback",
+          "cell": "t10_p1",
+          "outcome": "ai_activity",
+          "select": {
+            "part": "control",
+            "condition": "unchanged|baseline_only",
+            "window": "800-1500"
+          },
+          "reference": {
+            "part": "control",
+            "condition": "unchanged|coupled",
+            "window": "800-1500"
+          }
+        },
+        {
+          "name": "current_behavior_removed_ai_reference",
+          "question": "Does renewal need to follow current behavior?",
+          "experiment": "feedback",
+          "cell": "reference",
+          "outcome": "ai_activity",
+          "select": {
+            "part": "control",
+            "condition": "unchanged|fixed_cooperation",
+            "window": "800-1500"
+          },
+          "reference": {
+            "part": "control",
+            "condition": "unchanged|coupled",
+            "window": "800-1500"
+          }
+        },
+        {
+          "name": "current_behavior_removed_ai_strong_feedback",
+          "question": "Does renewal need to follow current behavior?",
+          "experiment": "feedback",
+          "cell": "t10_p1",
+          "outcome": "ai_activity",
+          "select": {
+            "part": "control",
+            "condition": "unchanged|fixed_cooperation",
+            "window": "800-1500"
+          },
+          "reference": {
+            "part": "control",
+            "condition": "unchanged|coupled",
+            "window": "800-1500"
+          }
+        },
+        {
+          "name": "threshold_up_late_human",
+          "question": "What do payoff changes of the inherited family do to activity and stocks?",
+          "experiment": "interventions",
+          "cell": "reference",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "threshold_up",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_up_late_ai",
+          "question": "What do payoff changes of the inherited family do to activity and stocks?",
+          "experiment": "interventions",
+          "cell": "reference",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_up",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_human",
+          "question": "What do payoff changes of the inherited family do to activity and stocks?",
+          "experiment": "interventions",
+          "cell": "reference",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_ai",
+          "question": "What do payoff changes of the inherited family do to activity and stocks?",
+          "experiment": "interventions",
+          "cell": "reference",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_large_late_ai",
+          "question": "What do payoff changes of the inherited family do to activity and stocks?",
+          "experiment": "interventions",
+          "cell": "reference",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down_large",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_up_early_ai",
+          "question": "What do payoff changes of the inherited family do to activity and stocks?",
+          "experiment": "interventions",
+          "cell": "reference",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_up",
+            "timing": "after_development",
+            "window": "0-50"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-50"
+          }
+        },
+        {
+          "name": "threshold_down_early_ai",
+          "question": "What do payoff changes of the inherited family do to activity and stocks?",
+          "experiment": "interventions",
+          "cell": "reference",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "0-50"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-50"
+          }
+        },
+        {
+          "name": "threshold_up_contested_stock",
+          "question": "What do payoff changes of the inherited family do to activity and stocks?",
+          "experiment": "interventions",
+          "cell": "reference",
+          "outcome": "contested_stock",
+          "select": {
+            "condition": "threshold_up",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_contested_stock",
+          "question": "What do payoff changes of the inherited family do to activity and stocks?",
+          "experiment": "interventions",
+          "cell": "reference",
+          "outcome": "contested_stock",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_ai_strong_feedback",
+          "question": "What do payoff changes of the inherited family do to activity and stocks?",
+          "experiment": "interventions",
+          "cell": "t10_p1",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_large_late_ai_strong_feedback",
+          "question": "What do payoff changes of the inherited family do to activity and stocks?",
+          "experiment": "interventions",
+          "cell": "t10_p1",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down_large",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_full_late_human",
+          "question": "Does reading the stock of all affected sources, or acting more reliably, help?",
+          "experiment": "interventions",
+          "cell": "reference",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "consequence_full",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_full_late_ai",
+          "question": "Does reading the stock of all affected sources, or acting more reliably, help?",
+          "experiment": "interventions",
+          "cell": "reference",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "consequence_full",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_full_late_human_strong_feedback",
+          "question": "Does reading the stock of all affected sources, or acting more reliably, help?",
+          "experiment": "interventions",
+          "cell": "t10_p1",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "consequence_full",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_full_late_ai_strong_feedback",
+          "question": "Does reading the stock of all affected sources, or acting more reliably, help?",
+          "experiment": "interventions",
+          "cell": "t10_p1",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "consequence_full",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "no_reversals_late_human",
+          "question": "Does reading the stock of all affected sources, or acting more reliably, help?",
+          "experiment": "interventions",
+          "cell": "reference",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "no_reversals",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "no_reversals_late_ai",
+          "question": "Does reading the stock of all affected sources, or acting more reliably, help?",
+          "experiment": "interventions",
+          "cell": "reference",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "no_reversals",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        }
+      ]
+    }
+  }
+}

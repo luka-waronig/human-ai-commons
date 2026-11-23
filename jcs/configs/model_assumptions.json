@@ -1,0 +1,795 @@
+{
+  "extends": "original_game.json",
+  "paper": {
+    "protocol": "paper-model-assumptions-2026-11-20",
+    "role": "confirmatory companion: key designs under changed allocation, renewal law, planning schedule, placement, demand split and grid size, on the confirmatory split; declared before any result of that split was read",
+    "interventions": {
+      "designs": [
+        "threshold_up",
+        "threshold_down",
+        "threshold_down_large",
+        "consequence_full",
+        "no_reversals",
+        "always_ordinary",
+        "always_intensified"
+      ],
+      "cells": [
+        "human_first_allocation",
+        "published_renewal_law",
+        "sequential_planning",
+        "unconditioned_placement",
+        "ai_demand_ratio_5",
+        "ai_demand_ratio_40",
+        "larger_grid"
+      ],
+      "from_initialization_cells": []
+    },
+    "feedback": {
+      "cells": [
+        "reference"
+      ],
+      "hysteresis_design_cells": []
+    },
+    "cells": {
+      "human_first_allocation": {
+        "scenario": {
+          "allocation": "human_priority"
+        }
+      },
+      "published_renewal_law": {
+        "scenario": {
+          "feedback": "manuscript"
+        }
+      },
+      "sequential_planning": {
+        "scenario": {
+          "schedule": "sequential_planning"
+        }
+      },
+      "unconditioned_placement": {
+        "world_spec": {
+          "require_access": false
+        }
+      },
+      "ai_demand_ratio_5": {
+        "scenario": {
+          "demand_ratio": 5
+        }
+      },
+      "ai_demand_ratio_40": {
+        "scenario": {
+          "demand_ratio": 40
+        }
+      },
+      "larger_grid": {
+        "world_spec": {
+          "width": 40,
+          "height": 40,
+          "humans": 200,
+          "ai": 200
+        }
+      }
+    },
+    "confirmatory": {
+      "contrasts": [
+        {
+          "name": "threshold_down_late_human_human_first_allocation",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "human_first_allocation",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_ai_human_first_allocation",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "human_first_allocation",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_full_late_human_human_first_allocation",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "human_first_allocation",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "consequence_full",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_full_late_ai_human_first_allocation",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "human_first_allocation",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "consequence_full",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "no_reversals_late_human_human_first_allocation",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "human_first_allocation",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "no_reversals",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "no_reversals_late_ai_human_first_allocation",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "human_first_allocation",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "no_reversals",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_human_published_renewal_law",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "published_renewal_law",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_ai_published_renewal_law",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "published_renewal_law",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_full_late_human_published_renewal_law",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "published_renewal_law",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "consequence_full",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_full_late_ai_published_renewal_law",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "published_renewal_law",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "consequence_full",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "no_reversals_late_human_published_renewal_law",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "published_renewal_law",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "no_reversals",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "no_reversals_late_ai_published_renewal_law",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "published_renewal_law",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "no_reversals",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_human_sequential_planning",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sequential_planning",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_ai_sequential_planning",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sequential_planning",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_full_late_human_sequential_planning",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sequential_planning",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "consequence_full",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_full_late_ai_sequential_planning",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sequential_planning",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "consequence_full",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "no_reversals_late_human_sequential_planning",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sequential_planning",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "no_reversals",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "no_reversals_late_ai_sequential_planning",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sequential_planning",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "no_reversals",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_human_unconditioned_placement",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "unconditioned_placement",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_ai_unconditioned_placement",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "unconditioned_placement",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_full_late_human_unconditioned_placement",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "unconditioned_placement",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "consequence_full",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_full_late_ai_unconditioned_placement",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "unconditioned_placement",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "consequence_full",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "no_reversals_late_human_unconditioned_placement",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "unconditioned_placement",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "no_reversals",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "no_reversals_late_ai_unconditioned_placement",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "unconditioned_placement",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "no_reversals",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_human_ai_demand_ratio_5",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_5",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_ai_ai_demand_ratio_5",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_5",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_full_late_human_ai_demand_ratio_5",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_5",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "consequence_full",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_full_late_ai_ai_demand_ratio_5",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_5",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "consequence_full",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "no_reversals_late_human_ai_demand_ratio_5",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_5",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "no_reversals",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "no_reversals_late_ai_ai_demand_ratio_5",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_5",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "no_reversals",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_human_ai_demand_ratio_40",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_40",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_ai_ai_demand_ratio_40",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_40",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_full_late_human_ai_demand_ratio_40",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_40",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "consequence_full",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_full_late_ai_ai_demand_ratio_40",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_40",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "consequence_full",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "no_reversals_late_human_ai_demand_ratio_40",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_40",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "no_reversals",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "no_reversals_late_ai_ai_demand_ratio_40",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_40",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "no_reversals",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_human_larger_grid",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "larger_grid",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "threshold_down_late_ai_larger_grid",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "larger_grid",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "threshold_down",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_full_late_human_larger_grid",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "larger_grid",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "consequence_full",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "consequence_full_late_ai_larger_grid",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "larger_grid",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "consequence_full",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "no_reversals_late_human_larger_grid",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "larger_grid",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "no_reversals",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        },
+        {
+          "name": "no_reversals_late_ai_larger_grid",
+          "question": "Do the main design effects hold under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "larger_grid",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "no_reversals",
+            "timing": "after_development",
+            "window": "500-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "500-1500"
+          }
+        }
+      ]
+    },
+    "experiments": [
+      "interventions"
+    ]
+  }
+}

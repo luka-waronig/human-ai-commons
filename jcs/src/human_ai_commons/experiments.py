@@ -8,7 +8,7 @@ import threading
 import numpy as np
 from .capacity import strict_safety_bound
 from .config import budget_plan, metric_spec, problems, robustness_variants, scenario, stress_spec, welfare_spec, world_spec
-from .dynamics import ArchivedDrivers, Drivers, Scenario, simulate
+from .dynamics import ArchivedDrivers, Drivers, Scenario, scenario_record, simulate
 from .metrics import MetricSpec, StressSpec, WelfareSpec, paired_interval, probability_upper_bound
 from .optimization import differential_search, one_dimensional
 from .payoffs import Policy
@@ -89,7 +89,7 @@ class Evaluation:
         metric = metric_spec(self.config)
         driver_seed = seed(self.config['validation']['base_seed'], split, index, 'trajectory')
         welfare, stress = welfare_spec(self.config), stress_spec(self.config)
-        inputs = dict(world_id=world.id, scenario=asdict(physical), policy=asdict(policy), driver_seed=driver_seed,
+        inputs = dict(world_id=world.id, scenario=scenario_record(physical), policy=asdict(policy), driver_seed=driver_seed,
                       steps=steps, burn=burn, metric=asdict(metric),
                       welfare_spec=asdict(welfare) if welfare else None, stress_spec=asdict(stress) if stress else None)
         evaluation_id = identifier(inputs)[:32]

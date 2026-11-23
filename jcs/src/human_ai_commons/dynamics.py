@@ -1,5 +1,5 @@
 """Frozen-observation spatial dynamics with independent indexed random inputs."""
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 import numpy as np
 from .metrics import Depletion, LocalStress, MetricSpec, Service, request_fulfillment
 from .provenance import rng
@@ -16,6 +16,12 @@ class Scenario:
     feedback: str = 'repository'
     schedule: str = 'simultaneous'
     allocation: str = 'human_priority'
+    selection: str = 'uniform'
+    response: str = 'threshold'
+    temperature: float = .25
+    price: float = 0.
+    floor: float = 0.
+    regulated: str = 'all'
 
     def __post_init__(self):
         values = [self.pressure, self.demand_ratio, self.defect_ratio, self.theta, self.epsilon]
@@ -28,6 +34,31 @@ class Scenario:
             raise ValueError('unknown planning schedule')
         if self.allocation not in ['human_priority', 'proportional']:
             raise ValueError('unknown withdrawal allocation')
+        if self.selection not in ['uniform', 'stock_weighted', 'fullest', 'priced']:
+            raise ValueError('unknown source selection')
+        if not np.isfinite(self.price) or self.price < 0 or (self.price > 0 and self.selection != 'priced'):
+            raise ValueError('a scarcity price requires priced source selection and must not be negative')
+        if not np.isfinite(self.floor) or not 0 <= self.floor < 1:
+            raise ValueError('a stock floor lies in [0,1)')
+        if self.regulated not in ['all', 'ai'] or (self.regulated == 'ai' and self.selection == 'uniform' and not self.floor):
+            raise ValueError('a restriction to ai agents requires a source selection rule or a stock floor to restrict')
+        if self.response not in ['threshold', 'logit'] or not np.isfinite(self.temperature) or self.temperature <= 0:
+            raise ValueError('unknown action response')
+
+
+def scenario_record(scenario):
+    """The scenario as it enters an evaluation identifier.
+
+    Options that only the experiments of the paper switch on are left out while they
+    hold their defaults, so a staged-study evaluation keeps the identifier it had
+    before those options existed.
+    """
+    record = asdict(scenario)
+    added = dict(selection='uniform', response='threshold', temperature=.25, price=0., floor=0., regulated='all')
+    if all(record[key] == value for key, value in added.items()):
+        for key in added:
+            del record[key]
+    return record
 
 
 def multiplier(n, cooperation, theta, law):
@@ -38,6 +69,31 @@ def multiplier(n, cooperation, theta, law):
     else:
         raise ValueError('unknown feedback law')
     return np.clip(1+.5*n*(1-n)*expression, 1 if law == 'repository' else .1, 3)
+
+
+@dataclass(frozen=True)
+class RenewalControl:
+    """Experimental control of how local cooperation enters renewal.
+
+    coupled: the model; current neighborhood cooperation enters the multiplier.
+    fixed_cooperation: the multiplier keeps its stock dependence but reads a
+        supplied time-invariant cooperation value (one number, or one per source)
+        instead of current behavior.
+    baseline: the multiplier is one, so renewal is the baseline rate.
+    Requests, access, source selection, payoffs and choices are unaffected.
+    """
+    mode: str = 'coupled'
+    cooperation: float | tuple | None = None
+
+    def __post_init__(self):
+        if self.mode not in ['coupled', 'fixed_cooperation', 'baseline']:
+            raise ValueError('unknown renewal control')
+        if (self.mode == 'fixed_cooperation') != (self.cooperation is not None):
+            raise ValueError('a cooperation value is required for, and only for, fixed_cooperation')
+        if self.cooperation is not None:
+            values = np.atleast_1d(np.asarray(self.cooperation, dtype=float))
+            if not np.all(np.isfinite(values) & (values >= 0) & (values <= 1)):
+                raise ValueError('fixed cooperation must lie in [0,1]')
 
 
 class Drivers:
@@ -66,7 +122,28 @@ class ArchivedDrivers:
 
 
 class Simulator:
-    def __init__(self, world, scenario, policy):
+    def __init__(self, world, scenario, policy, *, cooperative_request=None, renewal_control=None, consequence_weight=0.,
+                 consequence_scope='feedback'):
+        """The optional arguments belong to separately identified experiments.
+
+        cooperative_request fixes each agent's ordinary request in resource units
+        instead of scaling requests to accessible baseline renewal; scenario.pressure
+        and scenario.demand_ratio are then unused.
+
+        consequence_weight changes which stock enters an agent's payoff. Renewal at
+        a source reads the behavior of every agent within the feedback radius, but
+        the inherited payoff reads only the stock of the source the agent selected.
+        With weight w the payoff reads (1-w) times that stock plus w times the mean
+        stock of all sources whose renewal the agent's behavior enters. Zero is the
+        inherited rule. Defaults reproduce the staged study.
+        """
+        if not np.isfinite(consequence_weight) or not 0 <= consequence_weight <= 1:
+            raise ValueError('consequence weight must lie in [0,1]')
+        self.consequence_weight = float(consequence_weight)
+        # 'access' makes the payoff read the sources the agent can draw from instead of all sources its behavior affects.
+        if consequence_scope not in ['feedback', 'access']:
+            raise ValueError('unknown consequence scope')
+        self.consequence_scope = consequence_scope
         self.world, self.scenario, self.policy = world, scenario, policy
         self.water = world.capacity.copy()
         self.strategies = world.initial.copy()
@@ -79,12 +156,31 @@ class Simulator:
             raise ValueError('accessible baseline supply must be positive')
         human_unit = scenario.pressure*supply/(world.spec.humans+scenario.demand_ratio*world.spec.ai)
         self.cooperative_request = np.where(world.kinds, scenario.demand_ratio*human_unit, human_unit)
+        if cooperative_request is not None:
+            fixed = np.array(cooperative_request, dtype=float, copy=True)
+            if fixed.shape != world.kinds.shape or not np.all(np.isfinite(fixed) & (fixed > 0)):
+                raise ValueError('one finite positive ordinary request per agent required')
+            self.cooperative_request = fixed
+        self.renewal_control = renewal_control or RenewalControl()
+        self.fixed_cooperation = None
+        if self.renewal_control.mode == 'fixed_cooperation':
+            self.fixed_cooperation = np.broadcast_to(
+                np.asarray(self.renewal_control.cooperation, dtype=float), world.renewal.shape).copy()
+        # a temporary common disturbance of supply; one leaves the model unchanged.
+        self.renewal_scale = 1.
         distances = torus_distances(world.resources, world.positions, world.spec.width, world.spec.height)
         self.ecological = (distances <= world.spec.feedback_radius).astype(float)
         self.interaction = distances <= world.spec.game_radius
         self.ecological_count = self.ecological.sum(axis=1)
         self.interaction_count = self.interaction.sum(axis=1)
         self.withdrawal_order = np.argsort(world.kinds, kind='stable')
+
+    def restore(self, water, strategies):
+        water, strategies = np.array(water, dtype=float, copy=True), np.array(strategies, dtype=bool, copy=True)
+        if (water.shape != self.world.capacity.shape or strategies.shape != self.world.kinds.shape
+                or not np.all(np.isfinite(water) & (water >= 0) & (water <= self.world.capacity))):
+            raise ValueError('state does not match the world or its capacities')
+        self.water, self.strategies = water, strategies
 
     def step(self, target_rank, reversal, order):
         n_agents = len(self.strategies)
@@ -98,20 +194,47 @@ class Simulator:
         old = self.strategies.copy()
         cooperative = self.ecological @ old.astype(float)
         local = np.divide(cooperative, self.ecological_count, out=np.zeros_like(cooperative), where=self.ecological_count > 0)
+        if self.fixed_cooperation is not None:
+            local = self.fixed_cooperation
         factors = multiplier(self.water/self.world.capacity, local, self.scenario.theta, self.scenario.feedback)
         if self.scenario.feedback != 'manuscript':
             factors[self.ecological_count == 0] = 1
+        if self.renewal_control.mode == 'baseline':
+            factors = np.ones_like(factors)
         replenished = np.minimum(self.world.capacity, self.water+self.world.renewal*factors)
+        potential = self.world.renewal*factors
+        if self.renewal_scale != 1:
+            potential = potential*self.renewal_scale
+            replenished = np.minimum(self.world.capacity, self.water+potential)
         resource_renewal = replenished-self.water
         actual_renewal = replenished.sum()-before
         planned = old.copy()
         target = np.full(n_agents, -1, dtype=int)
+        affected = None
+        if self.consequence_weight:
+            reach = self.ecological.sum(axis=0)
+            affected = np.divide(self.ecological.T @ (replenished/self.world.capacity), reach, out=np.zeros(n_agents), where=reach > 0)
+            if self.consequence_scope == 'access':
+                reach = self.access.sum(axis=1)
+                affected = np.divide(self.access @ (replenished/self.world.capacity), reach, out=np.zeros(n_agents), where=reach > 0)
         planning_order = np.arange(n_agents) if self.scenario.schedule == 'simultaneous' else order
         for i in planning_order:
             available = np.flatnonzero(self.access[i] & (replenished > 0))
             if not len(available):
                 continue
             j = available[min(int(target_rank[i]*len(available)), len(available)-1)]
+            # with regulated == 'ai' only ai agents respond to source stock; human agents keep choosing at random.
+            if self.scenario.selection != 'uniform' and (self.scenario.regulated == 'all' or self.world.kinds[i]):
+                # agents prefer fuller sources: the same random draw picks in proportion to stock, or the fullest source is taken.
+                level = replenished[available]/self.world.capacity[available]
+                edges = np.cumsum(level)
+                if self.scenario.selection == 'priced':
+                    # a price on scarcity: a reachable source is chosen with probability proportional to exp(price x stock level).
+                    edges = np.cumsum(np.exp(self.scenario.price*level))
+                j = available[min(int(np.searchsorted(edges, target_rank[i]*edges[-1], side='right')), len(available)-1)]
+                if self.scenario.selection == 'fullest':
+                    top = available[level >= level.max()-1e-12]
+                    j = top[min(int(target_rank[i]*len(top)), len(top)-1)]
             target[i] = j
             if self.policy.forced:
                 planned[i] = self.policy.forced == 'C'
@@ -126,7 +249,16 @@ class Simulator:
                 neighbors[i] = False
                 x = float(observed[neighbors].mean()) if neighbors.any() else .5
             best = self.policy.gap(replenished[j]/self.world.capacity[j], x) <= 0
+            if affected is not None:
+                w = self.consequence_weight
+                best = self.policy.gap((1-w)*replenished[j]/self.world.capacity[j]+w*affected[i], x) <= 0
             planned[i] = bool(best) != bool(reversal[i] < self.scenario.epsilon)
+            if self.scenario.response == 'logit':
+                # the size of the payoff difference matters: a larger advantage is followed more reliably.
+                state = replenished[j]/self.world.capacity[j]
+                if affected is not None:
+                    state = (1-self.consequence_weight)*state+self.consequence_weight*affected[i]
+                planned[i] = bool(reversal[i] >= 1/(1+np.exp(-self.policy.gap(state, x)/self.scenario.temperature)))
         requested = self.cooperative_request*np.where(planned, 1, self.scenario.defect_ratio)
         delivered = np.zeros(n_agents)
         water = replenished.copy()
@@ -134,13 +266,31 @@ class Simulator:
             selected = target >= 0
             total_request = np.bincount(target[selected], weights=requested[selected], minlength=len(water))
             fraction = np.minimum(1, np.divide(water, total_request, out=np.ones_like(water), where=total_request > 0))
-            delivered[selected] = requested[selected]*fraction[target[selected]]
+            admitted = requested
+            if self.scenario.floor and self.scenario.regulated == 'ai':
+                # the cap binds ai agents only: their requests at a source are cut back, in proportion, to the stock above the
+                # floor, and the source is then shared as without a cap, so the cap never restricts a human withdrawal.
+                large = selected & self.world.kinds
+                asked = np.bincount(target[large], weights=requested[large], minlength=len(water))
+                usable = np.maximum(0, water-self.scenario.floor*self.world.capacity)
+                cut = np.minimum(1, np.divide(usable, asked, out=np.ones_like(water), where=asked > 0))
+                admitted = requested.copy()
+                admitted[large] *= cut[target[large]]
+                total_request = np.bincount(target[selected], weights=admitted[selected], minlength=len(water))
+                fraction = np.minimum(1, np.divide(water, total_request, out=np.ones_like(water), where=total_request > 0))
+            if self.scenario.floor and self.scenario.regulated == 'all':
+                # a local cap: withdrawals are cut back so that a source is not drawn below the floor share of its capacity.
+                usable = np.maximum(0, water-self.scenario.floor*self.world.capacity)
+                fraction = np.minimum(1, np.divide(usable, total_request, out=np.ones_like(water), where=total_request > 0))
+            delivered[selected] = admitted[selected]*fraction[target[selected]]
             water = np.maximum(0, water-np.bincount(target[selected], weights=delivered[selected], minlength=len(water)))
         else:
             for i in self.withdrawal_order:
                 if target[i] >= 0:
                     j = target[i]
                     delivered[i] = min(requested[i], water[j])
+                    if self.scenario.floor and (self.scenario.regulated == 'all' or self.world.kinds[i]):
+                        delivered[i] = min(requested[i], max(0., water[j]-self.scenario.floor*self.world.capacity[j]))
                     water[j] -= delivered[i]
         residual = float(water.sum()-(before+actual_renewal-delivered.sum()))
         if abs(residual) > 1e-9*max(1, before):
@@ -148,6 +298,7 @@ class Simulator:
         self.strategies, self.water = planned, water
         return dict(requested=requested, delivered=delivered, actual_renewal=float(actual_renewal),
                     balance_residual=residual, targets=target, resource_renewal=resource_renewal,
+                    potential_renewal=potential, renewal_multiplier=factors, source_level=replenished/self.world.capacity,
                     source_withdrawal=np.bincount(target[target >= 0], weights=delivered[target >= 0], minlength=len(water)))
 
 

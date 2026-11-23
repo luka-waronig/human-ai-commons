@@ -1,0 +1,1849 @@
+{
+  "extends": "local_measures.json",
+  "paper": {
+    "protocol": "paper-local-measures-assumptions-2026-11-23",
+    "role": "companion to the local measures: the price, the cap, both together, and siting of all AI agents under the changed assumptions about the model and the agents, one at a time, on the same 64 worlds; written after the results of the other final runs had been read, so its comparisons are not prospective",
+    "experiments": [
+      "interventions"
+    ],
+    "interventions": {
+      "designs": [
+        "price_4",
+        "cap_25",
+        "price_4_cap_25"
+      ],
+      "cells": [
+        "human_first_allocation",
+        "sited_human_first_allocation",
+        "published_renewal_law",
+        "sited_published_renewal_law",
+        "sequential_planning",
+        "sited_sequential_planning",
+        "unconditioned_placement",
+        "sited_unconditioned_placement",
+        "ai_demand_ratio_5",
+        "sited_ai_demand_ratio_5",
+        "ai_demand_ratio_40",
+        "sited_ai_demand_ratio_40",
+        "larger_grid",
+        "sited_larger_grid",
+        "higher_request_2x",
+        "sited_higher_request_2x",
+        "higher_request_3x",
+        "sited_higher_request_3x",
+        "graded_response_050",
+        "sited_graded_response_050",
+        "graded_response_025",
+        "sited_graded_response_025",
+        "graded_response_010",
+        "sited_graded_response_010"
+      ]
+    },
+    "cells": {
+      "human_first_allocation": {
+        "scenario": {
+          "allocation": "human_priority"
+        }
+      },
+      "sited_human_first_allocation": {
+        "scenario": {
+          "allocation": "human_priority"
+        },
+        "siting": "sited"
+      },
+      "published_renewal_law": {
+        "scenario": {
+          "feedback": "manuscript"
+        }
+      },
+      "sited_published_renewal_law": {
+        "scenario": {
+          "feedback": "manuscript"
+        },
+        "siting": "sited"
+      },
+      "sequential_planning": {
+        "scenario": {
+          "schedule": "sequential_planning"
+        }
+      },
+      "sited_sequential_planning": {
+        "scenario": {
+          "schedule": "sequential_planning"
+        },
+        "siting": "sited"
+      },
+      "unconditioned_placement": {
+        "world_spec": {
+          "require_access": false
+        }
+      },
+      "sited_unconditioned_placement": {
+        "world_spec": {
+          "require_access": false
+        },
+        "siting": "sited"
+      },
+      "ai_demand_ratio_5": {
+        "scenario": {
+          "demand_ratio": 5
+        }
+      },
+      "sited_ai_demand_ratio_5": {
+        "scenario": {
+          "demand_ratio": 5
+        },
+        "siting": "sited"
+      },
+      "ai_demand_ratio_40": {
+        "scenario": {
+          "demand_ratio": 40
+        }
+      },
+      "sited_ai_demand_ratio_40": {
+        "scenario": {
+          "demand_ratio": 40
+        },
+        "siting": "sited"
+      },
+      "larger_grid": {
+        "world_spec": {
+          "width": 40,
+          "height": 40,
+          "humans": 200,
+          "ai": 200
+        }
+      },
+      "sited_larger_grid": {
+        "world_spec": {
+          "width": 40,
+          "height": 40,
+          "humans": 200,
+          "ai": 200
+        },
+        "siting": "sited"
+      },
+      "higher_request_2x": {
+        "scenario": {
+          "defect_ratio": 2
+        }
+      },
+      "sited_higher_request_2x": {
+        "scenario": {
+          "defect_ratio": 2
+        },
+        "siting": "sited"
+      },
+      "higher_request_3x": {
+        "scenario": {
+          "defect_ratio": 3
+        }
+      },
+      "sited_higher_request_3x": {
+        "scenario": {
+          "defect_ratio": 3
+        },
+        "siting": "sited"
+      },
+      "graded_response_050": {
+        "scenario": {
+          "response": "logit",
+          "temperature": 0.5
+        }
+      },
+      "sited_graded_response_050": {
+        "scenario": {
+          "response": "logit",
+          "temperature": 0.5
+        },
+        "siting": "sited"
+      },
+      "graded_response_025": {
+        "scenario": {
+          "response": "logit",
+          "temperature": 0.25
+        }
+      },
+      "sited_graded_response_025": {
+        "scenario": {
+          "response": "logit",
+          "temperature": 0.25
+        },
+        "siting": "sited"
+      },
+      "graded_response_010": {
+        "scenario": {
+          "response": "logit",
+          "temperature": 0.1
+        }
+      },
+      "sited_graded_response_010": {
+        "scenario": {
+          "response": "logit",
+          "temperature": 0.1
+        },
+        "siting": "sited"
+      }
+    },
+    "confirmatory": {
+      "contrasts": [
+        {
+          "name": "price_4_human_human_first_allocation",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "human_first_allocation",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_ai_human_first_allocation",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "human_first_allocation",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_human_human_first_allocation",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "human_first_allocation",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_ai_human_first_allocation",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "human_first_allocation",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_human_human_first_allocation",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "human_first_allocation",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_ai_human_first_allocation",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "human_first_allocation",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_human_human_first_allocation",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_human_first_allocation",
+          "reference_cell": "human_first_allocation",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_ai_human_first_allocation",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_human_first_allocation",
+          "reference_cell": "human_first_allocation",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_human_published_renewal_law",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "published_renewal_law",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_ai_published_renewal_law",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "published_renewal_law",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_human_published_renewal_law",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "published_renewal_law",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_ai_published_renewal_law",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "published_renewal_law",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_human_published_renewal_law",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "published_renewal_law",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_ai_published_renewal_law",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "published_renewal_law",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_human_published_renewal_law",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_published_renewal_law",
+          "reference_cell": "published_renewal_law",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_ai_published_renewal_law",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_published_renewal_law",
+          "reference_cell": "published_renewal_law",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_human_sequential_planning",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sequential_planning",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_ai_sequential_planning",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sequential_planning",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_human_sequential_planning",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sequential_planning",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_ai_sequential_planning",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sequential_planning",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_human_sequential_planning",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sequential_planning",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_ai_sequential_planning",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sequential_planning",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_human_sequential_planning",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_sequential_planning",
+          "reference_cell": "sequential_planning",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_ai_sequential_planning",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_sequential_planning",
+          "reference_cell": "sequential_planning",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_human_unconditioned_placement",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "unconditioned_placement",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_ai_unconditioned_placement",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "unconditioned_placement",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_human_unconditioned_placement",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "unconditioned_placement",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_ai_unconditioned_placement",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "unconditioned_placement",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_human_unconditioned_placement",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "unconditioned_placement",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_ai_unconditioned_placement",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "unconditioned_placement",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_human_unconditioned_placement",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_unconditioned_placement",
+          "reference_cell": "unconditioned_placement",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_ai_unconditioned_placement",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_unconditioned_placement",
+          "reference_cell": "unconditioned_placement",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_human_ai_demand_ratio_5",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_5",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_ai_ai_demand_ratio_5",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_5",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_human_ai_demand_ratio_5",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_5",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_ai_ai_demand_ratio_5",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_5",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_human_ai_demand_ratio_5",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_5",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_ai_ai_demand_ratio_5",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_5",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_human_ai_demand_ratio_5",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_ai_demand_ratio_5",
+          "reference_cell": "ai_demand_ratio_5",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_ai_ai_demand_ratio_5",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_ai_demand_ratio_5",
+          "reference_cell": "ai_demand_ratio_5",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_human_ai_demand_ratio_40",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_40",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_ai_ai_demand_ratio_40",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_40",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_human_ai_demand_ratio_40",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_40",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_ai_ai_demand_ratio_40",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_40",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_human_ai_demand_ratio_40",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_40",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_ai_ai_demand_ratio_40",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "ai_demand_ratio_40",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_human_ai_demand_ratio_40",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_ai_demand_ratio_40",
+          "reference_cell": "ai_demand_ratio_40",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_ai_ai_demand_ratio_40",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_ai_demand_ratio_40",
+          "reference_cell": "ai_demand_ratio_40",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_human_larger_grid",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "larger_grid",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_ai_larger_grid",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "larger_grid",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_human_larger_grid",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "larger_grid",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_ai_larger_grid",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "larger_grid",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_human_larger_grid",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "larger_grid",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_ai_larger_grid",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "larger_grid",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_human_larger_grid",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_larger_grid",
+          "reference_cell": "larger_grid",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_ai_larger_grid",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_larger_grid",
+          "reference_cell": "larger_grid",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_human_higher_request_2x",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "higher_request_2x",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_ai_higher_request_2x",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "higher_request_2x",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_human_higher_request_2x",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "higher_request_2x",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_ai_higher_request_2x",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "higher_request_2x",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_human_higher_request_2x",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "higher_request_2x",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_ai_higher_request_2x",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "higher_request_2x",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_human_higher_request_2x",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_higher_request_2x",
+          "reference_cell": "higher_request_2x",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_ai_higher_request_2x",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_higher_request_2x",
+          "reference_cell": "higher_request_2x",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_human_higher_request_3x",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "higher_request_3x",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_ai_higher_request_3x",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "higher_request_3x",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_human_higher_request_3x",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "higher_request_3x",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_ai_higher_request_3x",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "higher_request_3x",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_human_higher_request_3x",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "higher_request_3x",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_ai_higher_request_3x",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "higher_request_3x",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_human_higher_request_3x",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_higher_request_3x",
+          "reference_cell": "higher_request_3x",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_ai_higher_request_3x",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_higher_request_3x",
+          "reference_cell": "higher_request_3x",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_human_graded_response_050",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_050",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_ai_graded_response_050",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_050",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_human_graded_response_050",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_050",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_ai_graded_response_050",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_050",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_human_graded_response_050",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_050",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_ai_graded_response_050",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_050",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_human_graded_response_050",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_graded_response_050",
+          "reference_cell": "graded_response_050",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_ai_graded_response_050",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_graded_response_050",
+          "reference_cell": "graded_response_050",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_human_graded_response_025",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_025",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_ai_graded_response_025",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_025",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_human_graded_response_025",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_025",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_ai_graded_response_025",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_025",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_human_graded_response_025",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_025",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_ai_graded_response_025",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_025",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_human_graded_response_025",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_graded_response_025",
+          "reference_cell": "graded_response_025",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_ai_graded_response_025",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_graded_response_025",
+          "reference_cell": "graded_response_025",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_human_graded_response_010",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_010",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_ai_graded_response_010",
+          "question": "Does a price on scarcity for AI agents raise the demand met under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_010",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_human_graded_response_010",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_010",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "cap_25_ai_graded_response_010",
+          "question": "Does a local cap on AI withdrawals raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_010",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_human_graded_response_010",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_010",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "price_4_cap_25_ai_graded_response_010",
+          "question": "Does the price together with the cap raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "graded_response_010",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "price_4_cap_25",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_human_graded_response_010",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_graded_response_010",
+          "reference_cell": "graded_response_010",
+          "outcome": "human_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        },
+        {
+          "name": "sited_ai_graded_response_010",
+          "question": "Does siting AI agents where the sources can carry them raise the demand met for both groups under this changed assumption?",
+          "experiment": "interventions",
+          "cell": "sited_graded_response_010",
+          "reference_cell": "graded_response_010",
+          "outcome": "ai_activity",
+          "select": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          },
+          "reference": {
+            "condition": "unchanged",
+            "timing": "after_development",
+            "window": "0-1500"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -5,7 +5,7 @@ Two notebooks connect the study's mathematics, implementation and saved results.
 | Notebook | Purpose | Inputs |
 |---|---|---|
 | [Model and mathematics](01_model_and_mathematics.ipynb) | Payoff decisions, renewal and allocation, followed by a small matched spatial example | The JCS package and research configuration; no production data |
-| [Exploring saved worlds](02_exploring_saved_worlds.ipynb) | Tested trade-offs, paired outcome distributions and selected spatial/time histories | A compatible JCS Pareto result bundle |
+| [Exploring saved worlds](02_exploring_saved_worlds.ipynb) | Tested trade-offs, paired outcome distributions and selected spatial/time histories of the earlier staged payoff search | A result bundle of that search |
 
 Complete the [JCS quick start](../../README.md#jcs-quick-start) once. It installs the model and notebook interface into `.venv/` at the repository root. From that same root (`WaterToC/`, the folder containing `jcs/`), open the notebooks with:
 
@@ -17,7 +17,7 @@ JupyterLab opens in your browser. Open either `.ipynb` file, select the Python k
 
 Use this same environment for the notebooks, simulations and saved-data analyses. Later sessions only need the launch command above.
 
-The first notebook runs only small illustrative simulations. They are identified as examples and do not alter the research bundle. The second reads saved files and never simulates. Set `BUNDLE_PATH` to a downloaded result bundle or a compatible bundle generated with the study code. The default is `jcs/results/research_protocol/`. A fresh source checkout does not include those results.
+The first notebook runs only small illustrative simulations. They are identified as examples and do not alter the research bundle. The second reads saved files of the earlier staged payoff search, an exploratory protocol that the paper does not report, and never simulates. Set `BUNDLE_PATH` to a downloaded result bundle or a compatible bundle generated with the study code. The default is `jcs/results/research_protocol/`. A fresh source checkout does not include those results.
 
 The data explorer uses `manifest.json`, `analysis/pareto_candidates.csv`, the original outcome-comparison table when available, and `test_comparisons.json`. Detailed views additionally need the selected `worlds/<id>.npz` and `trajectories/<id>.npz` files. Summary-only bundles can still show candidate outcomes; missing inputs leave the corresponding view inactive. All input paths remain inside the selected bundle. A bounded cache holds at most four selected histories, not the whole archive.
 

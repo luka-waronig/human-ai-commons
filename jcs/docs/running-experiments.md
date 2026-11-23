@@ -26,9 +26,35 @@ The smoke configuration is a tiny software check, not research evidence. To run 
 .venv/bin/python -m pytest jcs/tests -q
 ```
 
-## Experiments
+## Experiments of the paper and search audit
 
-There is one entry point:
+The [experiments of the paper](experiments.md) are the experiments that the journal paper reports: baseline continuity with the conference parameterization, payoff changes applied to developed states, controls of behavior-dependent renewal, a grid of the payoff family with a test of the designs it selects, local measures applied to AI agents (the paper calls them interventions), and runs under changed assumptions. Their configurations extend the research protocol, use their own random-input splits and output folders, and never write to a staged-search bundle.
+
+```sh
+.venv/bin/python jcs/reproduce.py paper all
+```
+
+This runs the six experiments in order and writes the tables of each to `jcs/results/<name>/report/`: `local_measures`, `original_game`, `original_game_long_horizon`, `model_assumptions`, `payoff_grid` and `agent_assumptions`. Together they are about 129 million model steps. The figures are then drawn one script at a time, for example `.venv/bin/python jcs/figures/plot_payoff_settings.py`, and saved to `jcs/results/figures/`; the scripts in `jcs/analysis/` print the numbers behind the paper's tables. The two companion experiments, siting in further settings and the local measures under changed assumptions, are run with the single-configuration commands below, using `jcs/configs/siting_across_settings.json` and `jcs/configs/local_measures_assumptions.json`. Names given after `all` restrict it to those experiments. It uses all but two cores, up to 16, unless `--workers` is given, and repeating it continues from the saved jobs.
+
+Single configurations, including the exploratory pilots and diagnostics, use the explicit commands:
+
+```sh
+.venv/bin/python jcs/reproduce.py paper plan --config jcs/configs/pilot.json
+.venv/bin/python jcs/reproduce.py paper run --config jcs/configs/pilot.json --output jcs/results/pilot --max-model-steps 2316000 --workers 1
+.venv/bin/python jcs/reproduce.py paper report --output jcs/results/pilot
+```
+
+`plan` prints the number of model steps without simulating. `run` refuses to start above the stated limit, saves each completed world, reuses saved worlds when repeated, and refuses a changed configuration or source. `report` writes tables to `report/` inside the run folder and never simulates.
+
+```sh
+.venv/bin/python jcs/reproduce.py audit-search jcs/results/research_protocol --output jcs/results/search_audit
+```
+
+`audit-search` reads a completed staged-search bundle and its saved original-game histories. It reports the range of each search score over all evaluated payoff designs, the scores of the forced-action rules, source states by expected local load, and how many sources per world are overloaded by geometry alone. It never simulates and does not modify the bundle.
+
+## Earlier staged payoff search
+
+The staged payoff search is an exploratory protocol that preceded the experiments of the paper and is not reported in the paper; its [protocol](research-plan.md) describes it. It has one entry point:
 
 ```sh
 .venv/bin/python jcs/reproduce.py
@@ -94,4 +120,4 @@ The plots cover primary and other tested trade-offs, original paired outcome int
 
 Verification and rescoring never simulate. Replay intentionally reruns one archived realization; the entry point selects the verified source snapshot when needed; use the recorded numerical environment. Bundle checksums cover immutable inputs and results. Regenerated outcome analyses have their own input manifest. Exporting a verified result bundle and its exact source remains available through `reproduce.py export`; the export contains the study source, the verified result bundle and a SHA256 inventory.
 
-See the [research protocol](research-plan.md), [implementation](implementation.md) and [model continuity](model-continuity.md) for scientific definitions. A persistent-low-stock event is not a validated definition of the ICCS spatial trap. Frontier membership describes tested sample means, not statistical dominance or global optimality. An empty supported frontier does not prove infeasibility.
+See the [experiments of the paper](experiments.md), [implementation](implementation.md) and [model continuity](model-continuity.md) for scientific definitions, and the [staged search protocol](research-plan.md) for the earlier search. A persistent-low-stock event is not a validated definition of the ICCS spatial trap. Frontier membership describes tested sample means, not statistical dominance or global optimality. An empty supported frontier does not prove infeasibility.

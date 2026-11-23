@@ -52,6 +52,7 @@ def simulation_worker(task):
 def parallel_aggregate(ctx, pressure, policy, split, count, *, variant=None, record=False):
     """Independent simulations in bounded batches; all bundle writes stay in the parent."""
     from dataclasses import asdict, replace
+    from .dynamics import scenario_record
     import numpy as np
     from human_ai_commons import experiments as ex
     from human_ai_commons.provenance import append_json, identifier, seed
@@ -67,7 +68,7 @@ def parallel_aggregate(ctx, pressure, policy, split, count, *, variant=None, rec
             burn = variant.get('burn', ctx.config['objective']['excluded_initial_steps'])
             metric, welfare, stress = ex.metric_spec(ctx.config), ex.welfare_spec(ctx.config), ex.stress_spec(ctx.config)
             driver_seed = seed(ctx.config['validation']['base_seed'], split, index, 'trajectory')
-            inputs = dict(world_id=world.id, scenario=asdict(physical), policy=asdict(candidate),
+            inputs = dict(world_id=world.id, scenario=scenario_record(physical), policy=asdict(candidate),
                 driver_seed=driver_seed, steps=steps, burn=burn, metric=asdict(metric),
                 welfare_spec=asdict(welfare) if welfare else None, stress_spec=asdict(stress) if stress else None)
             evaluation_id = identifier(inputs)[:32]

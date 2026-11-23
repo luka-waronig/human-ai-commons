@@ -1,4 +1,6 @@
-# Welfare and spatial traps in the coevolutionary commons
+# Staged payoff search: an earlier exploratory protocol
+
+This protocol preceded the [experiments of the paper](experiments.md) and is not reported in the paper. Its constrained Pareto search over payoff structures was replaced by those experiments. Two payoff designs it selected appear among the decision rules of the persistence experiment. It is kept so that its saved results can be reproduced and checked.
 
 ## Motivation
 
@@ -137,7 +139,7 @@ Payoff search starts with fixed payoff grids. In the two-dimensional families, t
 
 The resource restriction is first screened using the observed stress-event fraction. Up to 12 diverse candidates per family and problem are assessed on 16 independent validation realizations. Up to six validation designs per family are frozen before any test data are observed. Selection preserves objective extremes and fills gaps by distance in the three normalized outcomes; the geometric-mean score has no role. Equal-relative and redistribution candidates are also assessed as members of the full local family.
 
-When no candidate meets the empirical restriction, the output retains explicitly labelled diagnostic designs with the least observed violation. They cannot enter an admissible frontier unless the independent test assessment supports them. Search failure never proves infeasibility.
+When no candidate meets the empirical restriction, the output retains explicitly labeled diagnostic designs with the least observed violation. They cannot enter an admissible frontier unless the independent test assessment supports them. Search failure never proves infeasibility.
 
 The frozen designs and original game are tested on 320 paired independent realizations. Exact one-sided binomial bounds, corrected across distinct tested policy/pressure pairs, assess the persistent-stress probability. The larger test sample supports assessment of a collection of designs rather than one winner. A small empirical failure fraction is distinguished from statistical support for the required probability.
 
@@ -149,9 +151,9 @@ The overall 5% error allowance is divided equally among main outcome comparisons
 
 Robustness uses 256 realizations per variant and up to three representatives per family: the ends of the three validation outcomes, with gap filling when objective extremes coincide. These representatives are frozen during validation, before test or robustness data are observed. They characterize transfer of selected designs, not an entire reoptimized frontier. Outcome changes are assessed jointly across all robustness variants, and resource bounds are corrected across all variant/design pairs.
 
-The numerical configuration declares a resource-assessment planning probability of 0.02 against the acceptance limit of 0.1. Before any simulation, the runner calculates the exact probability of establishing compliance under this planning assumption, using the largest possible comparison count. Both main and robustness samples must achieve at least 90% power per comparison. This is not a guarantee that any actual design has a 2% event rate or that all designs will pass together. Designs near the 10% limit are harder to establish as compliant. `plan` reports the assumed probability, supported failure count, and calculated power; production configurations that fail the planning requirement are rejected. The small software-check configuration is exempt and is labelled accordingly.
+The numerical configuration declares a resource-assessment planning probability of 0.02 against the acceptance limit of 0.1. Before any simulation, the runner calculates the exact probability of establishing compliance under this planning assumption, using the largest possible comparison count. Both main and robustness samples must achieve at least 90% power per comparison. This is not a guarantee that any actual design has a 2% event rate or that all designs will pass together. Designs near the 10% limit are harder to establish as compliant. `plan` reports the assumed probability, supported failure count, and calculated power; production configurations that fail the planning requirement are rejected. The small software-check configuration is exempt and is labeled accordingly.
 
-The figure projects the three objectives onto human and AI support, with local depletion shown by colour. Designs without established resource protection remain visible with distinct markers. An empty supported frontier is reported explicitly; it is not replaced by a purported winner.
+The figure projects the three objectives onto human and AI support, with local depletion shown by color. Designs without established resource protection remain visible with distinct markers. An empty supported frontier is reported explicitly; it is not replaced by a purported winner.
 
 ## Experimental sequence
 

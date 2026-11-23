@@ -5,7 +5,7 @@ This is the public parent repository of a series of interdisciplinary research c
 | Study | Code and experiments | Documentation |
 | --- | --- | --- |
 | ICCS 2026 conference paper | [iccs2026/](iccs2026/) | [Model and analysis](iccs2026/docs/model-and-analysis.md), [setup and usage](iccs2026/docs/usage.md) |
-| Journal of Computational Science extension | [jcs/](jcs/) | [Research protocol](jcs/docs/research-plan.md), [Running the experiments](jcs/docs/running-experiments.md), [Interactive notebooks](jcs/notebooks/README.md) |
+| Journal of Computational Science extension | [jcs/](jcs/) | [Experiments of the paper](jcs/docs/experiments.md), [Running the experiments](jcs/docs/running-experiments.md), [Interactive notebooks](jcs/notebooks/README.md) |
 
 
 Each independent study has its own dependencies and tests. While they deliberately share the parent repository, the JCS journal study runs independently of the ICCS conference study.
@@ -41,13 +41,15 @@ Open the interactive notebooks:
 
 In JupyterLab, open either notebook, select **Python 3**, then choose **Run → Run All Cells**. The model notebook works without research data. The saved-results notebook needs a result bundle; see the [notebook guide](jcs/notebooks/README.md).
 
-To run the full journal experiment, which is a substantial simulation workload:
+The experiments of the journal paper run with one command, which is a substantial simulation workload:
 
 ```sh
-.venv/bin/python jcs/reproduce.py
+.venv/bin/python jcs/reproduce.py paper all
 ```
 
-The script writes data, tables, and figures to `jcs/results/research_protocol/`. Add `all` to run the main experiment followed by the human-priority, AI-priority, and delivery-protection experiments. See the [experiment instructions](jcs/docs/running-experiments.md) for individual stages, saved-data analysis and verification. Keep using the same `.venv/` in later terminal sessions; the setup does not need repeating.
+It runs six experiments and writes the tables of each to `jcs/results/<name>/report/`; two companion experiments run from their own configuration files. The [experiment descriptions](jcs/docs/experiments.md) specify them and the [experiment instructions](jcs/docs/running-experiments.md#experiments-of-the-paper-and-search-audit) describe their output. Results are not part of the repository. Keep using the same `.venv/` in later terminal sessions; the setup does not need repeating.
+
+The `jcs/` folder also keeps an earlier staged payoff search, an exploratory protocol that preceded the experiments of the paper and is not reported in it. Its [protocol](jcs/docs/research-plan.md) and [instructions](jcs/docs/running-experiments.md#earlier-staged-payoff-search) describe it, and `.venv/bin/python jcs/reproduce.py` runs it.
 
 See the [research overview](docs/overview.md) for the publications and model relationships. Citation metadata is in [CITATION.cff](CITATION.cff).
 

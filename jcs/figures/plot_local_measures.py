@@ -24,6 +24,7 @@ measures = {'scarcity pricing': (BLUE, 'o', lambda s: effects.loc[(s, 'price_4')
 # the settings in which a measure leaves its cloud, named beside the point: text, horizontal offset, vertical offset, alignment.
 exceptions = {('extraction cap', 'large_share_50'): ('AI 50% of demand', .7, 0, 'left'),
               ('extraction cap', 'large_share_20'): ('AI 20% of demand', .7, 0, 'left'),
+              ('extraction cap', 't3_conf'): ('fixed requests', .4, 1.7, 'right'),
               ('capacity-based siting', 't3_conf'): ('fixed requests', -.7, 1.3, 'right'),
               ('scarcity pricing', 't3_conf'): ('fixed requests', -.7, 0, 'right')}
 
@@ -50,5 +51,7 @@ open_ = tuple(Line2D([], [], marker=marker, color=color, markerfacecolor='white'
 handles = [Line2D([], [], marker=marker, color=color, markersize=8, linestyle='none') for color, marker, _ in measures.values()]+[filled, open_]
 labels = list(measures)+['reference setting', 'other six settings']
 legend = ax.legend(handles, labels, handler_map={tuple: HandlerTuple(ndivide=None, pad=.3)}, handlelength=3.4,
-                   loc='upper right', bbox_to_anchor=(.99, .91), frameon=False, fontsize=10)
+                   loc='upper right', bbox_to_anchor=(.99, .91), frameon=True, fancybox=False, edgecolor='0.3',
+                   framealpha=1, fontsize=10)
+legend.get_frame().set_linewidth(.8)
 save(fig, 'local_measures')

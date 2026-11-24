@@ -2,7 +2,7 @@
   "extends": "local_measures.json",
   "paper": {
     "protocol": "paper-local-measures-assumptions-2026-11-23",
-    "role": "companion to the local measures: the price, the cap, both together, and siting of all AI agents under the changed assumptions about the model and the agents, one at a time, on the same 64 worlds; written after the results of the other final runs had been read, so its comparisons are not prospective",
+    "role": "companion to the local measures: the price, the cap, both together, and siting of all AI agents under the changed assumptions about the model and the agents, one at a time, on the same 64 worlds; designed after the main experiments and treated as exploratory",
     "experiments": [
       "interventions"
     ],

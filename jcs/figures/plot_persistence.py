@@ -24,7 +24,7 @@ for ax, (start, title) in zip(axes, [('full', 'every source starts full'), ('equ
         ax.plot(np.arange(1, len(values)+1), values, color=color, linewidth=1.5, label=f'{capacity}')
     ax.axvline(100, color='0.4', linewidth=.8, linestyle=':')
     ax.text(104, 22, '100 steps', color='0.3', fontsize=9, va='bottom')
-    ax.set(title=title, xlabel='step', xlim=(0, steps), ylim=(20, 90))
+    ax.set(title=title, xlabel='step', xlim=(0, steps), ylim=(0, 100))
 axes[0].set_ylabel('cooperation (% of agents that restrain)')
 axes[1].legend(frameon=False, loc='lower right', title='source capacity (units)')
 save(fig, 'persistence')

@@ -27,6 +27,6 @@ for name in CLASSES:
 ax.legend(frameon=False, loc='upper right', title='source')
 ax.axhline(10, color='0.4', linewidth=.8, linestyle=':')
 ax.text(0, 11.5, 'nearly empty below this line', color='0.3', fontsize=9, ha='left')
-ax.set(xlabel='expected load of the source (requests relative to baseline renewal)', ylabel='stock in steps 1500 to 2000 (% of capacity)',
+ax.set(xlabel='expected load of the source (requests relative to baseline renewal)', ylabel='stock in steps 1,500 to 2,000 (% of capacity)',
        xlim=(-.05, 3.05), ylim=(-3, 103), xticks=[0, .5, 1, 1.5, 2, 2.5, 3], xticklabels=['0', '0.5', '1', '1.5', '2', '2.5', '3 or more'])
 save(fig, 'stock_by_load')

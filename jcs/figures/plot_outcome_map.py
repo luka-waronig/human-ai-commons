@@ -1,7 +1,7 @@
 """The outcomes drawn as a map: where each measure takes both groups from the original game.
 
 Reads the tables of the local measures and of the payoff grid. East is a larger share of demand met for
-human agents and north a larger share for AI agents, in percentage points, at one scale in both
+human agents and north a larger share for AI agents, in % of demand, at one scale in both
 directions. The flag is the original game; the small cluster on it is every combination of the payoff
 parameters. Each route ends at the measured position of one measure in the reference setting: the two
 black routes and the red one are the three measures, a black route continues the cap to the cap combined
@@ -82,5 +82,5 @@ with plt.rc_context({'font.family': ['Monaco', 'DejaVu Sans Mono'], 'font.size':
     ax.plot([10, 20], [bar, bar], color=INK, linewidth=1.8)
     for x in [10, 20]:
         ax.plot([x, x], [bar-.4, bar+.4], color=INK, linewidth=1.8)
-    ax.text(15, bar-.7, '10 pp', ha='center', va='top', **ink)
+    ax.text(15, bar-.7, '10% of demand', ha='center', va='top', **ink)
     save(fig, 'outcome_map')

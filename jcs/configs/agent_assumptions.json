@@ -2,7 +2,7 @@
   "extends": "original_game.json",
   "paper": {
     "protocol": "paper-agent-assumptions-2026-11-21",
-    "role": "confirmatory companion: key designs under assumptions that could produce the main findings by construction (source choice, size of the higher request, graded action response, planning order with participation-dependent designs, and a payoff that reads the sources an agent can reach), on the confirmatory split; written after the other final runs had been read, and repeated after a first complete run on other worlds showed a tie-breaking flaw (see docs/experiments.md)",
+    "role": "exploratory companion: key designs under assumptions that could produce the main findings by construction (source choice, size of the higher request, graded action response, planning order with participation-dependent designs, and a payoff that reads the sources an agent can reach), on the confirmatory split; designed after the main experiments, and repeated after a first complete run on other worlds showed a tie-breaking flaw (see docs/experiments.md)",
     "experiments": [
       "interventions",
       "feedback"

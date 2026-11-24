@@ -2,7 +2,7 @@
   "extends": "local_measures.json",
   "paper": {
     "protocol": "paper-siting-across-settings-2026-11-23",
-    "role": "companion to the local measures: siting of all AI agents in the five settings in which the local measures run tested the price and the cap without siting (source density 0.2 and 0.5, AI share of demand 50% and 20%, fixed requests), on the same 64 worlds; added after the results of the local measures had been read, so its comparisons are not prospective",
+    "role": "companion to the local measures: siting of all AI agents in the five settings in which the local measures run tested the price and the cap without siting (source density 0.2 and 0.5, AI share of demand 50% and 20%, fixed requests), on the same 64 worlds; designed after the main experiments and treated as exploratory",
     "experiments": [
       "interventions"
     ],

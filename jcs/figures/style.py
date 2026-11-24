@@ -36,5 +36,5 @@ def both_groups(ax, x, y):
                ('both lose', 'left', 'bottom'), ('AI gains, humans lose', 'left', 'top')]
     for text, h, v in corners:
         ax.text(.985 if h == 'right' else .015, .985 if v == 'top' else .015, text, transform=ax.transAxes, ha=h, va=v, fontsize=9, color='0.3')
-    ax.set(xlim=limits[0], ylim=limits[1], xlabel='change in share of demand met for humans\n(percentage points)',
-           ylabel='change in share of demand met for AI\n(percentage points)')
+    ax.set(xlim=limits[0], ylim=limits[1], xlabel='change in share of demand met for humans\n(% of demand)',
+           ylabel='change in share of demand met for AI\n(% of demand)')

@@ -39,7 +39,7 @@ Open the interactive notebooks:
 .venv/bin/jupyter lab jcs/notebooks/
 ```
 
-In JupyterLab, open either notebook, select **Python 3**, then choose **Run → Run All Cells**. The model notebook works without research data. The saved-results notebook needs a result bundle; see the [notebook guide](jcs/notebooks/README.md).
+In JupyterLab, open any notebook, select **Python 3**, then choose **Run → Run All Cells**. The model notebook and the interventions notebook work without research data. The saved-results notebook needs a result bundle; see the [notebook guide](jcs/notebooks/README.md).
 
 The experiments of the journal paper run with one command, which is a substantial simulation workload:
 

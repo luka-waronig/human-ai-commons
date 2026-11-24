@@ -1,11 +1,12 @@
 # Exploring the JCS model
 
-Two notebooks connect the study's mathematics, implementation and saved results.
+Three notebooks connect the study's mathematics, implementation and results.
 
 | Notebook | Purpose | Inputs |
 |---|---|---|
 | [Model and mathematics](01_model_and_mathematics.ipynb) | Payoff decisions, renewal and allocation, followed by a small matched spatial example | The JCS package and research configuration; no production data |
 | [Exploring saved worlds](02_exploring_saved_worlds.ipynb) | Tested trade-offs, paired outcome distributions and selected spatial/time histories of the earlier staged payoff search | A result bundle of that search |
+| [Load and local interventions](03_load_and_interventions.ipynb) | The load on each source, and scarcity pricing, the extraction cap and capacity-based siting on world 0 of the paper's interventions experiment | The JCS package and the paper's configuration; the experiment's tables are read when they exist |
 
 Complete the [JCS quick start](../../README.md#jcs-quick-start) once. It installs the model and notebook interface into `.venv/` at the repository root. From that same root (`WaterToC/`, the folder containing `jcs/`), open the notebooks with:
 
@@ -13,11 +14,11 @@ Complete the [JCS quick start](../../README.md#jcs-quick-start) once. It install
 .venv/bin/jupyter lab jcs/notebooks/
 ```
 
-JupyterLab opens in your browser. Open either `.ipynb` file, select the Python kernel belonging to this environment, then choose **Run → Run All Cells**. To work through the notebook one cell at a time, use **Shift+Enter**. Sliders and selectors update plots after release, rather than executing expensive calculations continuously. Restarting the kernel and running all cells restores the initial examples. Stop the local Jupyter server with **Ctrl+C** in the terminal when finished.
+JupyterLab opens in your browser. Open any `.ipynb` file, select the Python kernel belonging to this environment, then choose **Run → Run All Cells**. To work through the notebook one cell at a time, use **Shift+Enter**. Sliders and selectors update plots after release, rather than executing expensive calculations continuously. Restarting the kernel and running all cells restores the initial examples. Stop the local Jupyter server with **Ctrl+C** in the terminal when finished.
 
 Use this same environment for the notebooks, simulations and saved-data analyses. Later sessions only need the launch command above.
 
-The first notebook runs only small illustrative simulations. They are identified as examples and do not alter the research bundle. The second reads saved files of the earlier staged payoff search, an exploratory protocol that the paper does not report, and never simulates. Set `BUNDLE_PATH` to a downloaded result bundle or a compatible bundle generated with the study code. The default is `jcs/results/research_protocol/`. A fresh source checkout does not include those results.
+The third notebook reruns world 0 of the paper's interventions experiment, a few seconds per simulation, and its numbers agree with those the experiment saves. The first notebook runs only small illustrative simulations. They are identified as examples and do not alter the research bundle. The second reads saved files of the earlier staged payoff search, an exploratory protocol that the paper does not report, and never simulates. Set `BUNDLE_PATH` to a downloaded result bundle or a compatible bundle generated with the study code. The default is `jcs/results/research_protocol/`. A fresh source checkout does not include those results.
 
 The data explorer uses `manifest.json`, `analysis/pareto_candidates.csv`, the original outcome-comparison table when available, and `test_comparisons.json`. Detailed views additionally need the selected `worlds/<id>.npz` and `trajectories/<id>.npz` files. Summary-only bundles can still show candidate outcomes; missing inputs leave the corresponding view inactive. All input paths remain inside the selected bundle. A bounded cache holds at most four selected histories, not the whole archive.
 

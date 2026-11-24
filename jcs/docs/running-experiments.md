@@ -12,7 +12,7 @@ Follow the repository's [JCS quick start](../../README.md#jcs-quick-start). It i
 .venv/bin/jupyter lab jcs/notebooks/
 ```
 
-JupyterLab opens in your browser. Open either notebook, select **Python 3** and choose **Run → Run All Cells**, or use **Shift+Enter** to run one cell at a time. The [notebook guide](../notebooks/README.md) explains both notebooks and their data requirements.
+JupyterLab opens in your browser. Open any notebook, select **Python 3** and choose **Run → Run All Cells**, or use **Shift+Enter** to run one cell at a time. The [notebook guide](../notebooks/README.md) explains each notebook and its data requirements.
 
 ## Installation check
 
@@ -44,7 +44,7 @@ Single configurations, including the exploratory pilots and diagnostics, use the
 .venv/bin/python jcs/reproduce.py paper report --output jcs/results/pilot
 ```
 
-`plan` prints the number of model steps without simulating. `run` refuses to start above the stated limit, saves each completed world, reuses saved worlds when repeated, and refuses a changed configuration or source. `report` writes tables to `report/` inside the run folder and never simulates.
+The payoff grid runs in two parts, the search and then the test of the designs it selects; on its own it is run with `--experiment search` followed by `--experiment search_test`, or with `paper all payoff_grid`. `plan` prints the number of model steps without simulating. `run` refuses to start above the stated limit, saves each completed world, reuses saved worlds when repeated, and refuses a changed configuration or source. `report` writes tables to `report/` inside the run folder and never simulates.
 
 ```sh
 .venv/bin/python jcs/reproduce.py audit-search jcs/results/research_protocol --output jcs/results/search_audit

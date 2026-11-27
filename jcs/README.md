@@ -1,4 +1,4 @@
-# Strategic Incentives and Joint Welfare in Human-AI Commons: Journal of Computational Science - Special Issue
+# Strategic Incentives, Localized Interventions, and Joint Welfare in Human-AI Commons: Journal of Computational Science - Special Issue
 
 This JCS Special Issue study investigates patterns in the coevolution of behavioral and environmental parameters in a spatial and resource-bound Human-AI commons. 
 This directory contains all code and documentation for reproducing the experiments of the paper: whether the depleted locations of the conference study persist and what determines them, what changes to the payoffs do to the share of demand met for human and AI agents, and what three local interventions applied to AI agents change.
